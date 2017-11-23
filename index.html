@@ -1,0 +1,33 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">
+	<title>Pastèque - back office</title>
+	<link rel="stylesheet" type="text/css" href="res/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="res/css/bootstrap/css/bootstrap-datepicker.min.css">
+	<link rel="stylesheet" type="text/css" href="res/css/style.css">
+	<link rel="stylesheet" type="text/css" href="res/css/catalog.css">
+	<link rel="stylesheet" type="text/css" href="res/css/restaurant.css">
+	<script type="text/javascript" src="libs/mustache-2.3.0.min.js"></script>
+	<script type="text/javascript" src="libs/serverloader.js"></script>
+	<script type="text/javascript" src="src/gui.js"></script>
+	<script type="text/javascript" src="src/main.js"></script>
+	<script type="text/javascript" src="src/screens/home.js"></script>
+	<script type="text/javascript" src="src/views/login.js"></script>
+	<script type="text/javascript" src="src/views/menu.js"></script>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function() { start(); });
+	</script>
+</head>
+<body>
+<div id="loading">
+	<p>Loading</p>
+</div>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+	<div id="menu" class="container-fluid">
+	</div>
+</nav>
+<div id="content">
+</div>
+</body>
+</html>
