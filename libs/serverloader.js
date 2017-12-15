@@ -184,7 +184,7 @@ var Pasteque = (function(mod, status) {
                                 } catch (e) {
                                     // not json
                                 }
-                                scsuccess(data);
+                                scsuccess(data, req.getResponseHeader('Token'));
                             } else {
                                 scerror(req, status, response);
                             }

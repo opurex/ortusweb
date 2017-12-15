@@ -1,31 +1,66 @@
 function home_show() {
 	var elements = {
-		"server": "",
-		"user": ""
+		"server": login_getServer(),
+		"user": login_getUser(),
+		"hasData": storage_hasData()
 	};
+	if (storage_hasData()) {
+		let syncDate = storage_getSyncDate();
+		elements["sync_date"] = syncDate.getDate() + "/" + syncDate.getMonth() + "/" + syncDate.getFullYear();
+		elements["sync_time"] = syncDate.getHours() + "h" + syncDate.getMinutes();
+	}
 	if (appData.srv != null) {
 		elements.server = appData.srv.host;
 		elements.user = appData.srv.user;
 	}
-	var html = Mustache.render(view_login, elements);
+	var html = Mustache.render(view_home, elements);
 	document.getElementById('content').innerHTML = html;
 }
 
-function home_sendLogin() {
-	// Register login data
-	var server = document.getElementById('user_server').value;
-	var user = document.getElementById('user_login').value;
-	var password = document.getElementById('user_pass').value;
-	appData.srv = Pasteque.Connection(server, user, password);
-	// Check connection and version
-	Pasteque.srv_read(appData.srv, Pasteque.Request('api/version'), home_versionSuccess, home_error);
+function home_sendSync() {
 	gui_showLoading();
+	Pasteque.srv_read(appData.srv, Pasteque.Request('api/sync'), home_syncSuccess, home_syncError);
 }
 
-function home_versionSuccess(data) {
-	console.info(data);
+function home_syncSuccess(data) {
+	home_resetProgress(data);
+	storage_sync(appData.db, data, home_syncProgress, home_syncError, home_syncComplete);
 }
 
-function home_error(req, status, message) {
-	console.error(req + status + ': ' + message);
+/** Contains for each SYNC_MODELS: {"count": number of models, "done": index loaded}.
+ * "done" contains a dictionary with true/false when an index was loaded.
+ * This is for preventing concurrential access on a single integer. */
+var _home_progress = {};
+
+/** Initialize home_progress. */
+function home_resetProgress(data) {
+	for (let i = 0; i < SYNC_MODELS.length; i++) {
+		let model = SYNC_MODELS[i];
+		_home_progress[model] = {"count": data[model].length + 1, "done": []};
+	}
 }
+
+function home_syncProgress(model, i, event) {
+	_home_progress[model]["done"][i] = true;
+	home_checkProgress();
+}
+
+function home_syncError(model, i, event) {
+	_home_progress[model]["done"][i] = false;
+	console.error(model, i, event);
+}
+
+function home_syncComplete() {
+	gui_hideLoading();
+	home_show();
+}
+
+function home_checkProgress() {
+	for (let i = 0; i < SYNC_MODELS.length; i++) {
+		let model = SYNC_MODELS[i];
+		if (_home_progress[model]["count"] + 1 != _home_progress[model]["done"].length) {
+			return false;
+		}
+	}
+}
+
