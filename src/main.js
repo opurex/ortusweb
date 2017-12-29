@@ -1,5 +1,4 @@
 var appData = {
-	srv: null,
 	db: null
 };
 
@@ -7,7 +6,7 @@ function route(screen) {
 	if (arguments.length == 0) {
 		screen = "default";
 	}
-	if (appData.srv == null) {
+	if (login_getToken() == null) {
 		gui_showScreen("login");
 		return;
 	}

@@ -4,11 +4,10 @@ var login_set = function(https, server, user, token) {
 	localStorage.setItem("server", server);
 	if (https) { localStorage.setItem("https", "1"); }
 	else { localStorage.setItem("https", "0"); }
-	localStorage.setItem("token", token); // TODO use cookie
 }
 
 var login_logout = function() {
-	sessionStorage.removeItem("token");
+	localStorage.removeItem("token");
 }
 
 var login_getUser = function() {
@@ -30,6 +29,9 @@ var login_getHostUrl = function() {
 		if (https) { server = "https://" + server; }
 		else { server = "http://" + server; }
 	}
+	if (!server.endsWith("/")) {
+		server += "/";
+	}
 	return server;
 }
 
@@ -38,7 +40,11 @@ var login_getToken = function() {
 }
 
 var login_updateToken = function(token) {
-	sessionStorage.setItem("token", token);
+	localStorage.setItem("token", token);
+}
+
+var login_revokeToken = function() {
+	localStorage.removeItem("token");
 }
 
 /** Check if a JWT token is available
@@ -57,25 +63,27 @@ var login_sendLogin = function() {
 	}
 	var user = document.getElementById('user_login').value;
 	var password = document.getElementById('user_pass').value;
-	appData.srv = Pasteque.Connection(server, user, password);
+	appData.srvUrl = server;
+	appData.srvUser = user;
 	// Check connection and version
-	Pasteque.srv_read(appData.srv, Pasteque.Request('api/version'), login_versionSuccess, login_error);
+	srvcall_write("api/login", {"user": user, "password": password}, login_loginCallback);
 	gui_showLoading();
 }
 
-function login_versionSuccess(data, token) {
-	// Register data
-	var server = document.getElementById('user_server').value;
-	var https = document.getElementById("user_https").checked;
-	login_set(https, server, document.getElementById("user_login").value, token);
-	// Check compatibility
-	// TODO
-	// restart
-	start();
-}
-
-function login_error(req, status, message) {
-	console.error(req + status + ': ' + message);
+function login_loginCallback(request, status, response) {
+	if (status == 200) {
+		// Register data
+		var server = document.getElementById('user_server').value;
+		var https = document.getElementById("user_https").checked;
+		var user = document.getElementById('user_login').value;
+		login_set(https, server, user);
+		// Check compatibility
+		// TODO
+		// restart
+		start();
+	} else {
+		console.error(response);
+	}
 }
 
 var login_show = function() {

@@ -22,9 +22,10 @@ var view_category = `
 <div class="row spacing-row">
 	<h1>Édition d'une categorie</h1>
 </div>
+<div id="message-box"></div>
 <div class="row spacing-row">
-	<form class="form-horizontal" onsubmit="javascript:category_saveCategory();">
-		<input type="hidden" name="id" value="{{id}}"/>
+	<form id="edit-category-form" class="form-horizontal" onsubmit="javascript:category_saveCategory(); return false;">
+		{{#category}}<input type="hidden" name="id" value="{{id}}"/>{{/category}}
 		<div class="form-group row">
 			<label for="edit-label" class="col-sm-2 control-label">Désignation</label>
 			<div class="col-sm-10">
@@ -38,9 +39,9 @@ var view_category = `
 			</div>
 		</div>
 		<div class="form-group row">
-			<label for="edit-parentId" class="col-sm-2 control-label">Parent</label>
+			<label for="edit-parent" class="col-sm-2 control-label">Parent</label>
 			<div class="col-sm-10">
-				<select class="form-control" id="edit-parentId" name="parentId">
+				<select class="form-control" id="edit-parent" name="parent">
 					<option value="" {{#category}}{{#parent}}selected="true"{{/parent}}{{/category}}></option>
 					{{#categories}}
 					<option value="{{id}}" {{#selected}}selected="true"{{/selected}}>{{label}}</option>
@@ -54,6 +55,8 @@ var view_category = `
 				<input class="form-control" id="edit-dispOrder" type="numeric" name="dispOrder" {{#category}}value="{{dispOrder}}"{{/category}}>
 			</div>
 		</div>
+		<input type="hidden" name="hasImage" value="{{#category}}{{#hasImage}}1{{/hasImage}}{{^hasImage}}0{{/hasImage}}{{/category}}" />
+		<!-- TODO: restore image
 		<div class="row spacing-row">
 			<div class="form-group row">
 				<label for="image" class="col-sm-2 control-label">Image</label>
@@ -68,7 +71,7 @@ var view_category = `
 			<img id="img" class="image-preview" src="{{#imgUrl}}{{id}}{{/imgUrl}}"></div>
 			<div class="btn-group" role="group"><a class="btn btn-delete" onclick="javascript:clearImage();">Supprimer</a><a class="btn btn-add" onclick="javascript:restoreImage();">Restaurer</a>
 		</div>
-		{{/hasImage}}{{/category}}
+		{{/hasImage}}{{/category}}-->
 		<div class="form-group">
 			<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 		</div>

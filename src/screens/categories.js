@@ -60,8 +60,8 @@ function categories_showCategory(id) {
 function _categories_showCategory(category, categories) {
 	gui_hideLoading();
 	if (category != null && category["parent"] != null) {
-		for (let i = 0; i < categories.length(); i++) {
-			if (category["parent"] == categories[i][id]) {
+		for (let i = 0; i < categories.length; i++) {
+			if (category["parent"] == categories[i]["id"]) {
 				categories[i]["selected"] = true;
 			}
 		}
@@ -79,7 +79,27 @@ function _categories_showCategory(category, categories) {
 	document.getElementById('content').innerHTML = html;		
 }
 
-function category_send(form) {
-	let cat = Category.fromForm(form);
-	app.srv.srv_write("api/category/write", cat);
+function category_saveCategory() {
+	let cat = Category_fromForm("edit-category-form");
+	gui_showLoading();
+	srvcall_write("api/category", {"category": cat}, category_saveCallback);
 }
+
+function category_saveCallback(request, status, response) {
+	if (status == 200) {
+		let cat = Category_fromForm("edit-category-form");
+		gui_hideLoading();
+		// Update in local database
+		let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
+		let req = catStore.put(cat);
+		req.onsuccess = function(event) {
+			gui_showMessage("Les modifications ont été enregistrées");
+		}
+		req.onerror = function(event) {
+			gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
+		}
+	} else {
+		gui_showError("Erreur " + status + " : " + response);
+	}
+}
+

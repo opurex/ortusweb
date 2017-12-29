@@ -39,6 +39,19 @@ function gui_hideMenu() {
 	document.getElementById("menu").innerHTML = "";
 }
 
+function gui_showMessage(message) {
+	var box = document.getElementById("message-box");
+	box.classList.add("message");
+	box.classList.remove("error");
+	box.innerHTML = message;
+}
+function gui_showError(message) {
+	var box = document.getElementById("message-box");
+	box.classList.remove("message");
+	box.classList.add("error");
+	box.innerHTML = message;
+}
+
 var _gui_currentScreen = null;
 
 function gui_showScreen(screen, args) {

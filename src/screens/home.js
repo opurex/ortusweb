@@ -19,12 +19,18 @@ function home_show() {
 
 function home_sendSync() {
 	gui_showLoading();
-	Pasteque.srv_read(appData.srv, Pasteque.Request('api/sync'), home_syncSuccess, home_syncError);
+	srvcall_read("api/sync", home_syncCallback);
 }
 
-function home_syncSuccess(data) {
-	home_resetProgress(data);
-	storage_sync(appData.db, data, home_syncProgress, home_syncError, home_syncComplete);
+function home_syncCallback(request, status, response) {
+	if (status == 200) {
+		var data = JSON.parse(response);
+		home_resetProgress(data);
+		storage_sync(appData.db, data, home_syncProgress, home_syncError, home_syncComplete);
+	} else {
+		console.error(response);
+		gui_showScreen("login");
+	}
 }
 
 /** Contains for each SYNC_MODELS: {"count": number of models, "done": index loaded}.
