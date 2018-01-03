@@ -82,12 +82,19 @@ function _categories_showCategory(category, categories) {
 function category_saveCategory() {
 	let cat = Category_fromForm("edit-category-form");
 	gui_showLoading();
-	srvcall_write("api/category", {"category": cat}, category_saveCallback);
+	if ("id" in cat) {
+		srvcall_post("api/category", cat, category_saveCallback);
+	} else {
+		srvcall_put("api/category/" + cat["reference"], cat, category_saveCallback);
+	}
 }
 
 function category_saveCallback(request, status, response) {
 	if (status == 200) {
 		let cat = Category_fromForm("edit-category-form");
+		if (!"id" in cat) {
+			cat.id = parseInt(response);
+		}
 		gui_hideLoading();
 		// Update in local database
 		let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");

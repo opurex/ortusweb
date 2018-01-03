@@ -1,21 +1,21 @@
 
 function Category_fromForm(formId) {
-	let form = document.forms[formId];
+	let inputs = document.forms[formId].elements;
 	let cat = {};
-	if (form["id"]) {
-		cat.id = parseInt(form["id"].value);
+	if ("id" in inputs) {
+		cat.id = parseInt(inputs["id"].value);
 	}
-	cat.reference = form["reference"].value;
-	cat.label = form["label"].value;
-	cat.dispOrder = parseInt(form["dispOrder"].value);
+	cat.reference = inputs["reference"].value;
+	cat.label = inputs["label"].value;
+	cat.dispOrder = parseInt(inputs["dispOrder"].value);
 	if (isNaN(cat.dispOrder)) { cat.dispOrder = 0; }
-	if (form["parent"].value == "") {
+	if (inputs["parent"].value == "") {
 		cat.parent = null;
 	} else {
-		cat.parent = parseInt(form["parent"].value);
+		cat.parent = parseInt(inputs["parent"].value);
 	}
 	// hasImage is used only locally
-	if (form["hasImage"] && form["hasImage"].value != "0") {
+	if ("hasImage" in inputs && inputs["hasImage"].value != "0") {
 		cat.hasImage = true;
 	} else {
 		cat.hasImage = false;

@@ -19,7 +19,7 @@ function home_show() {
 
 function home_sendSync() {
 	gui_showLoading();
-	srvcall_read("api/sync", home_syncCallback);
+	srvcall_get("api/sync", home_syncCallback);
 }
 
 function home_syncCallback(request, status, response) {

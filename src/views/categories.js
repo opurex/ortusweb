@@ -1,4 +1,10 @@
 var view_categories = `
+<div class="row spacing-row">
+	<div class="btn-group" role="group">
+		<a class="btn btn-add" href="?p=category">Ajouter une catégorie</a>
+	</div>
+</div>
+
 <table class="table table-bordered table-hover">
 	<thead>
 		<tr>
@@ -55,7 +61,7 @@ var view_category = `
 				<input class="form-control" id="edit-dispOrder" type="numeric" name="dispOrder" {{#category}}value="{{dispOrder}}"{{/category}}>
 			</div>
 		</div>
-		<input type="hidden" name="hasImage" value="{{#category}}{{#hasImage}}1{{/hasImage}}{{^hasImage}}0{{/hasImage}}{{/category}}" />
+		{{#category}}<input type="hidden" name="hasImage" value="{{#hasImage}}1{{/hasImage}}{{^hasImage}}0{{/hasImage}}" />{{/category}}
 		<!-- TODO: restore image
 		<div class="row spacing-row">
 			<div class="form-group row">

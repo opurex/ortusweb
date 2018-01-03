@@ -66,7 +66,7 @@ var login_sendLogin = function() {
 	appData.srvUrl = server;
 	appData.srvUser = user;
 	// Check connection and version
-	srvcall_write("api/login", {"user": user, "password": password}, login_loginCallback);
+	srvcall_post("api/login", {"user": user, "password": password}, login_loginCallback);
 	gui_showLoading();
 }
 

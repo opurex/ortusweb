@@ -1,4 +1,4 @@
-function _srvcall_send(target, method, params, callback) {
+function _srvcall_send(target, method, data, callback) {
 	var request = new XMLHttpRequest();
 	request.onreadystatechange = function() {
 		if (request.readyState === XMLHttpRequest.DONE) {
@@ -14,20 +14,14 @@ function _srvcall_send(target, method, params, callback) {
 		}
 	};
 	let dataStr = null;
+	if (data != null) {
+		dataStr = JSON.stringify(data);
+	}
 	switch (method) {
-	case "post":
+	case "PUT":
 	case "POST":
-		var enc = function(data) {
-			var str = (typeof data == 'object') ? JSON.stringify(data) : data;
-			return encodeURI(str).replace('%20', '+');
-		}
-		dataStr = "";
-		for (let key in params) {
-		if (dataStr.length > 0) { dataStr += '&'; }
-			dataStr += enc(key) + '=' + enc(params[key]);
-		}
-		request.open("POST", login_getHostUrl() + target);
-		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.open(method.toUpperCase(), login_getHostUrl() + target);
+		request.setRequestHeader("Content-type", "application/json");
 		break;
 	case "get":
 	default:
@@ -45,9 +39,18 @@ function _srvcall_send(target, method, params, callback) {
 	}
 }
 
-function srvcall_read(target, callback) {
-	_srvcall_send(target, "GET", [], callback);
+function srvcall_get(target, callback) {
+	_srvcall_send(target, "GET", null, callback);
 }
-function srvcall_write	(target, data, callback) {
+function srvcall_post(target, data, callback) {
 	_srvcall_send(target, "POST", data, callback);
+}
+function srvcall_put(target, data, callback) {
+	_srvcall_send(target, "PUT", data, callback);
+}
+function srvcall_patch(target, data, callback) {
+	_srvcall_send(target, "PATCH", data, callback);
+}
+function srvcall_delete(target, callback) {
+	_srvcall_send(target, "DELETE", null, callback);
 }

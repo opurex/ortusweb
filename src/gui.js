@@ -11,7 +11,7 @@ function gui_showMenu() {
 			{"name": "Catalogue",
 			"items": [
 				{"target": "categories", "name": "Categories", "icon": "menu_category.png"},
-				{"target": "catalog", "name": "Produits", "icon": "menu_product.png"},
+				{"target": "products", "name": "Produits", "icon": "menu_product.png"},
 				{"target": "discounts", "name": "Promotions"},
 				{"target": "tariffareas", "name": "Zones tarifaires"},
 				{"target": "customers", "name": "Clients"}
@@ -73,6 +73,14 @@ function gui_showScreen(screen, args) {
 	case "category":
 		_gui_currentScreen = "category";
 		categories_showCategory(args);
+		break;
+	case "products":
+		_gui_currentScreen = "products";
+		products_show();
+		break;
+	case "product":
+		_gui_currentScreen = "product";
+		products_showProduct(args);
 		break;
 	default:
 		_gui_currentScreen = 'home';
