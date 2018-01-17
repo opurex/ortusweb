@@ -12,22 +12,10 @@ function gui_showMenu() {
 			"items": [
 				{"target": "categories", "name": "Categories", "icon": "menu_category.png"},
 				{"target": "products", "name": "Produits", "icon": "menu_product.png"},
-				{"target": "discounts", "name": "Promotions"},
-				{"target": "tariffareas", "name": "Zones tarifaires"},
-				{"target": "customers", "name": "Clients"}
 			]},
 			{"name": "Ventes",
 			"items": [
 				{"target": "sales_z", "name": "Tickets Z"},
-				{"target": "sales_products", "name": "Ventes par produits"}
-			]},
-			{"name": "Administration",
-			"items": [
-				{"target": "roles", "name": "Droits d'accès"},
-				{"target": "users", "name": "Opérateurs"},
-				{"target": "cashregisters", "name": "Caisses"},
-				{"target": "paymentmodes", "name": "Modes de paiement"},
-				{"target": "currencies", "name": "Devises"}
 			]}
 		]
 	};
