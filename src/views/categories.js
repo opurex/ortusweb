@@ -58,7 +58,7 @@ var view_category = `
 		<div class="form-group row">
 			<label for="edit-dispOrder" class="col-sm-2 control-label">Ordre</label>
 			<div class="col-sm-10">
-				<input class="form-control" id="edit-dispOrder" type="numeric" name="dispOrder" {{#category}}value="{{dispOrder}}"{{/category}}>
+				<input class="form-control" id="edit-dispOrder" type="number" name="dispOrder" {{#category}}value="{{dispOrder}}"{{/category}}{{^category}}value="0"{{/category}}>
 			</div>
 		</div>
 		{{#category}}<input type="hidden" name="hasImage" value="{{#hasImage}}1{{/hasImage}}{{^hasImage}}0{{/hasImage}}" />{{/category}}

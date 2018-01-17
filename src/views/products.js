@@ -64,13 +64,13 @@ var view_product_form = `
 			<div class="form-group row">
 				<label for="edit-dispOrder" class="col-sm-2 control-label">Ordre</label>
 				<div class="col-sm-10">
-					<input class="form-control" id="edit-dispOrder" type="numeric" name="dispOrder" {{#product}}value="{{dispOrder}}"{{/product}}>
+					<input class="form-control" id="edit-dispOrder" type="number" name="dispOrder" {{#product}}value="{{dispOrder}}"{{/product}}{{^product}}value="0"{{/product}}>
 				</div>
 			</div>
 			<div class="form-group row">
 				<label for="edit-visible" class="col-sm-2 control-label">En vente</label>
 				<div class="col-sm-10">
-					<input class="form-control" id="edit-visible" type="checkbox" name="visible" {{#product}}{{#visible}}checked="checked"{{/visible}}{{/product}}>
+					<input class="form-control" id="edit-visible" type="checkbox" name="visible" {{#product}}{{#visible}}checked="checked"{{/visible}}{{/product}}{{^product}}checked="checked"{{/product}}>
 				</div>
 			</div>
 			<div class="form-group row">
