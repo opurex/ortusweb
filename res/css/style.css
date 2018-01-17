@@ -1,4 +1,5 @@
 body {
+	background: #999 url(../img/fond.png) repeat center fixed;
 	padding-top: 50px;
 	padding-bottom: 25px;
 	padding-left: 25px;
@@ -17,6 +18,13 @@ body {
 h1, h2, h3, h4, h5, h6 {
 	color: #A3351E;
 	font-family: Titillium;
+}
+
+.box {
+	background-color: #fff;
+	border-radius: 4px;
+	margin: 1ex;
+	padding: 1ex;
 }
 
 .btn-add {

@@ -1,4 +1,5 @@
 var view_products = `
+<div class="box">
 <div class="row spacing-row">
 	<div class="btn-group" role="group">
 		<a class="btn btn-add" href="?p=product">Ajouter un produit</a>
@@ -23,6 +24,8 @@ var view_products = `
 	</thead>
 	<tbody id="product-list">
 	</tbody>
+</table>
+</div>
 `;
 
 var view_product_list = `

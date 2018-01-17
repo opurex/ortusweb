@@ -1,4 +1,5 @@
 var view_categories = `
+<div class="box">
 <div class="row spacing-row">
 	<div class="btn-group" role="group">
 		<a class="btn btn-add" href="?p=category">Ajouter une catégorie</a>
@@ -22,6 +23,8 @@ var view_categories = `
 		</tr>
 		{{/categories}}
 	</tbody>
+</table>
+</div>
 `;
 
 var view_category = `

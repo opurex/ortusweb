@@ -1,5 +1,6 @@
 var view_home = `
 {{#user}}
+<div class="box">
 <p>Bonjour {{user}}</p>
 <p>Vous êtes connectés sur {{server}}.</p>
 {{/user}}
@@ -8,4 +9,5 @@ var view_home = `
 {{/hasData}}
 <p><button class="btn btn-primary" onclick="javascript:home_sendSync();">Recharger les données</button></p>
 <p><button class="btn btn-primary" onclick="javascript:home_logout();">Deconnexion</button></p>
+</div>
 `;
