@@ -28,6 +28,13 @@ var storage_open = function(success, error) {
 	request.onupgradeneeded = _storage_install;
 }
 
+var storage_drop = function(db, success, error) {
+	db.close();
+	var request = window.indexedDB.deleteDatabase("pasteque");
+	request.onerror = error;
+	request.onsuccess = success;
+}
+
 /** The initializing function called on opening before onsuccess when
  * a new version is detected (or no version at all). */
 var _storage_install = function(event) {

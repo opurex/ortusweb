@@ -63,8 +63,7 @@ var login_sendLogin = function() {
 	}
 	var user = document.getElementById('user_login').value;
 	var password = document.getElementById('user_pass').value;
-	appData.srvUrl = server;
-	appData.srvUser = user;
+	login_set(https, server, user, null);
 	// Check connection and version
 	srvcall_post("api/login", {"user": user, "password": password}, login_loginCallback);
 	gui_showLoading();

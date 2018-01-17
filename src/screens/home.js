@@ -17,6 +17,16 @@ function home_show() {
 	document.getElementById('content').innerHTML = html;
 }
 
+function home_logout() {
+	// Drop local database
+	storage_drop(appData.db, function() {
+		login_logout();
+		boot();
+	}, function() {
+		console.error("Could not drop local database");
+	});
+}
+
 function home_sendSync() {
 	gui_showLoading();
 	srvcall_get("api/sync", home_syncCallback);
