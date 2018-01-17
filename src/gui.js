@@ -82,6 +82,10 @@ function gui_showScreen(screen, args) {
 		_gui_currentScreen = "product";
 		products_showProduct(args);
 		break;
+	case "sales_z":
+		_gui_currentScreen = "sales_z";
+		ztickets_show();
+		break;
 	default:
 		_gui_currentScreen = 'home';
 	case "home":

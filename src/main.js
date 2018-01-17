@@ -14,6 +14,7 @@ function route(screen) {
 	case "home":
 	case "categories":
 	case "products":
+	case "sales_z":
 		gui_showScreen(screen);
 		break;
 	case "category":
