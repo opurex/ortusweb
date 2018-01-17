@@ -159,7 +159,7 @@ function products_saveProduct() {
 function products_saveCallback(request, status, response) {
 	if (status == 200) {
 		let prd = Product_fromForm("edit-product-form");
-		if (!"id" in prd) {
+		if (!("id" in prd)) {
 			prd.id = parseInt(response);
 		}
 		gui_hideLoading();

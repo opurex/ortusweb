@@ -1,6 +1,6 @@
 
 function Product_fromForm(formId) {
-	let inputs = document.forms[formId];
+	let inputs = document.forms[formId].elements;
 	let prd = {};
 	if ("id" in inputs) {
 		prd.id = parseInt(inputs["id"].value);

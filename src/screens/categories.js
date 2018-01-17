@@ -92,7 +92,7 @@ function category_saveCategory() {
 function category_saveCallback(request, status, response) {
 	if (status == 200) {
 		let cat = Category_fromForm("edit-category-form");
-		if (!"id" in cat) {
+		if (!("id" in cat)) {
 			cat.id = parseInt(response);
 		}
 		gui_hideLoading();
