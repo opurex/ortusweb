@@ -132,7 +132,7 @@ function product_updatePrice() {
 	let taxSelect = document.getElementById("edit-tax");
 	let tax = taxSelect.options[taxSelect.selectedIndex];
 	let taxRate = parseFloat(tax.getAttribute("data-rate"));
-	let priceSell = Number(sellVat / (1.0 + taxRate)).toFixed(6);
+	let priceSell = Number(sellVat / (1.0 + taxRate)).toFixed(5);
 	document.getElementById("edit-priceSell").value = priceSell;
 	let priceBuy = parseFloat(document.getElementById("edit-priceBuy").value);
 	if (isNaN(priceBuy) || priceBuy == 0.0) {
