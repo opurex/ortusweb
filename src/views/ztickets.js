@@ -1,34 +1,28 @@
 var view_ztickets = `
 <div class="box">
-<form id="ztickets-filter" onsubmit="javascript:ztickets_filter();return false;">
-<div class="row spacing-row">
-	<div class="form-group row">
-		<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
-			<input type="text" class="form-control" name="start" id="start" value="{{start}}" />
-			<div class="input-group-addon">
-				<span class="glyphicon glyphicon-th"></span>
+	<nav class="navbar navbar-default">
+		<form id="ztickets-filter" onsubmit="javascript:ztickets_filter();return false;">
+			<div class="navbar-form navbar-left">
+				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
+					<label for="start">Du</label>
+					<input type="text" class="form-control" name="start" id="start" value="{{start}}" />
+				</div>
 			</div>
-		</div>
-	</div>
-</div>
-<div class="row spacing-row">
-	<div class="form-group row">
-		<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
-			<input type="text" class="form-control" name="stop" id="stop" value="{{stop}}" />
-			<div class="input-group-addon">
-				<span class="glyphicon glyphicon-th"></span>
+			<div class="navbar-form navbar-left">
+				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
+					<label for="stop">au</label>
+					<input type="text" class="form-control" name="stop" id="stop" value="{{stop}}" />
+				</div>
 			</div>
-		</div>
+			<div class="row actions">
+				<div class="form-group">
+					<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
+				</div>
+			</div>
+		</form>
+	</nav>
+	<div class="box-body" id="z-content">
 	</div>
-</div>
-	<div class="row actions">
-		<div class="form-group">
-			<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
-		</div>
-	</div>
-</form>
-</div>
-<div class="box" id="z-content">
 </div>
 `;
 
