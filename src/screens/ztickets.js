@@ -28,7 +28,7 @@ function ztickets_filter() {
 }
 
 function _ztickets_filterCallback(request, status, response) {
-	if (status != 200) {
+	if (srvcall_callbackCatch(request, status, response, ztickets_filter)) {
 		return;
 	}
 	let zTickets = JSON.parse(response);

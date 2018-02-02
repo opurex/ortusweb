@@ -90,23 +90,23 @@ function category_saveCategory() {
 }
 
 function category_saveCallback(request, status, response) {
-	if (status == 200) {
-		let cat = Category_fromForm("edit-category-form");
-		if (!("id" in cat)) {
-			cat.id = parseInt(response);
-		}
+	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
+		return;
+	}
+	let cat = Category_fromForm("edit-category-form");
+	if (!("id" in cat)) {
+		cat.id = parseInt(response);
+	}
+	// Update in local database
+	let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
+	let req = catStore.put(cat);
+	req.onsuccess = function(event) {
 		gui_hideLoading();
-		// Update in local database
-		let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
-		let req = catStore.put(cat);
-		req.onsuccess = function(event) {
-			gui_showMessage("Les modifications ont été enregistrées");
-		}
-		req.onerror = function(event) {
-			gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-		}
-	} else {
-		gui_showError("Erreur " + status + " : " + response);
+		gui_showMessage("Les modifications ont été enregistrées");
+	}
+	req.onerror = function(event) {
+		gui_hideLoading();
+		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
 	}
 }
 

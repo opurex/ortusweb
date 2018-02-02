@@ -53,3 +53,24 @@ function srvcall_patch(target, data, callback) {
 function srvcall_delete(target, callback) {
 	_srvcall_send(target, "DELETE", null, callback);
 }
+
+/** Helper class to get the default behaviour for faulty responses.
+ * @return False if the response is ok to be used (it has not been catched).
+ * True if the response has been catched and has already been proceeded. */
+function srvcall_callbackCatch(request, status, response, pendingOperation) {
+	switch (status) {
+	case 200:
+		return false;
+		break;
+	case 403:
+		login_setPendingOperation(pendingOperation);
+		login_show();
+		gui_showMessage("La session a expiré");
+		return true;
+	default:
+		login_show();
+		gui_showError("Erreur serveur: " + status + " " + response);
+		return true;
+	}
+}
+

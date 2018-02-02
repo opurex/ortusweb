@@ -80,10 +80,17 @@ function login_loginCallback(request, status, response) {
 			var https = document.getElementById("user_https").checked;
 			var user = document.getElementById('user_login').value;
 			login_set(https, server, user);
-			// Check compatibility
-			// TODO
-			// restart
-			start();
+			// Hide login screen and let content be shown
+			document.getElementById("login-content").classList.add("hidden");
+			document.getElementById("content").classList.remove("hidden");
+			// Next operation
+			if (_login_pendingOperation == null) {
+				start();
+			} else {
+				let nextOperation = _login_pendingOperation;
+				_login_pendingOperation = null;
+				nextOperation();
+			}
 			break;
 		}
 		// else nobreak
@@ -107,9 +114,16 @@ var login_show = function() {
 		elements.user = appData.srv.user;
 	}
 	var html = Mustache.render(view_login, elements);
-	document.getElementById('content').innerHTML = html;
+	document.getElementById("login-content").innerHTML = html;
+	document.getElementById("login-content").classList.remove("hidden");
+	document.getElementById("content").classList.add("hidden");
+	gui_hideLoading();
 	if (login_getUser()) {
 		document.getElementById("user_pass").focus();
 	}
 }
 
+var _login_pendingOperation = null;
+var login_setPendingOperation = function(functionVar) {
+	_login_pendingOperation = functionVar;
+}

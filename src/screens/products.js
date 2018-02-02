@@ -157,23 +157,23 @@ function products_saveProduct() {
 }
 
 function products_saveCallback(request, status, response) {
-	if (status == 200) {
-		let prd = Product_fromForm("edit-product-form");
-		if (!("id" in prd)) {
-			prd.id = parseInt(response);
-		}
+	if (srvcall_callbackCatch(request, status, response, products_saveProduct)) {
+		return;
+	}
+	let prd = Product_fromForm("edit-product-form");
+	if (!("id" in prd)) {
+		prd.id = parseInt(response);
+	}
+	// Update in local database
+	let prdStore = appData.db.transaction(["products"], "readwrite").objectStore("products");
+	let req = prdStore.put(prd);
+	req.onsuccess = function(event) {
 		gui_hideLoading();
-		// Update in local database
-		let prdStore = appData.db.transaction(["products"], "readwrite").objectStore("products");
-		let req = prdStore.put(prd);
-		req.onsuccess = function(event) {
-			gui_showMessage("Les modifications ont été enregistrées");
-		}
-		req.onerror = function(event) {
-			gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-		}
-	} else {
-		gui_showError("Erreur " + status + " : " + response);
+		gui_showMessage("Les modifications ont été enregistrées");
+	}
+	req.onerror = function(event) {
+		gui_hideLoading();
+		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
 	}
 }
 
