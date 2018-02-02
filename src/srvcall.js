@@ -4,10 +4,9 @@ function _srvcall_send(target, method, data, callback) {
 		if (request.readyState === XMLHttpRequest.DONE) {
 			// Update the token.
 			var token = request.getResponseHeader('Token');
-			if (token != null) {
+			if (token != null && token != "") {
 				login_updateToken(token);
-			}
-			if (request.status == 403) {	
+			} else {
 				login_revokeToken();
 			}
 			callback(request, request.status, request.responseText);

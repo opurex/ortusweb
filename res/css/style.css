@@ -122,16 +122,22 @@ dt {
 	src: url("../fonts/Amble-Regular.ttf");
 }
 
-.message {
-	background-color: #FBC108;
-	border: 2px solid #DDD;
+#message-box {
 	padding: 8px 15px;
 	margin: 0px 30px 20px 30px;
+	position: fixed;
+	top: 3ex;
+	right: 3ex;
+	z-index: 2000;
+	cursor: pointer;
 }
-.error {
+#message-box.message-info {
+	background-color: #393F4C;
+	color: #DDD;
+	border: 2px solid #DDD;
+}
+#message-box.message-error {
 	background-color: #4F4C4D;
 	border: 2px solid #333;
-	padding: 8px 15px;
 	color: #DDD;
-	margin: 0px 30px 20px 30px;
 }

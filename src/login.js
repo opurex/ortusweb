@@ -70,18 +70,29 @@ var login_sendLogin = function() {
 }
 
 function login_loginCallback(request, status, response) {
-	if (status == 200) {
-		// Register data
-		var server = document.getElementById('user_server').value;
-		var https = document.getElementById("user_https").checked;
-		var user = document.getElementById('user_login').value;
-		login_set(https, server, user);
-		// Check compatibility
-		// TODO
-		// restart
-		start();
-	} else {
-		console.error(response);
+	gui_hideLoading();
+	gui_closeMessageBox();
+	switch (status) {
+	case 200:
+		if (response != "null") {
+			// Register data
+			var server = document.getElementById('user_server').value;
+			var https = document.getElementById("user_https").checked;
+			var user = document.getElementById('user_login').value;
+			login_set(https, server, user);
+			// Check compatibility
+			// TODO
+			// restart
+			start();
+			break;
+		}
+		// else nobreak
+	case 403:
+		gui_showMessage("Utilisateur ou mot de passe invalide.");
+		break;
+	default:
+		gui_showError("Erreur serveur : " + status + " " + response);
+		break;
 	}
 }
 

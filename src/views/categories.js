@@ -31,7 +31,6 @@ var view_category = `
 <div class="box">
 	<div class="box-body">
 		<h1>Édition d'une categorie</h1>
-		<div id="message-box"></div>
 		<form id="edit-category-form" onsubmit="javascript:category_saveCategory(); return false;">
 			{{#category}}<input type="hidden" name="id" value="{{id}}"/>{{/category}}
 			<dl class="dl-horizontal">

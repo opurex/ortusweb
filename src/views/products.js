@@ -42,7 +42,6 @@ var view_product_form = `
 <div class="box">
 	<div class="box-body">
 		<h1>Édition d'un produit</h1>
-		<div id="message-box"></div>
 		<form id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
 			{{#product}}<input type="hidden" name="id" value="{{id}}"/>{{/product}}
 			<fieldset class="form-group">

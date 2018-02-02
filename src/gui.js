@@ -5,6 +5,22 @@ function gui_hideLoading() {
 	document.getElementById('loading').classList.add('hidden');
 }
 
+function _gui_showMessage(messageClass, message) {
+	document.getElementById("message-box").className = messageClass;
+	let html = Mustache.render("{{text}}", {"text": message});
+	document.getElementById("message-box").innerHTML = html;
+}
+function gui_closeMessageBox() {
+	document.getElementById("message-box").className = "hidden";
+}
+function gui_showMessage(message) {
+	_gui_showMessage("message-info", message);
+}
+function gui_showError(message) {
+	_gui_showMessage("message-error", message);
+}
+
+
 function gui_showMenu() {
 	var elements = {
 		"sections": [
@@ -25,19 +41,6 @@ function gui_showMenu() {
 
 function gui_hideMenu() {
 	document.getElementById("menu").innerHTML = "";
-}
-
-function gui_showMessage(message) {
-	var box = document.getElementById("message-box");
-	box.classList.add("message");
-	box.classList.remove("error");
-	box.innerHTML = message;
-}
-function gui_showError(message) {
-	var box = document.getElementById("message-box");
-	box.classList.remove("message");
-	box.classList.add("error");
-	box.innerHTML = message;
 }
 
 var _gui_currentScreen = null;
