@@ -65,14 +65,31 @@ function _ztickets_filterCallback(request, status, response) {
 
 function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 	// Collect the listed taxes, payment modes and cat taxes
+	let catTaxes = [];
+	for (let i = 0; i < categories.length; i++) {
+		for (let j = 0; j < taxes.length; j++) {
+			catTaxes.push(JSON.parse(JSON.stringify(taxes[j])));
+			catTaxes[i * taxes.length + j]["cat"] = categories[i]["label"];
+		}
+	}
 	let renderZs = [];
 	let keptPayments = [];
 	let keptTaxes = [];
+	let keptCategories = [];
+	let keptCatTaxes = [];
 	for (let i = 0; i < paymentModes.length; i++) {
 		keptPayments[i] = false;
 	}
 	for (let i = 0; i < taxes.length; i++) {
 		keptTaxes[i] = false;
+	}
+	for (let i = 0; i < categories.length; i++) {
+		keptCategories[i] = false;
+	}
+	for (let i = 0; i < categories.length; i++) {
+		for (let j = 0; j < taxes.length; j++) {
+			keptCatTaxes[i * taxes.length + j] = false;
+		}
 	}
 	// Build the full data
 	for (let i = 0; i < zTickets.length; i++) {
@@ -92,6 +109,8 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			"csFYear": z.csFYear,
 			"payments": [],
 			"taxes": [],
+			"categories": [],
+			"catTaxes": [],
 		}
 		for (let j = 0; j < paymentModes.length; j++) {
 			let pm = paymentModes[j];
@@ -124,6 +143,40 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				renderZ.taxes.push({"base": "", "amount": ""});
 			}
 		}
+		for (let j = 0; j < categories.length; j++) {
+			let cat = categories[j];
+			let found = false;
+			for (let k = 0; k < z.catSales.length; k++) {
+				if (z.catSales[k].reference == cat.reference) {
+					renderZ.categories.push({"amount": z.catSales[k].amount});
+					found = true;
+					keptCategories[j] = true;
+					break;
+				}
+			}
+			if (!found) {
+				renderZ.categories.push({"amount": ""});
+			}
+		}
+		for (let j = 0; j < categories.length; j++) {
+			let cat = categories[j]
+			for (let j2 = 0; j2 < taxes.length; j2++) {
+				let tax = taxes[j2]
+				let found = false;
+				for (let k = 0; k < z.catTaxes.length; k++) {
+					if (z.catTaxes[k].reference == cat.reference && z.catTaxes[k].tax == tax.id) {
+						renderZ.catTaxes.push({"base": z.catTaxes[k].base,
+							"amount": z.catTaxes[k].amount});
+						found = true;
+						keptCatTaxes[j * taxes.length + j2] = true;
+						break;
+					}
+				}
+				if (!found) {
+					renderZ.catTaxes.push({"base": "", "amount": ""});
+				}
+			}
+		}
 		renderZs.push(renderZ);
 	}
 	// Remove the empty columns
@@ -147,10 +200,31 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			spliced++;
 		}
 	}
+	spliced = 0;
+	for (let i = 0; i < keptCategories.length; i++) {
+		if (!keptCategories[i]) {
+			for (let j = 0; j < renderZs.length; j++) {
+				renderZs[j]["categories"].splice(i - spliced, 1);
+			}
+			categories.splice(i - spliced, 1);
+			spliced++;
+		}
+	}
+	spliced = 0;
+	for (let i = 0; i < keptCatTaxes.length; i++) {
+		if (!keptCatTaxes[i]) {
+			for (let j = 0; j < renderZs.length; j++) {
+				renderZs[j]["catTaxes"].splice(i - spliced, 1);
+			}
+			catTaxes.splice(i - spliced, 1);
+			spliced++;
+		}
+	}
 	// Render
 	let elements = { "paymentModes": paymentModes,
 		"taxes": taxes,
-		"catTaxes": [],
+		"categories": categories,
+		"catTaxes": catTaxes,
 		"z": renderZs
 	};
 	var html = Mustache.render(view_zticketsTable, elements);

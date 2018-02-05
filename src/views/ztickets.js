@@ -49,9 +49,12 @@ var view_zticketsTable = `
 	<th>{{label}} base</th>
 	<th>{{label}} TVA</th>
 	{{/taxes}}
+	{{#categories}}
+	<th>{{label}}</th>
+	{{/categories}}
 	{{#catTaxes}}
-	<th>{{cat}} {{tax}} base</th>
-	<th>{{cat}} {{tax}} TVA</th>
+	<th>{{cat}} {{label}} base</th>
+	<th>{{cat}} {{label}} TVA</th>
 	{{/catTaxes}}
 </tr>
 </thead>
@@ -76,6 +79,13 @@ var view_zticketsTable = `
 	<td>{{base}}</td>
 	<td>{{amount}}</td>
 	{{/taxes}}
+	{{#categories}}
+	<td>{{amount}}</td>
+	{{/categories}}
+	{{#catTaxes}}
+	<td>{{base}}</td>
+	<td>{{amount}}</td>
+	{{/catTaxes}}
 </tr>
 {{/z}}
 </tbody>
