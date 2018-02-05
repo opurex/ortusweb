@@ -66,6 +66,15 @@ function _ztickets_filterCallback(request, status, response) {
 function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 	// Collect the listed taxes, payment modes and cat taxes
 	let renderZs = [];
+	let keptPayments = [];
+	let keptTaxes = [];
+	for (let i = 0; i < paymentModes.length; i++) {
+		keptPayments[i] = false;
+	}
+	for (let i = 0; i < taxes.length; i++) {
+		keptTaxes[i] = false;
+	}
+	// Build the full data
 	for (let i = 0; i < zTickets.length; i++) {
 		let z = zTickets[i];
 		let openDate = new Date(z.openDate * 1000);
@@ -91,6 +100,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				if (z.payments[k].paymentMode == pm.id) {
 					renderZ.payments.push({"amount": z.payments[k].currencyAmount});
 					found = true;
+					keptPayments[j] = true;
 					break;
 				}
 			}
@@ -106,6 +116,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 					renderZ.taxes.push({"base": z.taxes[k].base,
 						"amount": z.taxes[k].amount});
 					found = true;
+					keptTaxes[j] = true;
 					break;
 				}
 			}
@@ -115,6 +126,28 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 		}
 		renderZs.push(renderZ);
 	}
+	// Remove the empty columns
+	let spliced = 0;
+	for (let i = 0; i < keptPayments.length; i++) {
+		if (!keptPayments[i]) {
+			for (let j = 0; j < renderZs.length; j++) {
+				renderZs[j]["payments"].splice(i - spliced, 1);
+			}
+			paymentModes.splice(i - spliced, 1);
+			spliced++;
+		}
+	}
+	spliced = 0;
+	for (let i = 0; i < keptTaxes.length; i++) {
+		if (!keptTaxes[i]) {
+			for (let j = 0; j < renderZs.length; j++) {
+				renderZs[j]["taxes"].splice(i - spliced, 1);
+			}
+			taxes.splice(i - spliced, 1);
+			spliced++;
+		}
+	}
+	// Render
 	let elements = { "paymentModes": paymentModes,
 		"taxes": taxes,
 		"catTaxes": [],
