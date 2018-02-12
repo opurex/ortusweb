@@ -15,7 +15,7 @@ function products_show() {
 function _products_initView(categories) {
 	gui_hideLoading();
 	// Init view and categories filter
-	var sortedCats = categories.sort(function(a, b) { return a.dispOrder - b.dispOrder; });
+	var sortedCats = categories.sort(tools_sort("dispOrder", "reference"));
 	var elements = {
 		"categories": sortedCats,
 		"imgUrl": function() {
@@ -44,7 +44,7 @@ function products_selectCategory(catId) {
 			products.push(cursor.value);
 			cursor.continue();
 		} else {
-			let sortedPrds = products.sort(function(a, b) { return a.dispOrder - b.dispOrder; });
+			let sortedPrds = products.sort(tools_sort("dispOrder", "reference"));
 			products_showProducts(sortedPrds);
 		}
 	}

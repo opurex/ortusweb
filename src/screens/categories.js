@@ -14,7 +14,7 @@ function categories_show() {
 }
 function _categories_showCategories(categories) {
 	gui_hideLoading();
-	var sortedCats = categories.sort(function(a, b) { return a.dispOrder - b.dispOrder; });
+	var sortedCats = categories.sort(tools_sort("dispOrder", "reference"));
 	var elements = {
 		"categories": sortedCats,
 		"imgUrl": function() {
