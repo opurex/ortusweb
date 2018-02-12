@@ -30,11 +30,15 @@ function route(screen) {
 
 
 function boot() {
+	if (!storage_available) {
+		gui_showError("Stockage des données non disponible. Votre navigateur est peut être obsolète.");
+		return;
+	}
 	storage_open(function(event) {
 		appData.db = event.target.result;
 		start();
 	}, function(event) {
-		console.error("Failed to open local database");
+		gui_showError("Impossible d'accéder aux stockage des données locales.");
 	});
 }
 
