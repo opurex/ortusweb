@@ -23,18 +23,24 @@
 	<script type="text/javascript" src="src/screens/categories.js"></script>
 	<script type="text/javascript" src="src/screens/products.js"></script>
 	<script type="text/javascript" src="src/screens/ztickets.js"></script>
+	<script type="text/javascript" src="src/screens/salesbyproduct.js"></script>
 	<script type="text/javascript" src="src/views/home.js"></script>
 	<script type="text/javascript" src="src/views/login.js"></script>
 	<script type="text/javascript" src="src/views/menu.js"></script>
 	<script type="text/javascript" src="src/views/categories.js"></script>
 	<script type="text/javascript" src="src/views/products.js"></script>
 	<script type="text/javascript" src="src/views/ztickets.js"></script>
+	<script type="text/javascript" src="src/views/salesbyproduct.js"></script>
+	<script type="text/javascript" src="src/views/table.js"></script>
 	<script type="text/javascript">
 		document.addEventListener('DOMContentLoaded', function() { boot(); });
 	</script>
 </head>
 <body>
-<div id="loading">Chargement...</div>
+<div id="loading">
+	<p>Chargement...</p>
+	<p id="loading-progress"><span id="loading-progress-current"></span>/<span id="loading-progress-max"></span></p>
+</div>
 <nav class="navbar navbar-fixed-top navbar-inverse">
 	<div id="menu" class="container-fluid">
 	</div>

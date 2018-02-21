@@ -1,8 +1,15 @@
 function gui_showLoading() {
 	document.getElementById('loading').classList.remove('hidden');
+	document.getElementById('loading-progress').classList.add('hidden');
 }
 function gui_hideLoading() {
 	document.getElementById('loading').classList.add('hidden');
+}
+function gui_showProgress(current, total) {
+	document.getElementById('loading').classList.remove('hidden');
+	document.getElementById('loading-progress').classList.remove('hidden');
+	document.getElementById('loading-progress-current').innerHTML = current;
+	document.getElementById('loading-progress-max').innerHTML = total;
 }
 
 function _gui_showMessage(messageClass, message) {
@@ -32,6 +39,7 @@ function gui_showMenu() {
 			{"name": "Ventes",
 			"items": [
 				{"target": "sales_z", "name": "Tickets Z"},
+				{"target": "salesbyproduct", "name": "Par produit"},
 			]}
 		]
 	};
@@ -76,6 +84,10 @@ function gui_showScreen(screen, args) {
 	case "sales_z":
 		_gui_currentScreen = "sales_z";
 		ztickets_show();
+		break;
+	case "salesbyproduct":
+		_gui_currentScreen = "salesbyproduct";
+		salesbyproduct_show();
 		break;
 	default:
 		_gui_currentScreen = 'home';
