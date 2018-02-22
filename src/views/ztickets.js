@@ -31,6 +31,14 @@ var view_zticketsTable = `
 <table class="table table-bordered table-hover">
 <thead>
 <tr>
+	<th colspan="8">Session de caisse</th>
+	<th colspan="3" class="z-oddcol">Chiffre d'affaire</th>
+	<th colspan="{{paymentModesCount}}">Encaissements</th>
+	<th colspan="{{taxesCount}}" class="z-oddcol">Taxes</th>
+	<th colspan="{{categoriesCount}}">CA par catégorie</th>
+	<th colspan="{{catTaxesCount}}" class="z-oddcol">Taxes par catégorie</th>
+</tr>
+<tr>
 	<th>Caisse</th>
 	<th>N°</th>
 	<th>Ouverture</th>
@@ -39,22 +47,22 @@ var view_zticketsTable = `
 	<th>Fond clôture</th>
 	<th>Fond attendu</th>
 	<th>Tickets</th>
-	<th>CA</th>
-	<th>CA mois</th>
-	<th>CA année</th>
+	<th class="z-oddcol">CA</th>
+	<th class="z-oddcol">CA mois</th>
+	<th class="z-oddcol">CA année</th>
 	{{#paymentModes}}
 	<th>{{label}}</th>
 	{{/paymentModes}}
 	{{#taxes}}
-	<th>{{label}} base</th>
-	<th>{{label}} TVA</th>
+	<th class="z-oddcol">{{label}} base</th>
+	<th class="z-oddcol">{{label}} TVA</th>
 	{{/taxes}}
 	{{#categories}}
 	<th>{{label}}</th>
 	{{/categories}}
 	{{#catTaxes}}
-	<th>{{cat}} {{label}} base</th>
-	<th>{{cat}} {{label}} TVA</th>
+	<th class="z-oddcol">{{cat}} {{label}} - base</th>
+	<th class="z-oddcol">{{cat}} {{label}} - TVA</th>
 	{{/catTaxes}}
 </tr>
 </thead>
@@ -69,22 +77,22 @@ var view_zticketsTable = `
 	<td>{{closeCash}}</td>
 	<td>{{expectedCash}}</td>
 	<td>{{ticketCount}}</td>
-	<td>{{cs}}</td>
-	<td>{{csPeriod}}</td>
-	<td>{{csFYear}}</td>
+	<td class="z-oddcol">{{cs}}</td>
+	<td class="z-oddcol">{{csPeriod}}</td>
+	<td class="z-oddcol">{{csFYear}}</td>
 	{{#payments}}
 	<td>{{amount}}</td>
 	{{/payments}}
 	{{#taxes}}
-	<td>{{base}}</td>
-	<td>{{amount}}</td>
+	<td class="z-oddcol">{{base}}</td>
+	<td class="z-oddcol">{{amount}}</td>
 	{{/taxes}}
 	{{#categories}}
 	<td>{{amount}}</td>
 	{{/categories}}
 	{{#catTaxes}}
-	<td>{{base}}</td>
-	<td>{{amount}}</td>
+	<td class="z-oddcol">{{base}}</td>
+	<td class="z-oddcol">{{amount}}</td>
 	{{/catTaxes}}
 </tr>
 {{/z}}

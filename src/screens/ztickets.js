@@ -101,12 +101,13 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			"sequence": z.sequence,
 			"openDate": openDate.getDate() + "/" + (openDate.getMonth() + 1) + "/" + openDate.getFullYear() + " " + openDate.getHours() + ":" + openDate.getMinutes(),
 			"closeDate": closeDate.getDate() + "/" + (closeDate.getMonth() + 1) + "/" + closeDate.getFullYear() + " " + closeDate.getHours() + ":" + closeDate.getMinutes(),
-			"openCash": z.openCash,
-			"closeCash": z.closeCash,
-			"expectedCash": z.expectedCash,
-			"cs": z.cs,
-			"csPeriod": z.csPeriod,
-			"csFYear": z.csFYear,
+			"openCash": (z.openCash != null) ? z.openCash.toLocaleString() : "",
+			"closeCash": (z.closeCash != null) ? z.closeCash.toLocaleString() : "",
+			"expectedCash": (z.expectedCash != null) ? z.expectedCash.toLocaleString() : "",
+			"ticketCount": z.ticketCount,
+			"cs": z.cs.toLocaleString(),
+			"csPeriod": z.csPeriod.toLocaleString(),
+			"csFYear": z.csFYear.toLocaleString(),
 			"payments": [],
 			"taxes": [],
 			"categories": [],
@@ -117,7 +118,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			let found = false;
 			for (let k = 0; k < z.payments.length; k++) {
 				if (z.payments[k].paymentMode == pm.id) {
-					renderZ.payments.push({"amount": z.payments[k].currencyAmount});
+					renderZ.payments.push({"amount": z.payments[k].currencyAmount.toLocaleString()});
 					found = true;
 					keptPayments[j] = true;
 					break;
@@ -132,8 +133,8 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			let found = false;
 			for (let k = 0; k < z.taxes.length; k++) {
 				if (z.taxes[k].tax == tax.id) {
-					renderZ.taxes.push({"base": z.taxes[k].base,
-						"amount": z.taxes[k].amount});
+					renderZ.taxes.push({"base": z.taxes[k].base.toLocaleString(),
+						"amount": z.taxes[k].amount.toLocaleString()});
 					found = true;
 					keptTaxes[j] = true;
 					break;
@@ -148,7 +149,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			let found = false;
 			for (let k = 0; k < z.catSales.length; k++) {
 				if (z.catSales[k].reference == cat.reference) {
-					renderZ.categories.push({"amount": z.catSales[k].amount});
+					renderZ.categories.push({"amount": z.catSales[k].amount.toLocaleString()});
 					found = true;
 					keptCategories[j] = true;
 					break;
@@ -165,8 +166,8 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				let found = false;
 				for (let k = 0; k < z.catTaxes.length; k++) {
 					if (z.catTaxes[k].reference == cat.reference && z.catTaxes[k].tax == tax.id) {
-						renderZ.catTaxes.push({"base": z.catTaxes[k].base,
-							"amount": z.catTaxes[k].amount});
+						renderZ.catTaxes.push({"base": z.catTaxes[k].base.toLocaleString(),
+							"amount": z.catTaxes[k].amount.toLocaleString()});
 						found = true;
 						keptCatTaxes[j * taxes.length + j2] = true;
 						break;
@@ -222,9 +223,13 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 	}
 	// Render
 	let elements = { "paymentModes": paymentModes,
+		"paymentModesCount": paymentModes.length,
 		"taxes": taxes,
+		"taxesCount": taxes.length * 2,
 		"categories": categories,
+		"categoriesCount": categories.length,
 		"catTaxes": catTaxes,
+		"catTaxesCount": catTaxes.length * 2,
 		"z": renderZs
 	};
 	var html = Mustache.render(view_zticketsTable, elements);

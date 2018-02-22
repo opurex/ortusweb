@@ -141,3 +141,14 @@ dt {
 	border: 2px solid #333;
 	color: #DDD;
 }
+
+tr {
+	background-color: #fff;
+}
+.z-oddcol {
+	background-color: #f0f0f0;
+}
+tbody tr:hover .z-oddcol {
+	background-color: #ebebeb;
+}
+
