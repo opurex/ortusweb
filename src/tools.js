@@ -37,3 +37,33 @@ var tools_sort = function(field1, field2) {
 	}
 }
 
+/** Convert a Date object to a DD/MM/YYYY string. */
+var tools_dateToString = function(dateTime) {
+	let day = dateTime.getDate();
+	let month = dateTime.getMonth() + 1;
+	let year = dateTime.getFullYear();
+	if (day < 10) {
+		day = "0" + day;
+	}
+	if (month < 10) {
+		month = "0" + month;
+	}
+	return day + "/" + month + "/" + year;
+}
+/** Convert a Date object to a HH:mm string. */
+var tools_timeToString = function(dateTime) {
+	let hours = dateTime.getHours();
+	let minutes = dateTime.getMinutes();
+	if (hours < 10) {
+		hours = "0" + hours;
+	}
+	if (minutes < 10) {
+		minutes = "0" + minutes;
+	}
+	return hours + ":" + minutes;
+}
+/** Convert a Date object to a DD/MM/YYYY HH:mm string. */
+var tools_dateTimeToString = function(dateTime) {
+	return tools_dateToString(dateTime) + " " + tools_timeToString(dateTime);
+}
+

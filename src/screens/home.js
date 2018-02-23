@@ -6,8 +6,8 @@ function home_show() {
 	};
 	if (storage_hasData()) {
 		let syncDate = storage_getSyncDate();
-		elements["sync_date"] = syncDate.getDate() + "/" + syncDate.getMonth() + "/" + syncDate.getFullYear();
-		elements["sync_time"] = syncDate.getHours() + "h" + syncDate.getMinutes();
+		elements["sync_date"] = tools_dateToString(syncDate);
+		elements["sync_time"] = tools_timeToString(syncDate);
 	}
 	if (appData.srv != null) {
 		elements.server = appData.srv.host;

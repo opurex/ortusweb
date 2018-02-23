@@ -1,8 +1,8 @@
 function ztickets_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
-	start = start.getDate() + "/" + (start.getMonth() + 1) + "/" + start.getFullYear();
+	start = tools_dateToString(start);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
-	stop = stop.getDate() + "/" + (stop.getMonth() + 1) + "/" + stop.getFullYear();
+	stop = tools_dateToString(stop);
 	var html = Mustache.render(view_ztickets, {"start": start, "stop": stop});
 	document.getElementById('content').innerHTML = html;
 }
@@ -99,8 +99,8 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 		let renderZ = {
 			"cashRegister": "",
 			"sequence": z.sequence,
-			"openDate": openDate.getDate() + "/" + (openDate.getMonth() + 1) + "/" + openDate.getFullYear() + " " + openDate.getHours() + ":" + openDate.getMinutes(),
-			"closeDate": closeDate.getDate() + "/" + (closeDate.getMonth() + 1) + "/" + closeDate.getFullYear() + " " + closeDate.getHours() + ":" + closeDate.getMinutes(),
+			"openDate": tools_dateTimeToString(openDate),
+			"closeDate": tools_dateTimeToString(closeDate),
 			"openCash": (z.openCash != null) ? z.openCash.toLocaleString() : "",
 			"closeCash": (z.closeCash != null) ? z.closeCash.toLocaleString() : "",
 			"expectedCash": (z.expectedCash != null) ? z.expectedCash.toLocaleString() : "",

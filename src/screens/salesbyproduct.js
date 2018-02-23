@@ -3,9 +3,9 @@ var _salesbyproduct_data = {};
 
 function salesbyproduct_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
-	start = start.getDate() + "/" + (start.getMonth() + 1) + "/" + start.getFullYear();
+	start = tools_dateToString(start);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
-	stop = stop.getDate() + "/" + (stop.getMonth() + 1) + "/" + stop.getFullYear();
+	stop = tools_dateToString(stop);
 	var html = Mustache.render(view_salesbyproduct, {"start": start, "stop": stop});
 	document.getElementById('content').innerHTML = html;
 }
