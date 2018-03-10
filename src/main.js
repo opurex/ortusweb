@@ -13,6 +13,7 @@ function route(screen) {
 	switch (screen) {
 	case "home":
 	case "categories":
+	case "customers":
 	case "products":
 	case "sales_z":
 	case "salesbyproduct":
@@ -20,6 +21,7 @@ function route(screen) {
 		break;
 	case "category":
 	case "product":
+	case "customer":
 		gui_showScreen(screen, _get("id"));
 		break;
 	default:

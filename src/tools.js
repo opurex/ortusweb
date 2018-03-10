@@ -50,6 +50,9 @@ var tools_dateToString = function(dateTime) {
 	}
 	return day + "/" + month + "/" + year;
 }
+var tools_dateToDataString = function(dateTime) {
+	return dateTime.getFullYear() + "-" + (dateTime.getMonth() + 1) + "-" + dateTime.getDate();
+}
 /** Convert a Date object to a HH:mm string. */
 var tools_timeToString = function(dateTime) {
 	let hours = dateTime.getHours();
@@ -67,3 +70,19 @@ var tools_dateTimeToString = function(dateTime) {
 	return tools_dateToString(dateTime) + " " + tools_timeToString(dateTime);
 }
 
+/** Convert a D(D)[-/]M(M)[-/]YY(YY) string to a Date object.
+ * Return false if the format is invalid. */
+var tools_stringToDate = function(stringDate) {
+	stringDate = stringDate.replace(/-/g, "/");
+	let parts = stringDate.split("/");
+	if (parts.length != 3) {
+		return false;
+	} else {
+		if (parts[2].length == 2) {
+			parts[2] = "20" + parts[2];
+		} else if (parts[2].length != 4) {
+			return false;
+		}
+		return new Date(parts[2], parts[1] - 1, parts[0]);
+	}
+}

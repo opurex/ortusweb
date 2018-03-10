@@ -35,6 +35,7 @@ function gui_showMenu() {
 			"items": [
 				{"target": "categories", "name": "Categories", "icon": "menu_category.png"},
 				{"target": "products", "name": "Produits", "icon": "menu_product.png"},
+				{"target": "customers", "name": "Clients", "icon": "menu_customer.png"},
 			]},
 			{"name": "Ventes",
 			"items": [
@@ -80,6 +81,14 @@ function gui_showScreen(screen, args) {
 	case "product":
 		_gui_currentScreen = "product";
 		products_showProduct(args);
+		break;
+	case "customers":
+		_gui_currentScreen = "customers";
+		customers_show();
+		break;
+	case "customer":
+		_gui_currentScreen = "customer";
+		customers_showCustomer(args);
 		break;
 	case "sales_z":
 		_gui_currentScreen = "sales_z";

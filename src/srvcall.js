@@ -19,10 +19,11 @@ function _srvcall_send(target, method, data, callback) {
 	switch (method) {
 	case "PUT":
 	case "POST":
+	case "PATCH":
 		request.open(method.toUpperCase(), login_getHostUrl() + target);
 		request.setRequestHeader("Content-type", "application/json");
 		break;
-	case "get":
+	case "GET":
 	default:
 		request.open("GET", login_getHostUrl() + target);
 		break;

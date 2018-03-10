@@ -134,3 +134,38 @@ var storage_hasData = function() {
 	return (localStorage.getItem("syncDate") != null);
 }
 
+var storage_readStores = function(storeNames, callback) {
+	let data = {};
+	let finished = [];
+	let callbackCalled = false;
+	for (let i = 0; i < storeNames.length; i++) {
+		data[storeNames[i]] = [];
+		finished.push(false);
+	}
+	let stores = appData.db.transaction(storeNames, "readonly");
+	let successClosure = function(name, index) {
+		return function(event) {
+			let cursor = event.target.result;
+			if (cursor) {
+				data[name].push(cursor.value);
+				cursor.continue();
+			} else {
+				finished[index] = true;
+				for (let k = 0; k < finished.length; k++) {
+					if (finished[k] == false) {
+						return;
+					}
+				}
+				if (callbackCalled == false) {
+					callbackCalled = true;
+					callback(data);
+				}
+			}
+		}
+	}
+	for (let i = 0; i < storeNames.length; i++) {
+		let storeName = storeNames[i];
+		let store = stores.objectStore(storeName);
+		store.openCursor().onsuccess = successClosure(storeName, i);
+	}
+}
