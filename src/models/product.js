@@ -13,16 +13,16 @@ function Product_fromForm(formId) {
 	prd.prepay = inputs["prepay"].checked;
 	prd.priceSell = parseFloat(inputs["priceSell"].value);
 	prd.tax = parseInt(inputs["tax"].value);
-	prd.priceBuy = parseFloat(inputs["priceBuy"]);
+	prd.priceBuy = parseFloat(inputs["priceBuy"].value);
 	if (isNaN(prd.priceBuy)) { prd.priceBuy = null; }
 	prd.scaled = inputs["scaled"].checked;
 	prd.reference = inputs["reference"].value;
 	prd.barcode = inputs["barcode"].value;
 	prd.scaleType = parseInt(inputs["scaleType"].value);
-	prd.scaleValue = parseFloat(inputs["scaleValue"]);
+	prd.scaleValue = parseFloat(inputs["scaleValue"].value);
 	if (isNaN(prd.scaleValue)) { prd.scaleValue = 1.0; }
 	prd.discountEnabled = inputs["discountEnabled"].checked;
-	prd.discountRate = parseFloat(inputs["discountRate"]);
+	prd.discountRate = parseFloat(inputs["discountRate"].value);
 	if (isNaN(prd.discountRate)) { prd.discountRate = 0.0; }
 	if (inputs["composition"] == "1") { prd.composition = true; }
 	else { prd.composition = false; }

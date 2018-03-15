@@ -115,13 +115,13 @@ var view_product_form = `
 					</dd>
 
 					<dt><label for="edit-scaleValue">Contenance</label></dt>
-					<dd><input class="form-control" id="edit-scaleValue" type="numeric" step="any" name="scaleValue" {{#product}}value="{{scaleValue}}"{{/product}}></dt>
+					<dd><input class="form-control" id="edit-scaleValue" type="number" step="any" name="scaleValue" {{#product}}value="{{scaleValue}}"{{/product}} /></dt>
 
 					<dt><label for="edit-discountEnabled">Remise auto</label></dt>
 					<dd><input class="form-control" id="edit-discountEnable" type="checkbox" name="discountEnabled" {{#product}}{{#discountEnabled}}checked="checked"{{/discountEnabled}}{{/product}}></dt>
 
 					<dt><label for="edit-discountRate">Taux de remise</label></dt>
-					<dd><input class="form-control" id="edit-discountRate" type="numeric" name="discountRate" {{#product}}value="{{discountRate}}"{{/product}}></dd>
+					<dd><input class="form-control" id="edit-discountRate" type="number" name="discountRate" {{#product}}value="{{discountRate}}"{{/product}} step="0.01" /></dd>
 				</dl>
 			</fieldset>
 		<input type="hidden" name="composition" value="{{#product}}{{#composition}}1{{/composition}}{{^composition}}0{{/composition}}{{/product}}{{^product}}0{{/product}}" />
