@@ -155,7 +155,7 @@ var view_customer_form = `
 <div class="box" style="margin-top:1ex">
 	{{#customer}}
 	<div class="box-body">
-		<h1>Modifier le solde</h1>
+		<h2>Modifier le solde</h2>
 		<form id="edit-customer-balance-form" onsubmit="javascript:customers_saveBalance(); return false;">
 			{{#customer}}<input id="customer-balance-id" type="hidden" name="id" value="{{id}}"/>{{/customer}}
 			<dl class="dl-horizontal">
@@ -169,4 +169,53 @@ var view_customer_form = `
 	</div>
 	{{/customer}}
 </div>
+
+{{#customer}}
+<div class="box" style="margin-top:1ex">
+	<nav class="navbar navbar-default">
+		<h2>Historique client</h2>
+		<form id="customer-history-filter" onsubmit="javascript:customers_filterHistory();return false;">
+			<div class="navbar-form navbar-left">
+				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
+					<label for="start">Du</label>
+					<input type="text" class="form-control" name="start" id="start" value="{{start}}" />
+				</div>
+			</div>
+			<div class="navbar-form navbar-left">
+				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
+					<label for="stop">au</label>
+					<input type="text" class="form-control" name="stop" id="stop" value="{{stop}}" />
+				</div>
+			</div>
+			<div class="row actions">
+				<div class="form-group">
+					<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
+				</div>
+			</div>
+		</form>
+	</nav>
+	<div class="box-body" id="customer-history">
+	</div>
+</div>
+{{/customer}}`;
+
+var view_customerHistoryTable = `
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Produit</th>
+				<th>Quantité</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#lines}}
+			<tr>
+				<td>{{date}}</td>
+				<td>{{product}}</td>
+				<td>{{quantity}}</td>
+			</tr>
+			{{/lines}}
+		</tbody>
+	</table>
 `;

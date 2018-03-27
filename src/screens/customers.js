@@ -72,11 +72,15 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles)
 			customer.expireDate = tools_dateToString(new Date(customer.expireDate * 1000));
 		}
 	}
+	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
+	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	var elements = {
 		"customer": customer,
 		"taxes": taxes,
 		"tariffAreas": tariffAreas,
 		"discountProfiles": discountProfiles,
+		"start": tools_dateToString(start),
+		"stop": tools_dateToString(stop),
 		"imgUrl": function() {
 			return function (text, render) {
 				return login_getHostUrl() + "/api/image/customer/" + render(text) + "?Token=" + login_getToken();
@@ -139,3 +143,42 @@ function _customers_saveCallback(request, status, response) {
 	}
 }
 
+function customers_filterHistory() {
+	let inputs = document.forms["customer-history-filter"].elements;
+	let start = inputs["start"].value.split("/");
+	if (start.length != 3) {
+		start = new Date(new Date().getTime() - 604800000);
+	} else {
+		start = new Date(start[2], start[1] - 1, start[0]);
+	}
+	let stop = inputs["stop"].value.split("/");
+	if (stop.length != 3) {
+		stop = new Date(new Date().getTime() + 86400000);
+	} else {
+		stop = new Date(stop[2], stop[1] - 1, stop[0]);
+	}
+	let custId = document.forms["edit-customer-form"].elements["id"].value;
+	srvcall_get("api/ticket/search?dateStart=" + (start.getTime() / 1000) + "&dateStop=" + (stop.getTime() / 1000) + "&customer=" + custId, _customers_historyCallback);
+	gui_showLoading();
+}
+
+function _customers_historyCallback(request, status, response) {
+	if (srvcall_callbackCatch(request, status, response, customers_filterHistory)) {
+		return;
+	}
+	let tickets = JSON.parse(response);
+	let lines = [];
+	for (let i = 0; i < tickets.length; i++) {
+		let tkt = tickets[i];
+		let date = new Date(tkt.date * 1000);
+		for (let j = 0; j < tkt.lines.length; j++) {
+			lines.push({"date": tools_dateTimeToString(date),
+				"product": tkt.lines[j].productLabel,
+				"quantity": tkt.lines[j].quantity
+			});
+		}
+	}
+	var html = Mustache.render(view_customerHistoryTable, {"lines": lines});
+	document.getElementById("customer-history").innerHTML = html;
+	gui_hideLoading();
+}
