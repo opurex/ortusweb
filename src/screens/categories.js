@@ -79,6 +79,25 @@ function _categories_showCategory(category, categories) {
 	document.getElementById('content').innerHTML = html;		
 }
 
+function category_toggleImage() {
+	let clearImage = document.getElementById("clear-image");
+	let imgTag = document.getElementById("category-image");
+	let imgInput = document.getElementById("edit-image");
+	let deleteBtn = document.getElementById("toggle-image");
+	if (clearImage.value == "0") {
+		clearImage.value = "1";
+		imgTag.classList.add("hidden");
+		imgInput.value = "";
+		imgInput.classList.add("hidden");
+		deleteBtn.innerHTML = "Restaurer";
+	} else {
+		clearImage.value = "0";
+		imgTag.classList.remove("hidden");
+		imgInput.classList.remove("hidden");
+		deleteBtn.innerHTML = "Supprimer";
+	}
+}
+
 function category_saveCategory() {
 	let cat = Category_fromForm("edit-category-form");
 	gui_showLoading();
@@ -97,8 +116,25 @@ function category_saveCallback(request, status, response) {
 	if (!("id" in cat)) {
 		cat.id = parseInt(response);
 	}
+	if ("image" in cat) {
+		if (cat.image == null) {
+			srvcall_delete("api/image/category/" + cat.id, function(request, status, response) {
+				_category_saveCommit(cat);
+			});
+		} else {
+			srvcall_patch("api/image/category/" + cat.id, cat.image, function(request, status, response) {
+				_category_saveCommit(cat);
+			});
+		}
+	} else {
+		_category_saveCommit(cat);
+	}
+}
+
+function _category_saveCommit(cat) {
 	// Update in local database
 	let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
+	delete cat.image;
 	let req = catStore.put(cat);
 	req.onsuccess = function(event) {
 		gui_hideLoading();
@@ -109,4 +145,3 @@ function category_saveCallback(request, status, response) {
 		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
 	}
 }
-

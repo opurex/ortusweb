@@ -6,6 +6,21 @@ function Product_fromForm(formId) {
 		prd.id = parseInt(inputs["id"].value);
 	}
 	prd.label = inputs["label"].value;
+	if (inputs["clear-image"].value != "0") {
+		prd.image = null;
+		prd.hasImage = false;
+	} else {
+		if (inputs["image"].files.length == 0) {
+			if ("hasImage" in inputs && inputs["hasImage"].value != "0") {
+				prd.hasImage = true;
+			} else {
+				prd.hasImage = false;
+			}
+		} else {
+			prd.image = inputs["image"].files[0];
+			prd.hasImage = true;
+		}
+	}
 	prd.category = parseInt(inputs["category"].value);
 	prd.dispOrder = parseInt(inputs["dispOrder"].value);
 	if (isNaN(prd.dispOrder)) { prd.dispOrder = 0; }
@@ -26,12 +41,6 @@ function Product_fromForm(formId) {
 	if (isNaN(prd.discountRate)) { prd.discountRate = 0.0; }
 	if (inputs["composition"] == "1") { prd.composition = true; }
 	else { prd.composition = false; }
-	// hasImage is used only locally
-	if ("hasImage" in inputs && inputs["hasImage"].value != "0") {
-		prd.hasImage = true;
-	} else {
-		prd.hasImage = false;
-	}
 	// taxedPrice is used only locally
 	prd.taxedPrice = parseFloat(inputs["taxedPrice"].value);
 	return prd;

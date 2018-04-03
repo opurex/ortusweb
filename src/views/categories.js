@@ -37,6 +37,15 @@ var view_category = `
 				<dt><label for="edit-label">Désignation</label></dt>
 				<dd><input class="form-control" id="edit-label" type="text" name="label" {{#category}}value="{{label}}"{{/category}} required="true" /></dd>
 
+				<dt><label for="edit-image">Image</dt>
+				<dd>
+					{{#category}}{{#hasImage}}<img id="category-image" class="img img-thumbnail thumbnail" src="{{#imgUrl}}{{id}}{{/imgUrl}}" />{{/hasImage}}{{/category}}
+					<input id="edit-image" type="file" name="image" accept="image/*" />
+					<input type="hidden" name="clear-image" value="0" id="clear-image" />
+					{{#category}}{{#hasImage}}<a id="toggle-image" class="btn btn-del" onclick="javascript:category_toggleImage();return false;" >Supprimer</a>
+					<input type="hidden" name="hasImage" value="1" />{{/hasImage}}{{/category}}
+				</dd>
+
 				<dt><label for="edit-reference">Référence</label></dt>
 				<dd><input class="form-control" id="edit-reference" type="text" name="reference" {{#category}}value="{{reference}}"{{/category}} /></dd>
 
@@ -54,23 +63,7 @@ var view_category = `
 				<dd><input class="form-control" id="edit-dispOrder" type="number" name="dispOrder" {{#category}}value="{{dispOrder}}"{{/category}}{{^category}}value="0"{{/category}}></dd>
 
 			</dl>
-			{{#category}}<input type="hidden" name="hasImage" value="{{#hasImage}}1{{/hasImage}}{{^hasImage}}0{{/hasImage}}" />{{/category}}
-			<!-- TODO: restore image
-			<div class="row spacing-row">
-				<div class="form-group row">
-					<label for="image" class="col-sm-2 control-label">Image</label>
-					<div class="col-sm-10">
-						<input id="image" type="file" name="image">
-					</div>
-				</div>
-			</div>
-			<input id="clearImage" type="hidden" name="clearImage" value="0"/>
-			{{#category}}{{#hasImage}}
-			<div class="row spacing-row">
-				<img id="img" class="image-preview" src="{{#imgUrl}}{{id}}{{/imgUrl}}"></div>
-				<div class="btn-group" role="group"><a class="btn btn-delete" onclick="javascript:clearImage();">Supprimer</a><a class="btn btn-add" onclick="javascript:restoreImage();">Restaurer</a>
-			</div>
-			{{/hasImage}}{{/category}}-->
+
 			<div class="form-group">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>

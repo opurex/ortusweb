@@ -144,6 +144,24 @@ function product_updatePrice() {
 	}
 }
 
+function products_toggleImage() {
+	let clearImage = document.getElementById("clear-image");
+	let imgTag = document.getElementById("product-image");
+	let imgInput = document.getElementById("edit-image");
+	let deleteBtn = document.getElementById("toggle-image");
+	if (clearImage.value == "0") {
+		clearImage.value = "1";
+		imgTag.classList.add("hidden");
+		imgInput.value = "";
+		imgInput.classList.add("hidden");
+		deleteBtn.innerHTML = "Restaurer";
+	} else {
+		clearImage.value = "0";
+		imgTag.classList.remove("hidden");
+		imgInput.classList.remove("hidden");
+		deleteBtn.innerHTML = "Supprimer";
+	}
+}
 function products_saveProduct() {
 	let prd = Product_fromForm("edit-product-form");
 	gui_showLoading();
@@ -164,8 +182,25 @@ function products_saveCallback(request, status, response) {
 	if (!("id" in prd)) {
 		prd.id = parseInt(response);
 	}
+	if ("image" in prd) {
+		if (prd.image == null) {
+			srvcall_delete("api/image/product/" + prd.id, function(request, status, response) {
+				_products_saveCommit(prd);
+			});
+		} else {
+			srvcall_patch("api/image/product/" + prd.id, prd.image, function(request, status, response) {
+				_products_saveCommit(prd);
+			});
+		}
+	} else {
+		_products_saveCommit(prd);
+	}
+}
+
+function _products_saveCommit(prd) {
 	// Update in local database
 	let prdStore = appData.db.transaction(["products"], "readwrite").objectStore("products");
+	delete prd.image;
 	let req = prdStore.put(prd);
 	req.onsuccess = function(event) {
 		gui_hideLoading();

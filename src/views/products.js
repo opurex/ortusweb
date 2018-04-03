@@ -50,6 +50,15 @@ var view_product_form = `
 					<dt><label for="edit-label">Désignation</label></dt>
 					<dd><input class="form-control" id="edit-label" type="text" name="label" {{#product}}value="{{label}}"{{/product}} required="true" /></dd>
 
+					<dt><label for="edit-image">Image</dt>
+					<dd>
+						{{#product}}{{#hasImage}}<img id="product-image" class="img img-thumbnail thumbnail" src="{{#imgUrl}}{{id}}{{/imgUrl}}" />{{/hasImage}}{{/product}}
+						<input id="edit-image" type="file" name="image" accept="image/*" />
+						<input type="hidden" name="clear-image" value="0" id="clear-image" />
+						{{#product}}{{#hasImage}}<a id="toggle-image" class="btn btn-del" onclick="javascript:products_toggleImage();return false;" >Supprimer</a>
+						<input type="hidden" name="hasImage" value="1" />{{/hasImage}}{{/product}}
+					</dd>
+
 					<dt><label for="edit-category">Catégorie</label></dt>
 					<dd>
 						<select class="form-control" id="edit-category" name="category">
@@ -125,8 +134,7 @@ var view_product_form = `
 				</dl>
 			</fieldset>
 		<input type="hidden" name="composition" value="{{#product}}{{#composition}}1{{/composition}}{{^composition}}0{{/composition}}{{/product}}{{^product}}0{{/product}}" />
-		{{#product}}<input type="hidden" name="hasImage" value="{{#hasImage}}1{{/hasImage}}{{^hasImage}}0{{/hasImage}}" />{{/product}}
-		<!-- TODO: restore image -->
+
 		<div class="form-group">
 			<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 		</div>

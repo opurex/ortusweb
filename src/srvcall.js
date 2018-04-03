@@ -12,28 +12,42 @@ function _srvcall_send(target, method, data, callback) {
 			callback(request, request.status, request.responseText);
 		}
 	};
-	let dataStr = null;
-	if (data != null) {
-		dataStr = JSON.stringify(data);
+	let dataSend = null;
+	let dataType = null;
+	if (data instanceof File) {
+		dataType = "application/octet-stream";
+	} else if (data != null) {
+		dataType = "application/json";
+		dataSend = JSON.stringify(data);
 	}
 	switch (method) {
 	case "PUT":
 	case "POST":
 	case "PATCH":
 		request.open(method.toUpperCase(), login_getHostUrl() + target);
-		request.setRequestHeader("Content-type", "application/json");
 		break;
 	case "GET":
 	default:
 		request.open("GET", login_getHostUrl() + target);
 		break;
 	}
+	if (dataType != null) {
+		request.setRequestHeader("Content-type", dataType);
+	}
 	var token = login_getToken();
 	if (token != null) {
 		request.setRequestHeader("Token", token);
 	}
 	try {
-		request.send(dataStr);
+		if (data instanceof File) {
+			let reader = new FileReader();
+			reader.onload = function() {
+				request.send(reader.result);
+			}
+			reader.readAsArrayBuffer(data)
+		} else {
+			request.send(dataSend);
+		}
 	} catch (error) {
 		callback(request, request.status, error);
 	}

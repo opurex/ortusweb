@@ -1,4 +1,3 @@
-
 function Category_fromForm(formId) {
 	let inputs = document.forms[formId].elements;
 	let cat = {};
@@ -14,11 +13,20 @@ function Category_fromForm(formId) {
 	} else {
 		cat.parent = parseInt(inputs["parent"].value);
 	}
-	// hasImage is used only locally
-	if ("hasImage" in inputs && inputs["hasImage"].value != "0") {
-		cat.hasImage = true;
-	} else {
+	if (inputs["clear-image"].value != "0") {
+		cat.image = null;
 		cat.hasImage = false;
+	} else {
+		if (inputs["image"].files.length == 0) {
+			if ("hasImage" in inputs && inputs["hasImage"].value != "0") {
+				cat.hasImage = true;
+			} else {
+				cat.hasImage = false;
+			}
+		} else {
+			cat.image = inputs["image"].files[0];
+			cat.hasImage = true;
+		}
 	}
 	return cat;
 }
