@@ -1,5 +1,6 @@
 var view_table = `
 <div class="box">
+{{#title}}<h2>{{.}}</h2>{{/title}}
 <table class="table table-bordered table-hover">
 <thead>
 <tr>

@@ -230,7 +230,9 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 		"categoriesCount": categories.length,
 		"catTaxes": catTaxes,
 		"catTaxesCount": catTaxes.length * 2,
-		"z": renderZs
+		"z": renderZs,
+		"start": document.forms["ztickets-filter"].elements["start"].value,
+		"stop": document.forms["ztickets-filter"].elements["stop"].value
 	};
 	var html = Mustache.render(view_zticketsTable, elements);
 	document.getElementById('z-content').innerHTML = html;

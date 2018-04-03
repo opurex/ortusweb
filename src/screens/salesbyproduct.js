@@ -141,7 +141,12 @@ function _salesbyproduct_render(categories, products) {
 			lines.push(line);
 		}
 	}
-	let elements = {"headers": headers, "lines": lines};
+	let elements = {"headers": headers, "lines": lines,
+		"title": "Ventes par produits du "
+			+ document.forms["tickets-filter"].elements["start"].value
+			+ " au "
+			+ document.forms["tickets-filter"].elements["stop"].value
+	};
 	var html = Mustache.render(view_table, elements);
 	document.getElementById('report-content').innerHTML = html;
 	gui_hideLoading();

@@ -28,6 +28,7 @@ var view_ztickets = `
 
 var view_zticketsTable = `
 <div class="box">
+<h2>Tickets Z du {{start}} au {{stop}}</h2>
 <table class="table table-bordered table-hover">
 <thead>
 <tr>
