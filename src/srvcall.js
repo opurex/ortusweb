@@ -24,6 +24,7 @@ function _srvcall_send(target, method, data, callback) {
 	case "PUT":
 	case "POST":
 	case "PATCH":
+	case "DELETE":
 		request.open(method.toUpperCase(), login_getHostUrl() + target);
 		break;
 	case "GET":
