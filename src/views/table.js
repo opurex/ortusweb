@@ -1,24 +1,20 @@
-var view_table = `
+Vue.component("vue-table", {
+	props: ["table"],
+	template: `
 <div class="box">
-{{#title}}<h2>{{.}}</h2>{{/title}}
-<table class="table table-bordered table-hover">
-<thead>
-<tr>
-	{{#headers}}
-	<th>{{.}}</th>
-	{{/headers}}
-</tr>
-</thead>
-<tbody>
-	{{#lines}}
-	<tr>
-		{{#.}}
-		<td>{{.}}</td>
-		{{/.}}
-	</tr>
-	{{/lines}}
-</tbody>
-</table>
+	<h2 v-if="table.title">{{table.title}}</h2>
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th v-for="header in table.headers">{{header}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="line in table.lines">
+				<td v-for="cell in line">{{cell}}</td>
+			</tr>
+		</tbody>
+	</table>
 </div>
-`;
+`});
 

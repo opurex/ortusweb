@@ -1,7 +1,5 @@
 function customers_show() {
 	gui_showLoading();
-	let html = Mustache.render(view_customers, {});
-	document.getElementById('content').innerHTML = html;
 	let custStore = appData.db.transaction(["customers"], "readonly").objectStore("customers");
 	let customers = [];
 	custStore.openCursor().onsuccess = function(event) {
@@ -17,20 +15,14 @@ function customers_show() {
 function _customers_showCustomers(customers) {
 	gui_hideLoading();
 	var sortedCusts = customers.sort(tools_sort("dispName", "card"));
-	var elements = {
-		"customers": sortedCusts,
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/customer/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	for (let i = 0; i < elements["customers"].length; i++) {
-		let cust = elements["customers"][i];
+	for (let i = 0; i < sortedCusts.length; i++) {
+		let cust = sortedCusts[i];
 		cust.balance = cust.balance.toLocaleString();
 	}
-	var html = Mustache.render(view_customer_list, elements);
-	document.getElementById('customer-list').innerHTML = html;
+	vue.screen.data = {
+		"customers": sortedCusts
+	}
+	vue.screen.component = "vue-customer-list";
 }
 
 function customers_showCustomer(custId) {
@@ -42,7 +34,7 @@ function customers_showCustomer(custId) {
 				_customers_showCustomer(event.target.result, data["taxes"], data["tariffareas"], data["discountprofiles"]);
 			}
 		} else {
-			_customers_showCustomer(null, data["taxes"], data["tariffareas"], data["discountprofiles"]);
+			_customers_showCustomer(Customer_default(), data["taxes"], data["tariffareas"], data["discountprofiles"]);
 		}
 	});
 }
@@ -50,49 +42,42 @@ function customers_showCustomer(custId) {
 function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles) {
 	gui_hideLoading();
 	if (customer != null) {
-		for (let i = 0; i < taxes.length; i++) {
-			if (customer["tax"] == taxes[i]["id"]) {
-				taxes[i]["selected"] = true;
-				break;
-			}
-		}
-		for (let i = 0; i < tariffAreas.length; i++) {
-			if (customer["tariffArea"] == tariffAreas[i]["id"]) {
-				tariffAreas[i]["selected"] = true;
-				break;
-			}
-		}
-		for (let i = 0; i < discountProfiles.length; i++) {
-			if (customer["discountProfile"] == discountProfiles[i]["id"]) {
-				discountProfiles[i]["selected"] = true;
-				break;
-			}
-		}
 		if (customer.expireDate != null) {
 			customer.expireDate = tools_dateToString(new Date(customer.expireDate * 1000));
 		}
 	}
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
-	var elements = {
+	vue.screen.data = {
 		"customer": customer,
 		"taxes": taxes,
 		"tariffAreas": tariffAreas,
 		"discountProfiles": discountProfiles,
+		"deleteImage": false,
+		"deleteImageButton": "Supprimer",
+		"hadImage": customer.hasImage, // Save for later check
 		"start": tools_dateToString(start),
 		"stop": tools_dateToString(stop),
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/customer/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	var html = Mustache.render(view_customer_form, elements);
-	document.getElementById('content').innerHTML = html;
+		"customerHistory": null
+	}
+	vue.screen.component = "vue-customer-form";
+}
+
+function customers_toggleImage() {
+	if (vue.screen.data.customer.hasImage) {
+		vue.screen.data.customer.hasImage = false;
+		vue.screen.data.deleteImage = true;
+		document.getElementById("edit-image").value = "";
+		vue.screen.data.deleteImageButton = "Restaurer";
+	} else {
+		vue.screen.data.customer.hasImage = true;
+		vue.screen.data.deleteImage = false;
+		vue.screen.data.deleteImageButton = "Supprimer";
+	}
 }
 
 function customers_saveCustomer() {
-	let cust = Customer_fromForm("edit-customer-form");
+	let cust = vue.screen.data.customer;
 	if (cust.expireDate == null && document.getElementById("edit-expireDate").value != "") {
 		gui_showError("Date d'expiration invalide");
 		return;
@@ -105,11 +90,9 @@ function customers_saveCustomer() {
 }
 
 function customers_saveBalance() {
-	let custId = parseInt(document.getElementById("customer-balance-id").value);
-	let balance = parseFloat(document.getElementById("edit-balance").value);
+	let custId = vue.screen.data.customer.id;
+	let balance = vue.screen.data.customer.balance;
 	gui_showLoading();
-	// Update balance input
-	document.getElementById("show-balance").value = balance;
 	srvcall_patch("api/customer/" + custId + "/balance/" + balance, null, _customers_saveCallbackClosure(customers_saveBalance));
 }
 
@@ -123,12 +106,40 @@ function _customers_saveCallbackClosure(originalFunc) {
 }
 
 function _customers_saveCallback(request, status, response) {
-	let cust = Customer_fromForm("edit-customer-form");
+	let cust = vue.screen.data.customer;
 	if (!("id" in cust)) {
 		cust.id = parseInt(response);
 	}
 	if (cust.expireDate != null) {
 		cust.expireDate = cust.expireDate.getTime() / 1000
+	}
+	let imgTag = document.getElementById("edit-image");
+	if (vue.screen.data.deleteImage) {
+		cust.hasImage = false;
+		srvcall_delete("api/image/customer/" + cust.id, function(request, status, response) {
+			_customers_saveCommit(cust);
+		});
+	} else if (imgTag.files.length != 0) {
+		cust.hasImage = true;
+		if (vue.screen.data.hadImage) {
+			srvcall_patch("api/image/customer/" + cust.id, imgTag.files[0], function(request, status, response) {
+				_customers_saveCommit(cust);
+			});
+		} else {
+			srvcall_put("api/image/customer/" + cust.id, imgTag.files[0], function(request, status, response) {
+				_customers_saveCommit(cust);
+			});
+		}
+	} else {
+		_customers_saveCommit(cust);
+	}
+}
+
+function _customers_saveCommit(cust) {
+	if (cust.hasImage) {
+		// Force image refresh
+		cust.hasImage = false;
+		cust.hasImage = true;
 	}
 	// Update in local database
 	let custStore = appData.db.transaction(["customers"], "readwrite").objectStore("customers");
@@ -141,23 +152,23 @@ function _customers_saveCallback(request, status, response) {
 		gui_hideLoading();
 		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
 	}
+
 }
 
 function customers_filterHistory() {
-	let inputs = document.forms["customer-history-filter"].elements;
-	let start = inputs["start"].value.split("/");
+	let start = vue.screen.data.start.split("/");
 	if (start.length != 3) {
 		start = new Date(new Date().getTime() - 604800000);
 	} else {
 		start = new Date(start[2], start[1] - 1, start[0]);
 	}
-	let stop = inputs["stop"].value.split("/");
+	let stop = vue.screen.data.stop.split("/");
 	if (stop.length != 3) {
 		stop = new Date(new Date().getTime() + 86400000);
 	} else {
 		stop = new Date(stop[2], stop[1] - 1, stop[0]);
 	}
-	let custId = document.forms["edit-customer-form"].elements["id"].value;
+	let custId = vue.screen.data.customer.id;
 	srvcall_get("api/ticket/search?dateStart=" + (start.getTime() / 1000) + "&dateStop=" + (stop.getTime() / 1000) + "&customer=" + custId, _customers_historyCallback);
 	gui_showLoading();
 }
@@ -178,7 +189,6 @@ function _customers_historyCallback(request, status, response) {
 			});
 		}
 	}
-	var html = Mustache.render(view_customerHistoryTable, {"lines": lines});
-	document.getElementById("customer-history").innerHTML = html;
+	vue.screen.data.customerHistory = lines;
 	gui_hideLoading();
 }

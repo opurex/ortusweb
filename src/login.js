@@ -7,7 +7,7 @@ var login_set = function(https, server, user, token) {
 }
 
 var login_logout = function() {
-	localStorage.removeItem("token");
+	sessionStorage.removeItem("token");
 }
 
 var login_getUser = function() {
@@ -36,15 +36,15 @@ var login_getHostUrl = function() {
 }
 
 var login_getToken = function() {
-	return localStorage.getItem("token");
+	return sessionStorage.getItem("token");
 }
 
 var login_updateToken = function(token) {
-	localStorage.setItem("token", token);
+	sessionStorage.setItem("token", token);
 }
 
 var login_revokeToken = function() {
-	localStorage.removeItem("token");
+	sessionStorage.removeItem("token");
 }
 
 /** Check if a JWT token is available
@@ -55,14 +55,14 @@ var login_isLogged = function() {
 
 var login_sendLogin = function() {
 	// Register login data
-	var server = document.getElementById('user_server').value;
-	var https = document.getElementById("user_https").checked;
+	var server = vue.login.server;
+	var https = vue.login.https;
 	if (!server.startsWith("http")) {
 		if (https) { server = "https://" + server; }
 		else { server = "http://" + server; }
 	}
-	var user = document.getElementById('user_login').value;
-	var password = document.getElementById('user_pass').value;
+	var user = vue.login.user;
+	var password = vue.login.password;
 	login_set(https, server, user, null);
 	// Check connection and version
 	srvcall_post("api/login", {"user": user, "password": password}, login_loginCallback);
@@ -76,13 +76,12 @@ function login_loginCallback(request, status, response) {
 	case 200:
 		if (response != "null") {
 			// Register data
-			var server = document.getElementById('user_server').value;
-			var https = document.getElementById("user_https").checked;
-			var user = document.getElementById('user_login').value;
+			var server = vue.login.server;
+			var https = vue.login.https;
+			var user = vue.login.user;
 			login_set(https, server, user);
 			// Hide login screen and let content be shown
-			document.getElementById("login-content").classList.add("hidden");
-			document.getElementById("content").classList.remove("hidden");
+			vue.login.loggedIn = true;
 			// Next operation
 			if (_login_pendingOperation == null) {
 				start();
@@ -103,24 +102,14 @@ function login_loginCallback(request, status, response) {
 	}
 }
 
+/** Set the vue app data to show the loading screen. */
 var login_show = function() {
-	var elements = {
-		"server": login_getServer(),
-		"user": login_getUser(),
-		"https": login_getHttps()
-	};
-	if (appData.srv != null) {
-		elements.server = appData.srv.host;
-		elements.user = appData.srv.user;
-	}
-	var html = Mustache.render(view_login, elements);
-	document.getElementById("login-content").innerHTML = html;
-	document.getElementById("login-content").classList.remove("hidden");
-	document.getElementById("content").classList.add("hidden");
+	vue.login.loggedIn = false;
+	vue.login.server = login_getServer();
+	vue.login.user = login_getUser();
+	vue.login.https = login_getHttps();
+	vue.login.password = "";
 	gui_hideLoading();
-	if (login_getUser()) {
-		document.getElementById("user_pass").focus();
-	}
 }
 
 var _login_pendingOperation = null;

@@ -13,18 +13,10 @@ function categories_show() {
 	}
 }
 function _categories_showCategories(categories) {
-	gui_hideLoading();
 	var sortedCats = categories.sort(tools_sort("dispOrder", "reference"));
-	var elements = {
-		"categories": sortedCats,
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/category/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	var html = Mustache.render(view_categories, elements);
-	document.getElementById('content').innerHTML = html;	
+	vue.screen.data = {categories: sortedCats};
+	vue.screen.component = "vue-category-list"
+	gui_hideLoading();
 }
 
 function categories_showCategory(id) {
@@ -52,54 +44,41 @@ function categories_showCategory(id) {
 				categories.push(cursor.value);
 				cursor.continue();
 			} else {
-				_categories_showCategory(null, categories);
+				_categories_showCategory(Category_default(), categories);
 			}
 		}
 	}
 }
 function _categories_showCategory(category, categories) {
-	gui_hideLoading();
-	if (category != null && category["parent"] != null) {
-		for (let i = 0; i < categories.length; i++) {
-			if (category["parent"] == categories[i]["id"]) {
-				categories[i]["selected"] = true;
-			}
-		}
+	vue.screen.data = {
+		category: category,
+		categories: categories,
+		deleteImage: false,
+		deleteImageButton: "Supprimer",
+		hadImage: category.hasImage // Save for later check
 	}
-	var elements = {
-		"category": category,
-		"categories": categories,
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/category/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	var html = Mustache.render(view_category, elements);
-	document.getElementById('content').innerHTML = html;		
+	vue.screen.component = "vue-category-form";
+	gui_hideLoading();
 }
 
 function category_toggleImage() {
-	let clearImage = document.getElementById("clear-image");
-	let imgTag = document.getElementById("category-image");
-	let imgInput = document.getElementById("edit-image");
-	let deleteBtn = document.getElementById("toggle-image");
-	if (clearImage.value == "0") {
-		clearImage.value = "1";
-		imgTag.classList.add("hidden");
-		imgInput.value = "";
-		imgInput.classList.add("hidden");
-		deleteBtn.innerHTML = "Restaurer";
+	if (vue.screen.data.category.hasImage) {
+		vue.screen.data.category.hasImage = false;
+		vue.screen.data.deleteImage = true;
+		document.getElementById("edit-image").value = "";
+		vue.screen.data.deleteImageButton = "Restaurer";
 	} else {
-		clearImage.value = "0";
-		imgTag.classList.remove("hidden");
-		imgInput.classList.remove("hidden");
-		deleteBtn.innerHTML = "Supprimer";
+		vue.screen.data.category.hasImage = true;
+		vue.screen.data.deleteImage = false;
+		vue.screen.data.deleteImageButton = "Supprimer"
 	}
 }
 
 function category_saveCategory() {
-	let cat = Category_fromForm("edit-category-form");
+	let cat = vue.screen.data.category;
+	if (cat.parent == "") {
+		cat.parent = null;
+	}
 	gui_showLoading();
 	if ("id" in cat) {
 		srvcall_post("api/category", cat, category_saveCallback);
@@ -112,17 +91,27 @@ function category_saveCallback(request, status, response) {
 	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
 		return;
 	}
-	let cat = Category_fromForm("edit-category-form");
+	let cat = vue.screen.data.category;
+	if (cat.parent == "") {
+		cat.parent = null;
+	}
 	if (!("id" in cat)) {
 		cat.id = parseInt(response);
 	}
-	if ("image" in cat) {
-		if (cat.image == null) {
-			srvcall_delete("api/image/category/" + cat.id, function(request, status, response) {
+	let imgTag = document.getElementById("edit-image");
+	if (vue.screen.data.deleteImage) {
+		cat.hasImage = false;
+		srvcall_delete("api/image/category/" + cat.id, function(request, status, response) {
+			_category_saveCommit(cat);
+		});
+	} else if (imgTag.files.length != 0) {
+		cat.hasImage = true;
+		if (vue.screen.data.hadImage) {
+			srvcall_patch("api/image/category/" + cat.id, imgTag.files[0], function(request, status, response) {
 				_category_saveCommit(cat);
 			});
 		} else {
-			srvcall_patch("api/image/category/" + cat.id, cat.image, function(request, status, response) {
+			srvcall_put("api/image/category/" + cat.id, imgTag.files[0], function(request, status, response) {
 				_category_saveCommit(cat);
 			});
 		}
@@ -132,9 +121,14 @@ function category_saveCallback(request, status, response) {
 }
 
 function _category_saveCommit(cat) {
+	if (cat.hasImage) {
+		// Force image refresh
+		cat.hasImage = false;
+		cat.hasImage = true;
+	}
 	// Update in local database
 	let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
-	delete cat.image;
+	document.getElementById("edit-image").value = "";
 	let req = catStore.put(cat);
 	req.onsuccess = function(event) {
 		gui_hideLoading();
@@ -145,3 +139,4 @@ function _category_saveCommit(cat) {
 		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
 	}
 }
+

@@ -24,9 +24,11 @@ function _products_initView(categories) {
 			}
 		}
 	};
-	var html = Mustache.render(view_products, elements);
-	document.getElementById('content').innerHTML = html;
-	// Select the first category
+	vue.screen.data = {
+		"categories": sortedCats,
+		"products": []
+	};
+	vue.screen.component = "vue-product-list";
 	products_selectCategory(sortedCats[0]["id"]);
 }
 
@@ -52,16 +54,7 @@ function products_selectCategory(catId) {
 
 function products_showProducts(products) {
 	gui_hideLoading();
-	var elements = {
-		"products": products,
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/product/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	var html = Mustache.render(view_product_list, elements);
-	document.getElementById("product-list").innerHTML = html;
+	vue.screen.data.products = products;
 }
 
 function products_showProduct(prdId) {
@@ -89,7 +82,7 @@ function products_showProduct(prdId) {
 							_products_showProduct(event.target.result, categories, taxes);
 						}
 					} else {
-						_products_showProduct(null, categories, taxes);
+						_products_showProduct(Product_default(categories[0].id, taxes[0].id), categories, taxes);
 					}
 				}
 			}
@@ -98,72 +91,56 @@ function products_showProduct(prdId) {
 }
 function _products_showProduct(product, categories, taxes) {
 	gui_hideLoading();
-	if (product != null) {
-		for (let i = 0; i < categories.length; i++) {
-			if (product["category"] == categories[i]["id"]) {
-				categories[i]["selected"] = true;
-				break;
-			}
-		}
-		for (let i = 0; i < taxes.length; i++) {
-			if (product["tax"] == taxes[i]["id"]) {
-				taxes[i]["selected"] = true;
-				break;
-			}
-		}
+	vue.screen.data = {
+		product: product,
+		categories: categories,
+		taxes: taxes,
+		deleteImage: false,
+		deleteImageButton: "Supprimer",
+		hadImage: product.hasImage // Save for later check
 	}
-	var elements = {
-		"product": product,
-		"categories": categories,
-		"taxes": taxes,
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/product/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	var html = Mustache.render(view_product_form, elements);
-	document.getElementById('content').innerHTML = html;
+	vue.screen.component = "vue-product-form";
 	product_updatePrice();
 }
 
 function product_updatePrice() {
-	let sellVat = parseFloat(document.getElementById("edit-taxedPrice").value);
-	let taxSelect = document.getElementById("edit-tax");
-	let tax = taxSelect.options[taxSelect.selectedIndex];
-	let taxRate = parseFloat(tax.getAttribute("data-rate"));
+	let sellVat = vue.screen.data.product.taxedPrice;
+	let taxId = vue.screen.data.product.tax;
+	let tax = null;
+	for (let i = 0; i < vue.screen.data.taxes.length; i++) {
+		if (vue.screen.data.taxes[i].id == taxId) {
+			tax = vue.screen.data.taxes[i];
+			break;
+		}
+	}
+	let taxRate = tax.rate;
 	let priceSell = Number(sellVat / (1.0 + taxRate)).toFixed(5);
-	document.getElementById("edit-priceSell").value = priceSell;
-	let priceBuy = parseFloat(document.getElementById("edit-priceBuy").value);
+	vue.screen.data.product.priceSell = priceSell;
+	let priceBuy = vue.screen.data.product.priceBuy;
 	if (isNaN(priceBuy) || priceBuy == 0.0) {
-		document.getElementById("edit-margin").value = "";
+		vue.screen.data.product.margin = "";
 	} else {
 		let margin = Number(priceSell / priceBuy).toFixed(2);
 		let ratio = Number((priceSell / priceBuy - 1) * 100).toFixed(2);
-		document.getElementById("edit-margin").value = ratio + "%\t\t" + margin;
+		vue.screen.data.product.margin = ratio + "%\t\t" + margin;
 	}
 }
 
-function products_toggleImage() {
-	let clearImage = document.getElementById("clear-image");
-	let imgTag = document.getElementById("product-image");
-	let imgInput = document.getElementById("edit-image");
-	let deleteBtn = document.getElementById("toggle-image");
-	if (clearImage.value == "0") {
-		clearImage.value = "1";
-		imgTag.classList.add("hidden");
-		imgInput.value = "";
-		imgInput.classList.add("hidden");
-		deleteBtn.innerHTML = "Restaurer";
+function product_toggleImage() {
+	if (vue.screen.data.product.hasImage) {
+		vue.screen.data.product.hasImage = false;
+		vue.screen.data.deleteImage = true;
+		document.getElementById("edit-image").value = "";
+		vue.screen.data.deleteImageButton = "Restaurer";
 	} else {
-		clearImage.value = "0";
-		imgTag.classList.remove("hidden");
-		imgInput.classList.remove("hidden");
-		deleteBtn.innerHTML = "Supprimer";
+		vue.screen.data.product.hasImage = true;
+		vue.screen.data.deleteImage = false;
+		vue.screen.data.deleteImageButton = "Supprimer";
 	}
 }
+
 function products_saveProduct() {
-	let prd = Product_fromForm("edit-product-form");
+	let prd = vue.screen.data.product;
 	gui_showLoading();
 	if ("id" in prd) {
 		// This is an update
@@ -178,17 +155,24 @@ function products_saveCallback(request, status, response) {
 	if (srvcall_callbackCatch(request, status, response, products_saveProduct)) {
 		return;
 	}
-	let prd = Product_fromForm("edit-product-form");
+	let prd = vue.screen.data.product;
 	if (!("id" in prd)) {
 		prd.id = parseInt(response);
 	}
-	if ("image" in prd) {
-		if (prd.image == null) {
-			srvcall_delete("api/image/product/" + prd.id, function(request, status, response) {
+	let imgTag = document.getElementById("edit-image");
+	if (vue.screen.data.deleteImage) {
+		prd.hasImage = false;
+		srvcall_delete("api/image/product/" + prd.id, function(request, status, response) {
+			_products_saveCommit(prd);
+		});
+	} else if (imgTag.files.length != 0) {
+		prd.hasImage = true;
+		if (vue.screen.data.hadImage) {
+			srvcall_patch("api/image/product/" + prd.id, imgTag.files[0], function(request, status, response) {
 				_products_saveCommit(prd);
 			});
 		} else {
-			srvcall_patch("api/image/product/" + prd.id, prd.image, function(request, status, response) {
+			srvcall_put("api/image/product/" + prd.id, imgTag.files[0], function(request, status, response) {
 				_products_saveCommit(prd);
 			});
 		}
@@ -198,9 +182,14 @@ function products_saveCallback(request, status, response) {
 }
 
 function _products_saveCommit(prd) {
+	if (prd.hasImage) {
+		// Force image refresh
+		prd.hasImage = false;
+		prd.hasImage = true;
+	}
 	// Update in local database
 	let prdStore = appData.db.transaction(["products"], "readwrite").objectStore("products");
-	delete prd.image;
+	delete prd.margin;
 	let req = prdStore.put(prd);
 	req.onsuccess = function(event) {
 		gui_hideLoading();

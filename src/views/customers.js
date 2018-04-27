@@ -1,4 +1,6 @@
-var view_customers = `
+Vue.component("vue-customer-list", {
+	props: ["data"],
+	template: `<div>
 <div class="box">
 	<nav class="navbar navbar-default">
 		<div class="navbar-form navbar-left">
@@ -14,47 +16,66 @@ var view_customers = `
 				</tr>
 			</thead>
 			<tbody id="customer-list">
+				<tr v-for="customer in data.customers">
+					<td>
+						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(customer)" />{{customer.dispName}}
+					</td>
+					<td>
+						{{customer.balance}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(customer)">Edit</a></div>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
-</div>`;
+</div>
+</div>
+`,
+	methods: {
+		imageSrc: function(cust) {
+			if (cust.hasImage) {
+				return login_getHostUrl() + "/api/image/customer/" + cust.id + "?Token=" + login_getToken();
+			} else {
+				return login_getHostUrl() + "/api/image/customer/default?Token=" + login_getToken();
+			}
+		},
+		editUrl: function(cust) {
+			return "?p=customer&id=" + cust.id;
+		}
 
-var view_customer_list = `
-		{{#customers}}
-		<tr>
-			<td>
-				<img class="img img-thumbnail thumbnail pull-left" src="{{#imgUrl}}{{#hasImage}}{{id}}{{/hasImage}}{{^hasImage}}default{{/hasImage}}{{/imgUrl}}" />{{dispName}}
-			</td>
-			<td>
-				<span>{{balance}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" href="?p=customer&id={{id}}">Edit</a></div>
-			</td>
-		</tr>
-		{{/customers}}
-`;
+	}
+});
 
-var view_customer_form = `
+Vue.component("vue-customer-form", {
+	props: ["data"],
+	template : `<div>
 <div class="box">
 	<div class="box-body">
 		<h1>Édition d'un client</h1>
 		<form id="edit-customer-form" onsubmit="javascript:customers_saveCustomer(); return false;">
-			{{#customer}}<input type="hidden" name="id" value="{{id}}"/>{{/customer}}
 			<fieldset class="form-group">
 				<legend>Affichage</legend>
 				<dl class="dl-horizontal">
 					<dt><label for="edit-dispName">Nom affiché</label></dt>
-					<dd><input class="form-control" id="edit-dispName" type="text" name="dispName" {{#customer}}value="{{dispName}}"{{/customer}} required="true" /></dd>
+					<dd><input class="form-control" id="edit-dispName" type="text" v-model="data.customer.dispName" required="true" /></dd>
 
 					<dt><label for="edit-card">Carte</label></dt>
-					<dd><input class="form-control" id="edit-card" type="text" name="card" {{#customer}}value="{{card}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-card" type="text" v-model="data.customer.card" /></dd>
+
+					<dt><label for="edit-image">Image</label></dt>
+					<dd>
+						<img v-if="data.customer.hasImage" id="customer-image" class="img img-thumbnail" v-bind:src="imageSrc(data.customer)" />
+						<input id="edit-image" type="file" accept="image/*" />
+						<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:customers_toggleImage();return false;" >{{data.deleteImageButton}}</a>
+					</dd>
 
 					<dt><label for="edit-visible">Actif</label></dt>
-					<dd><input class="form-control" id="edit-visible" type="checkbox" name="visible" {{#customer}}{{#visible}}checked="checked"{{/visible}}{{/customer}}{{^customer}}checked="checked"{{/customer}}></dd>
+					<dd><input class="form-control" id="edit-visible" type="checkbox" v-model="data.customer.visible" /></dd>
 
 					<dt><label for="edit-note">Notes</label></dt>
-					<dd><textarea class="form-control" id="edit-note" name="note">{{#customer}}{{note}}{{/customer}}</textarea></dd>
+					<dd><textarea class="form-control" id="edit-note" v-model="data.customer.note"></textarea></dd>
 
 					<dt><label for="edit-expireDate">Date d'expiration</label></dt>
-					<dd><input class="form-control" id="edit-expireDate" type="text" name="expireDate" {{#customer}}value="{{expireDate}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-expireDate" type="text" v-model="data.customer.expireDate" /></dd>
 			</dl>
 			</fieldset>
 
@@ -62,10 +83,10 @@ var view_customer_form = `
 				<legend>Pré-paiement et crédits</legend>
 				<dl class="dl-horizontal">
 					<dt><label for="show-balance">Solde</label></dt>
-					<dd><input type="number" id="show-balance" name="balance" class="form-control" {{#customer}}value="{{balance}}"{{/customer}} disabled="true"></dd>
+					<dd><input type="number" id="show-balance" class="form-control" v-model="data.customer.balance" disabled="true"></dd>
 
 					<dt><label for="edit-maxDebt">Dette max.</label></dt>
-					<dd><input type="number" id="edit-maxDebt" name="maxDebt" class="form-control" {{#customer}}value="{{maxDebt}}"{{/customer}} step="0.01" /></dd>
+					<dd><input type="number" id="edit-maxDebt" class="form-control" v-model="data.customer.maxDebt" step="0.01" /></dd>
 				</dl>
 			</fieldset>
 
@@ -74,31 +95,25 @@ var view_customer_form = `
 				<dl class="dl-horizontal">
 					<dt><label for="edit-discountProfile">Profil de remise</label></dt>
 					<dd>
-						<select class="form-control" id="edit-discountProfile" name="discountProfile">
+						<select class="form-control" id="edit-discountProfile" v-model="data.customer.discountProfile">
 							<option value="">Pas de profil de remise</option>
-							{{#discountProfiles}}
-							<option value="{{id}}" {{#selected}}selected="true"{{/selected}}>{{label}}</option>
-							{{/discountProfiles}}
+							<option v-for="discountProfile in data.discountProfiles" :key="discountProfile.id" v-bind:value="discountProfile.id">{{discountProfile.label}}</option>
 						</select>
 					</dd>
 
 					<dt><label for="edit-tariffArea">Zone tarifaire</label></dt>
 					<dd>
-						<select class="form-control" id="edit-tariffArea" name="tariffArea">
+						<select class="form-control" id="edit-tariffArea" v-model="data.customer.tariffArea">
 							<option value="">Pas de zone tarifaire</option>
-							{{#tariffAreas}}
-							<option value="{{id}}" {{#selected}}selected="true"{{/selected}}>{{label}}</option>
-							{{/tariffAreas}}
+							<option v-for="tariffArea in data.tariffAreas" :key="tariffArea.id" v-bind:value="tariffArea.id">{{tariffArea.label}}</option>
 						</select>
 					</dd>
 
 					<dt><label for="edit-tax">TVA</label></dt>
 					<dd>
-						<select class="form-control" id="edit-tax" name="tax">
+						<select class="form-control" id="edit-tax" v-model="data.customer.tax">
 							<option value="">Pas de modification</option>
-							{{#taxes}}
-							<option value="{{id}}" {{#selected}}selected="true"{{/selected}}>{{label}}</option>
-							{{/taxes}}
+							<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 						</select>
 					</dd>
 
@@ -109,40 +124,40 @@ var view_customer_form = `
 				<legend>Coordonnées</legend>
 				<dl class="dl-horizontal">
 					<dt><label for="edit-firstName">Prénom</label></dt>
-					<dd><input class="form-control" id="edit-firstName" type="text" name="firstName" {{#customer}}value="{{firstName}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-firstName" type="text" v-model="data.customer.firstName" /></dd>
 
 					<dt><label for="edit-lastName">Nom</label></dt>
-					<dd><input class="form-control" id="edit-lastName" type="text" name="lastName" {{#customer}}value="{{lastName}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-lastName" type="text" v-model="data.customer.lastName" /></dd>
 
 					<dt><label for="edit-email">Email</label></dt>
-					<dd><input class="form-control" id="edit-email" type="text" name="email" {{#customer}}value="{{email}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-email" type="text" v-model="data.customer.email" /></dd>
 
 					<dt><label for="edit-phone1">Téléphone</label></dt>
-					<dd><input class="form-control" id="edit-phone1" type="text" name="phone1" {{#customer}}value="{{phone1}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-phone1" type="text" v-model="data.customer.phone1" /></dd>
 
 					<dt><label for="edit-phone2">Téléphone 2</label></dt>
-					<dd><input class="form-control" id="edit-phone2" type="text" name="phone2" {{#customer}}value="{{phone2}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-phone2" type="text" v-model="data.customer.phone2" /></dd>
 
 					<dt><label for="edit-fax">Fax</label></dt>
-					<dd><input class="form-control" id="edit-fax" type="text" name="fax" {{#customer}}value="{{fax}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-fax" type="text" v-model="data.customer.fax" /></dd>
 
 					<dt><label for="edit-addr1">Adresse</label></dt>
-					<dd><input class="form-control" id="edit-addr1" type="text" name="addr1" {{#customer}}value="{{addr1}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-addr1" type="text" v-model="data.customer.addr1" /></dd>
 
 					<dt><label for="edit-addr2">Adresse 2</label></dt>
-					<dd><input class="form-control" id="edit-addr2" type="text" name="addr2" {{#customer}}value="{{addr2}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-addr2" type="text" v-model="data.customer.addr2" /></dd>
 
 					<dt><label for="edit-zipCode">Code postal</label></dt>
-					<dd><input class="form-control" id="edit-zipCode" type="text" name="zipCode" {{#customer}}value="{{zipCode}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-zipCode" type="text" v-model="data.customer.zipCode" /></dd>
 
 					<dt><label for="edit-city">Ville</label></dt>
-					<dd><input class="form-control" id="edit-city" type="text" name="city" {{#customer}}value="{{city}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-city" type="text" v-model="data.customer.city" /></dd>
 
 					<dt><label for="edit-region">Région</label></dt>
-					<dd><input class="form-control" id="edit-region" type="text" name="region" {{#customer}}value="{{region}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-region" type="text" v-model="data.customer.region" /></dd>
 
 					<dt><label for="edit-country">Pays</label></dt>
-					<dd><input class="form-control" id="edit-country" type="text" name="country" {{#customer}}value="{{country}}"{{/customer}} /></dd>
+					<dd><input class="form-control" id="edit-country" type="text" v-model="data.customer.country" /></dd>
 				</dl>
 			</fieldset>
 
@@ -152,39 +167,35 @@ var view_customer_form = `
 		</form>
 	</div>
 </div>
-<div class="box" style="margin-top:1ex">
-	{{#customer}}
+<div class="box" style="margin-top:1ex" v-if="data.customer.id">
 	<div class="box-body">
 		<h2>Modifier le solde</h2>
 		<form id="edit-customer-balance-form" onsubmit="javascript:customers_saveBalance(); return false;">
-			{{#customer}}<input id="customer-balance-id" type="hidden" name="id" value="{{id}}"/>{{/customer}}
 			<dl class="dl-horizontal">
 				<dt><label for="edit-balance">Solde</label></dt>
-				<dd><input type="number" id="edit-balance" name="balance" class="form-control" value="{{balance}}" step="0.01" /></dd>
+				<dd><input type="number" id="edit-balance" class="form-control" v-model="data.customer.balance" step="0.01" /></dd>
 			</dl>
 			<div class="form-group">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
 		</form>
 	</div>
-	{{/customer}}
 </div>
 
-{{#customer}}
-<div class="box" style="margin-top:1ex">
+<div class="box" style="margin-top:1ex" v-if="data.customer.id">
 	<nav class="navbar navbar-default">
 		<h2>Historique client</h2>
 		<form id="customer-history-filter" onsubmit="javascript:customers_filterHistory();return false;">
 			<div class="navbar-form navbar-left">
 				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
 					<label for="start">Du</label>
-					<input type="text" class="form-control" name="start" id="start" value="{{start}}" />
+					<input type="text" class="form-control" id="start" v-model="data.start" />
 				</div>
 			</div>
 			<div class="navbar-form navbar-left">
 				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
 					<label for="stop">au</label>
-					<input type="text" class="form-control" name="stop" id="stop" value="{{stop}}" />
+					<input type="text" class="form-control" id="stop" v-model="data.stop" />
 				</div>
 			</div>
 			<div class="row actions">
@@ -194,12 +205,7 @@ var view_customer_form = `
 			</div>
 		</form>
 	</nav>
-	<div class="box-body" id="customer-history">
-	</div>
-</div>
-{{/customer}}`;
-
-var view_customerHistoryTable = `
+	<div class="box-body" id="customer-history" v-if="data.customerHistory">
 	<table class="table table-bordered table-hover">
 		<thead>
 			<tr>
@@ -209,13 +215,25 @@ var view_customerHistoryTable = `
 			</tr>
 		</thead>
 		<tbody>
-			{{#lines}}
-			<tr>
-				<td>{{date}}</td>
-				<td>{{product}}</td>
-				<td>{{quantity}}</td>
+			<tr v-for="line in data.customerHistory">
+				<td>{{line.date}}</td>
+				<td>{{line.product}}</td>
+				<td>{{line.quantity}}</td>
 			</tr>
-			{{/lines}}
 		</tbody>
 	</table>
-`;
+	</div>
+</div>
+</div>
+`,
+	methods: {
+		imageSrc: function(cust) {
+			if (cust.hasImage) {
+				return login_getHostUrl() + "/api/image/customer/" + cust.id + "?Token=" + login_getToken();
+			} else {
+				return login_getHostUrl() + "/api/image/customer/default?Token=" + login_getToken();
+			}
+		}
+	}
+});
+

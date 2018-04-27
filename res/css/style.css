@@ -13,12 +13,11 @@
 
 body {
 	background: #999 url(../img/fond.png) repeat center fixed;
-	padding-top: 75px;
 	font-family:"PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 	line-height: 1.42857;
 	color: #555;
 }
-.navbar > .container-fluid .navbar-brand { padding: 1px; margin-left: 0; }
+.navbar.container-fluid .navbar-brand { padding: 1px; margin-left: 0; }
 .navbar-brand img { height: 100%; }
 h1, h2, h3, h4, h5, h6 {
 	color: #A3351E;
@@ -60,6 +59,11 @@ dt {
 .login-box .login-box-body {
 	padding: 2em;
 }
+
+#content {
+	padding-top: 75px;
+}
+
 .box {
 	background-color: #fff;
 	border-radius: 4px;

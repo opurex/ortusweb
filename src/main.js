@@ -1,3 +1,5 @@
+/** The vue.js app. */
+var vue = null;
 var appData = {
 	db: null
 };
@@ -7,32 +9,70 @@ function route(screen) {
 		screen = "default";
 	}
 	if (login_getToken() == null) {
-		gui_showScreen("login");
+		login_show();
 		return;
 	}
 	switch (screen) {
-	case "home":
 	case "categories":
-	case "customers":
+		categories_show();
+		break;
 	case "products":
+		products_show();
+		break;
+	case "customers":
+		customers_show();
+		break;
 	case "sales_z":
+		ztickets_show();
+		break;
 	case "salesbyproduct":
-		gui_showScreen(screen);
+		salesbyproduct_show();
 		break;
 	case "category":
-	case "product":
-	case "customer":
-		gui_showScreen(screen, _get("id"));
+		categories_showCategory(_get("id"));
 		break;
+	case "product":
+		products_showProduct(_get("id"));
+		break;
+	case "customer":
+		customers_showCustomer(_get("id"));
+		break;
+	case "home":
 	default:
-		gui_showScreen("home");
+		home_show();
 		break;
 	}
-	gui_showMenu();
 }
 
 
 function boot() {
+	vue = new Vue({
+		el: "#vue-app",
+		data: {
+			ready: false,
+			loading: {
+				loading: false,
+				progress: null,
+				progressMax: null
+			},
+			message: {
+				type: null,
+				message: null
+			},
+			login: {
+				loggedIn: false,
+				server: null,
+				user: null,
+				https: "0",
+				password: ''
+			},
+			menu: menu_init(),
+			screen: {
+				component: undefined,
+				data: null
+			}
+		}
+	});
 	if (!storage_available) {
 		gui_showError("Stockage des données non disponible. Votre navigateur est peut être obsolète.");
 		return;
@@ -46,6 +86,15 @@ function boot() {
 }
 
 function start() {
+	// Initialize default dynamic values
+	vue.login = {
+		loggedIn: login_isLogged(),
+		server: login_getServer(),
+		user: login_getUser(),
+		https: login_getHttps(),
+		password: ''
+	}
+	vue.ready = true;
 	// Show home/config screen
 	route(_get("p"));
 	gui_hideLoading();

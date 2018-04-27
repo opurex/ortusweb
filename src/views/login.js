@@ -1,5 +1,7 @@
-var view_login = `
-<div id="login" class="login-box">
+
+Vue.component("vue-login", {
+	props: ["login"],
+	template: `<div id="login" class="login-box" v-if="login.loggedIn == false">
 	<div class="row-fluid">
 		<div class="col-md-4">
 			<div class="box login-logo">
@@ -13,18 +15,18 @@ var view_login = `
 					<div id="login">
 						<div class="form-group">
 							<label class="control-label required" for="user_server">Serveur</label>
-							<input type="text" name="server" id="user_server" required="required" class="form-control" value="{{server}}" />
+							<input type="text" id="user_server" required="required" class="form-control" v-model="login.server" />
 						</div>
 						<div class="form-group">
 							<label class="control-label required" for="user_login">Identifiant</label>
-							<input type="text" name="login" id="user_login" required="required" class="form-control" value="{{user}}" />
+							<input type="text" id="user_login" required="required" class="form-control" v-model="login.user" />
 						</div>
 						<div class="form-group">
 							<label class="control-label required" for="user_pass">Mot de passe</label>
-							<input type="password" name="password" id="user_pass" required="required" class="form-control" value="" />
+							<input type="password" id="user_pass" required="required" class="form-control" v-model="login.password" />
 						</div>
 						<div class="checkbox">
-							<input type="checkbox" name="https" id="user_https" {{#https}}checked="true"{{/https}} />
+							<input type="checkbox" name="https" id="user_https" v-model="login.https" />
 							<label for="user_https">Connexion sécurisée</label>
 						</div>
 					</div>
@@ -35,5 +37,12 @@ var view_login = `
 			</div>
 		</div>
 	</div>
-</div>`;
+</div>
+`,
+	mounted: function() {
+		if (login_getUser()) {
+			document.getElementById("user_pass").focus();
+		}
+	}
+});
 

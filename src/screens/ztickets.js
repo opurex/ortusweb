@@ -3,19 +3,21 @@ function ztickets_show() {
 	start = tools_dateToString(start);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	stop = tools_dateToString(stop);
-	var html = Mustache.render(view_ztickets, {"start": start, "stop": stop});
-	document.getElementById('content').innerHTML = html;
+	vue.screen.data = {
+		"start": start,
+		"stop": stop
+	}
+	vue.screen.component = "vue-zticket-list";
 }
 
 function ztickets_filter() {
-	let inputs = document.forms["ztickets-filter"].elements;
-	let start = inputs["start"].value.split("/");
+	let start = vue.screen.data.start.split("/");
 	if (start.length != 3) {
 		start = new Date(new Date().getTime() - 604800000);
 	} else {
 		start = new Date(start[2], start[1] - 1, start[0]);
 	}
-	let stop = inputs["stop"].value.split("/");
+	let stop = vue.screen.data.stop.split("/");
 	if (stop.length != 3) {
 		stop = new Date(new Date().getTime() + 86400000);
 	} else {
@@ -222,20 +224,17 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 		}
 	}
 	// Render
-	let elements = { "paymentModes": paymentModes,
-		"paymentModesCount": paymentModes.length,
+	vue.screen.data = {
+		"paymentModes": paymentModes,
 		"taxes": taxes,
-		"taxesCount": taxes.length * 2,
 		"categories": categories,
-		"categoriesCount": categories.length,
 		"catTaxes": catTaxes,
-		"catTaxesCount": catTaxes.length * 2,
 		"z": renderZs,
-		"start": document.forms["ztickets-filter"].elements["start"].value,
-		"stop": document.forms["ztickets-filter"].elements["stop"].value
+		"start": vue.screen.data.start,
+		"stop": vue.screen.data.stop,
+		"startDisp": vue.screen.data.start,
+		"stopDisp": vue.screen.data.stop
 	};
-	var html = Mustache.render(view_zticketsTable, elements);
-	document.getElementById('z-content').innerHTML = html;
 	gui_hideLoading();
 }
 

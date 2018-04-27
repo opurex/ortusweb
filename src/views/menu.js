@@ -1,5 +1,6 @@
-var view_menu = `
-<div class="navbar-header">
+Vue.component("vue-menu", {
+	props: ["menu"],
+	template: `<nav id="menu" class="navbar navbar-fixed-top navbar-inverse container-fluid"><div class="navbar-header">
 	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false">
 	<span class="sr-only">Toggle menu</span>
 	<span class="icon-bar"></span>
@@ -11,17 +12,45 @@ var view_menu = `
 	</a>
 </div>
 <div class="collapse navbar-collapse" id="main-menu">
-	{{#sections}}
 	<ul class="nav navbar-nav">
-		<li class="dropdown">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-extended="false">{{name}}</a>
-		<ul class="dropdown-menu">
-			{{#items}}
-			<li><a style="background-image:url('res/img/{{#icon}}{{.}}{{/icon}}{{^icon}}menu_default.png{{/icon}}'); background-repeat: no-repeat; background-position: 2px 50%; padding-left: 25px;" href="?p={{target}}">{{name}}</a></li>
-			{{/items}}
+		<li class="dropdown" v-for="section in menu.sections">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-extended="false">{{section.name}}</a>
+			<ul class="dropdown-menu">
+				<li v-for="item in section.items"><a v-bind:style="item.icon" v-bind:href="item.target">{{item.name}}</a></li>
 			</ul>
 		</li>
 	</ul>
-	{{/sections}}
-</div>`;
+</div></nav>
+`});
+
+// TODO: this section should be moved in the controller
+function _menu_getTargetUrl(target) {
+	return "?p=" + target;
+}
+function _menu_getIcon(icon) {
+	// TODO: the default style should be in the CSS file
+	let style = "background-repeat: no-repeat; background-position: 2px 50%; padding-left: 25px;";
+	if (icon) {
+		return style + " background-image:url('res/img/" + icon + "');";
+	} else {
+		return style + " background-image:url('res/img/menu_default.png');";
+	}
+}
+function menu_init() {
+	return {
+		"sections": [
+			{"name": "Catalogue",
+			"items": [
+				{"target": _menu_getTargetUrl("categories"), "name": "Categories", "icon": _menu_getIcon("menu_category.png")},
+				{"target": _menu_getTargetUrl("products"), "name": "Produits", "icon": _menu_getIcon("menu_product.png")},
+				{"target": _menu_getTargetUrl("customers"), "name": "Clients", "icon": _menu_getIcon("menu_customer.png")},
+			]},
+			{"name": "Ventes",
+			"items": [
+				{"target": _menu_getTargetUrl("sales_z"), "name": "Tickets Z", "icon": _menu_getIcon(null)},
+				{"target": _menu_getTargetUrl("salesbyproduct"), "name": "Par produit", "icon": _menu_getIcon(null)},
+			]}
+		]
+	}
+}
 

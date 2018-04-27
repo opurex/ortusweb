@@ -1,27 +1,23 @@
 function home_show() {
-	var elements = {
-		"server": login_getServer(),
-		"user": login_getUser(),
-		"hasData": storage_hasData()
-	};
+	vue.screen.data = {
+		user: vue.login.user,
+		server: vue.login.server,
+	}
 	if (storage_hasData()) {
 		let syncDate = storage_getSyncDate();
-		elements["sync_date"] = tools_dateToString(syncDate);
-		elements["sync_time"] = tools_timeToString(syncDate);
+		vue.screen.data.syncDate = {
+			date: tools_dateToString(syncDate),
+			time: tools_timeToString(syncDate)
+		}
 	}
-	if (appData.srv != null) {
-		elements.server = appData.srv.host;
-		elements.user = appData.srv.user;
-	}
-	var html = Mustache.render(view_home, elements);
-	document.getElementById('content').innerHTML = html;
+	vue.screen.component = "vue-home";
 }
 
 function home_logout() {
 	// Drop local database
 	storage_drop(appData.db, function() {
 		login_logout();
-		boot();
+		start();
 	}, function() {
 		console.error("Could not drop local database");
 	});

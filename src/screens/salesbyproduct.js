@@ -6,19 +6,22 @@ function salesbyproduct_show() {
 	start = tools_dateToString(start);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	stop = tools_dateToString(stop);
-	var html = Mustache.render(view_salesbyproduct, {"start": start, "stop": stop});
-	document.getElementById('content').innerHTML = html;
+	vue.screen.data = {
+		"start": start,
+		"stop": stop,
+		"table": null
+	}
+	vue.screen.component = "vue-salesbyproduct";
 }
 
 function salesbyproduct_filter() {
-	let inputs = document.forms["tickets-filter"].elements;
-	let start = inputs["start"].value.split("/");
+	let start = vue.screen.data.start.split("/");
 	if (start.length != 3) {
 		start = new Date(new Date().getTime() - 604800000);
 	} else {
 		start = new Date(start[2], start[1] - 1, start[0]);
 	}
-	let stop = inputs["stop"].value.split("/");
+	let stop = vue.screen.data.stop.split("/");
 	if (stop.length != 3) {
 		stop = new Date(new Date().getTime() + 86400000);
 	} else {
@@ -141,14 +144,14 @@ function _salesbyproduct_render(categories, products) {
 			lines.push(line);
 		}
 	}
-	let elements = {"headers": headers, "lines": lines,
+	vue.screen.data.table = {
+		"headers": headers,
+		"lines": lines,
 		"title": "Ventes par produits du "
-			+ document.forms["tickets-filter"].elements["start"].value
+			+ vue.screen.data.start
 			+ " au "
-			+ document.forms["tickets-filter"].elements["stop"].value
+			+ vue.screen.data.stop
 	};
-	var html = Mustache.render(view_table, elements);
-	document.getElementById('report-content').innerHTML = html;
 	gui_hideLoading();
 }
 
