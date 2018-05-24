@@ -19,7 +19,7 @@ Vue.component("vue-category-list", {
 			<tbody>
 				<tr v-for="category in data.categories">
 					<td>
-						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(category)" />{{category.label}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a><a class="btn btn-delete" onclick="return confirm('Êtes-vous certain de vouloir faire ça ?');return false;" href="./?p=modules/base_products/actions/categories&delete-cat=000">Delete</a></div>
+						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(category)" />{{category.label}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a></div>
 					</td>
 				</tr>
 			</tbody>

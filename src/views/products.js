@@ -25,7 +25,7 @@ Vue.component("vue-product-list", {
 			<tbody id="product-list">
 				<tr v-for="product in data.products">
 					<td>
-						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" />{{product.label}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a><a class="btn btn-delete" onclick="return confirm('Êtes-vous certain de vouloir faire ça ?');return false;" href="./?p=modules/base_products/actions/categories&delete-cat=000">Delete</a></div>
+						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" />{{product.label}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a></div>
 					</td>
 				</tr>
 			</tbody>
