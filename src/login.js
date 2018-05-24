@@ -96,8 +96,14 @@ function login_loginCallback(request, status, response) {
 	case 403:
 		gui_showMessage("Utilisateur ou mot de passe invalide.");
 		break;
+	case 0:
+		if (response == "") {
+			gui_showError("Connexion refusée, le serveur " + login_getHostUrl() + " est-il correct ?");
+			break;
+		}
+		// else nobreak
 	default:
-		gui_showError("Erreur serveur : " + status + " " + response);
+		gui_showError("Le serveur est indisponible (" + status + " : " + response + ").");
 		break;
 	}
 }
