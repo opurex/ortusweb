@@ -76,6 +76,7 @@ function srvcall_delete(target, callback) {
 function srvcall_callbackCatch(request, status, response, pendingOperation) {
 	switch (status) {
 	case 200:
+	case 400:
 		return false;
 		break;
 	case 403:

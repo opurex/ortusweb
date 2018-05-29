@@ -127,7 +127,7 @@ Vue.component("vue-product-form", {
 				<legend>Référencement</legend>
 				<dl class="dl-horizontal">
 					<dt><label for="edit-reference">Référence</label></dt>
-					<dd><input class="form-control" id="edit-reference" type="text" v-model="data.product.reference" /></dd>
+					<dd><input class="form-control" id="edit-reference" type="text" v-model="data.product.reference" required="true" /></dd>
 
 					<dt><label for="edit-barcode">Code barre</label></dt>
 					<dd><input class="form-control" id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" /></dd>
