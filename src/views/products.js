@@ -20,18 +20,26 @@ Vue.component("vue-product-list", {
 	</nav>
 	<div class="box-body">
 		<table class="table table-bordered table-hover">
+			<col />
+			<col style="width:10%; min-width: 5em;" />
+			<col style="width:10%; min-width: 5em;" />
+			<col style="width:10%; min-width: 5em;" />
 			<thead>
 				<tr>
-					<th>
-					Désignation
-					</th>
+					<th>Désignation</th>
+					<th>Prix de vente TTC</th>
+					<th>Ordre d'affichage</th>
+					<th>Opération</th>
 				</tr>
 			</thead>
 			<tbody id="product-list">
 				<tr v-for="product in data.products" v-bind:class="{'invisible-data': !product.visible}" v-if="data.filterVisible == 'all' || (product.visible && data.filterVisible == 'visible') || (!product.visible && data.filterVisible == 'invisible')">
 					<td>
-						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" /><span v-if="!product.visible">(archive) </span><span>{{product.label}}</span><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a></div>
+						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" /><span v-if="!product.visible">(archive) </span><span>{{product.label}}</span>
 					</td>
+					<td>{{product.taxedPrice.toLocaleString()}}</td>
+					<td>{{product.dispOrder}}</td>
+					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a></div></td>
 				</tr>
 			</tbody>
 		</table>
