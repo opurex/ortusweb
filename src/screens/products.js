@@ -26,7 +26,8 @@ function _products_initView(categories) {
 	};
 	vue.screen.data = {
 		"categories": sortedCats,
-		"products": []
+		"products": [],
+		"filterVisible": "visible"
 	};
 	vue.screen.component = "vue-product-list";
 	products_selectCategory(sortedCats[0]["id"]);

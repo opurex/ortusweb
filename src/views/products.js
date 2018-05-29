@@ -11,6 +11,11 @@ Vue.component("vue-product-list", {
 			<select class="form-control" id="filter-category" name="category" onchange="javascript:products_categoryChanged();">
 				<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
 			</select>
+			<select class="form-control" id="filter-invisible" v-model="data.filterVisible">
+				<option value="visible">En vente</option>
+				<option value="invisible">Hors vente</option>
+				<option value="all">Tout</option>
+			</select>
 		</div>
 	</nav>
 	<div class="box-body">
@@ -23,9 +28,9 @@ Vue.component("vue-product-list", {
 				</tr>
 			</thead>
 			<tbody id="product-list">
-				<tr v-for="product in data.products">
+				<tr v-for="product in data.products" v-bind:class="{'invisible-data': !product.visible}" v-if="data.filterVisible == 'all' || (product.visible && data.filterVisible == 'visible') || (!product.visible && data.filterVisible == 'invisible')">
 					<td>
-						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" />{{product.label}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a></div>
+						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" /><span v-if="!product.visible">(archive) </span><span>{{product.label}}</span><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a></div>
 					</td>
 				</tr>
 			</tbody>

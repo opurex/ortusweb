@@ -156,3 +156,8 @@ tbody tr:hover .z-oddcol {
 	background-color: #ebebeb;
 }
 
+/* Archive entries like products not currently sold. */
+.invisible-data span {
+	font-style: italic;
+	font-size: small;
+}
