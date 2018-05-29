@@ -91,6 +91,16 @@ function category_saveCallback(request, status, response) {
 	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
 		return;
 	}
+	if (status == 400) {
+		if (request.statusText == "Reference is already taken") {
+			gui_showError("La référence existe déjà, veuillez en choisir une autre.");
+			document.getElementById("edit-reference").focus(); // TODO: make this Vuejsy.
+		} else {
+			gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		}
+		gui_hideLoading();
+		return;
+	}
 	let cat = vue.screen.data.category;
 	if (cat.parent == "") {
 		cat.parent = null;

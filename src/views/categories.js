@@ -60,7 +60,7 @@ Vue.component("vue-category-form", {
 				</dd>
 
 				<dt><label for="edit-reference">Référence</label></dt>
-				<dd><input class="form-control" id="edit-reference" type="text" v-model="data.category.reference" /></dd>
+				<dd><input class="form-control" id="edit-reference" type="text" v-model="data.category.reference" required="true" /></dd>
 
 				<dt><label for="edit-parent">Parent</label></dt>
 				<dd>
