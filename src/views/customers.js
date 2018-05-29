@@ -170,6 +170,7 @@ Vue.component("vue-customer-form", {
 <div class="box" style="margin-top:1ex" v-if="data.customer.id">
 	<div class="box-body">
 		<h2>Modifier le solde</h2>
+		<p>Attention : modifier le solde ici fera apparaître une incohérence avec l'historique des ventes. Vous devez pouvoir justifier cette opération dans votre comptabilité (une facture, un remboursement, un paiement hors caisse ou tout autre document).</p>
 		<form id="edit-customer-balance-form" onsubmit="javascript:customers_saveBalance(); return false;">
 			<dl class="dl-horizontal">
 				<dt><label for="edit-balance">Solde</label></dt>
