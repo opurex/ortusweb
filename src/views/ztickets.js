@@ -85,6 +85,24 @@ Vue.component("vue-zticket-list", {
 						</template>
 					</tr>
 				</tbody>
+				<tfoot>
+					<tr>
+						<th colspan="7">Totaux</th>
+						<th>{{data.total.tickets}}</th>
+						<th class="z-oddcol">{{data.total.cs}}</th>
+						<th colspan="2" class="z-oddcol"></th>
+						<th v-for="pmTotal in data.total.paymentModeTotal">{{pmTotal}}</th>
+						<template v-for="taxTotal in data.total.taxTotal">
+							<th class="z-oddcol">{{taxTotal.base}}</th>
+							<th class="z-oddcol">{{taxTotal.amount}}</th>
+						</template>
+						<th v-for="catTotal in data.total.categoryTotal">{{catTotal}}</th>
+						<template v-for="catTaxTotal in data.total.catTaxTotal">
+							<th class="z-oddcol">{{catTaxTotal.base}}</th>
+							<th class="z-oddcol">{{catTaxTotal.amount}}</th>
+						</template>
+					</tr>
+				</tfoot>
 			</table>
 		</div>
 	</div>

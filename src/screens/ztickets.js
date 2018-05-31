@@ -68,10 +68,28 @@ function _ztickets_filterCallback(request, status, response) {
 function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 	// Collect the listed taxes, payment modes and cat taxes
 	let catTaxes = [];
+	let total = {
+		"tickets": 0,
+		"cs": 0.0,
+		"paymentModeTotal": [],
+		"taxTotal": [],
+		"categoryTotal": [],
+		"catTaxTotal": []
+	};
+	for (let i = 0; i < categories.length; i++) {
+		total.categoryTotal.push(0.0);
+	}
+	for (let i = 0; i < paymentModes.length; i++) {
+		total.paymentModeTotal.push(0.0);
+	}
+	for (let i = 0; i < taxes.length; i++) {
+		total.taxTotal.push({"base": 0.0, "amount": 0.0});
+	}
 	for (let i = 0; i < categories.length; i++) {
 		for (let j = 0; j < taxes.length; j++) {
 			catTaxes.push(JSON.parse(JSON.stringify(taxes[j])));
 			catTaxes[i * taxes.length + j]["cat"] = categories[i]["label"];
+			total.catTaxTotal.push({"base": 0.0, "amount": 0.0});
 		}
 	}
 	let renderZs = [];
@@ -115,12 +133,15 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			"categories": [],
 			"catTaxes": [],
 		}
+		total.tickets += z.ticketCount;
+		total.cs += z.cs;
 		for (let j = 0; j < paymentModes.length; j++) {
 			let pm = paymentModes[j];
 			let found = false;
 			for (let k = 0; k < z.payments.length; k++) {
 				if (z.payments[k].paymentMode == pm.id) {
 					renderZ.payments.push({"amount": z.payments[k].currencyAmount.toLocaleString()});
+					total.paymentModeTotal[j] += z.payments[k].currencyAmount;
 					found = true;
 					keptPayments[j] = true;
 					break;
@@ -137,6 +158,8 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				if (z.taxes[k].tax == tax.id) {
 					renderZ.taxes.push({"base": z.taxes[k].base.toLocaleString(),
 						"amount": z.taxes[k].amount.toLocaleString()});
+					total.taxTotal[j].base += z.taxes[k].base;
+					total.taxTotal[j].amount += z.taxes[k].amount;
 					found = true;
 					keptTaxes[j] = true;
 					break;
@@ -152,6 +175,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			for (let k = 0; k < z.catSales.length; k++) {
 				if (z.catSales[k].reference == cat.reference) {
 					renderZ.categories.push({"amount": z.catSales[k].amount.toLocaleString()});
+					total.categoryTotal[j] += z.catSales[k].amount;
 					found = true;
 					keptCategories[j] = true;
 					break;
@@ -170,6 +194,8 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 					if (z.catTaxes[k].reference == cat.reference && z.catTaxes[k].tax == tax.id) {
 						renderZ.catTaxes.push({"base": z.catTaxes[k].base.toLocaleString(),
 							"amount": z.catTaxes[k].amount.toLocaleString()});
+						total.catTaxTotal[j * taxes.length + j2].base += z.catTaxes[k].base;
+						total.catTaxTotal[j * taxes.length + j2].amount += z.catTaxes[k].amount;
 						found = true;
 						keptCatTaxes[j * taxes.length + j2] = true;
 						break;
@@ -190,6 +216,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				renderZs[j]["payments"].splice(i - spliced, 1);
 			}
 			paymentModes.splice(i - spliced, 1);
+			total.paymentModeTotal.splice(i - spliced, 1);
 			spliced++;
 		}
 	}
@@ -200,6 +227,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				renderZs[j]["taxes"].splice(i - spliced, 1);
 			}
 			taxes.splice(i - spliced, 1);
+			total.taxTotal.splice(i - spliced, 1);
 			spliced++;
 		}
 	}
@@ -210,6 +238,7 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				renderZs[j]["categories"].splice(i - spliced, 1);
 			}
 			categories.splice(i - spliced, 1);
+			total.categoryTotal.splice(i - spliced, 1);
 			spliced++;
 		}
 	}
@@ -220,16 +249,33 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 				renderZs[j]["catTaxes"].splice(i - spliced, 1);
 			}
 			catTaxes.splice(i - spliced, 1);
+			total.catTaxTotal.splice(i - spliced, 1);
 			spliced++;
 		}
 	}
 	// Render
+	total.cs = total.cs.toLocaleString();
+	for (let i = 0; i < total.paymentModeTotal.length; i++) {
+		total.paymentModeTotal[i] = total.paymentModeTotal[i].toLocaleString();
+	}
+	for (let i = 0; i < total.taxTotal.length; i++) {
+		total.taxTotal[i].base = total.taxTotal[i].base.toLocaleString();
+		total.taxTotal[i].amount = total.taxTotal[i].amount.toLocaleString();
+	}
+	for (let i = 0; i < total.categoryTotal.length; i++) {
+		total.categoryTotal[i] = total.categoryTotal[i].toLocaleString();
+	}
+	for (let i = 0; i < total.catTaxTotal.length; i++) {
+		total.catTaxTotal[i].base = total.catTaxTotal[i].base.toLocaleString();
+		total.catTaxTotal[i].amount = total.catTaxTotal[i].amount.toLocaleString();
+	}
 	vue.screen.data = {
 		"paymentModes": paymentModes,
 		"taxes": taxes,
 		"categories": categories,
 		"catTaxes": catTaxes,
 		"z": renderZs,
+		"total": total,
 		"start": vue.screen.data.start,
 		"stop": vue.screen.data.stop,
 		"startDisp": vue.screen.data.start,
