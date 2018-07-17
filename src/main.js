@@ -77,12 +77,7 @@ function boot() {
 		gui_showError("Stockage des données non disponible. Votre navigateur est peut être obsolète.");
 		return;
 	}
-	storage_open(function(event) {
-		appData.db = event.target.result;
-		start();
-	}, function(event) {
-		gui_showError("Impossible d'accéder aux stockage des données locales.");
-	});
+	start();
 }
 
 function start() {
@@ -94,6 +89,20 @@ function start() {
 		https: login_getHttps(),
 		password: ''
 	}
+	// Open database if not already done
+	if (appData.db == null) {
+		storage_open(function(event) {
+			appData.db = event.target.result;
+			_start_done();
+		}, function(event) {
+			gui_showError("Impossible d'accéder aux stockage des données locales.");
+			return;
+		});
+	} else {
+		_start_done();
+	}
+}
+function _start_done() {
 	vue.ready = true;
 	// Show home/config screen
 	route(_get("p"));

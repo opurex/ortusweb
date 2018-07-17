@@ -17,6 +17,7 @@ function home_logout() {
 	// Drop local database
 	storage_drop(appData.db, function() {
 		login_logout();
+		appData.db = null;
 		start();
 	}, function() {
 		console.error("Could not drop local database");
