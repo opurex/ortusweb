@@ -37,6 +37,9 @@ function route(screen) {
 	case "customer":
 		customers_showCustomer(_get("id"));
 		break;
+	case "floors":
+		floors_show();
+		break;
 	case "home":
 	default:
 		home_show();

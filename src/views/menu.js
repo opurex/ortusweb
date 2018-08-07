@@ -49,7 +49,11 @@ function menu_init() {
 			"items": [
 				{"target": _menu_getTargetUrl("sales_z"), "name": "Tickets Z", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesbyproduct"), "name": "Par produit", "icon": _menu_getIcon(null)},
-			]}
+			]},
+			{"name": "Configuration",
+			"items": [
+				{"target": _menu_getTargetUrl("floors"), "name": "Plan de tables", "icon": _menu_getIcon("menu_floors.png")},
+			]},
 		]
 	}
 }

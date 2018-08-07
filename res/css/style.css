@@ -161,3 +161,19 @@ tbody tr:hover .z-oddcol {
 	font-style: italic;
 	font-size: small;
 }
+
+.floor-display {
+	width: 640px;
+	height: 480px;
+	border-top: 1px solid #888;
+	border-left: 1px solid #888;
+	background-image: url('../img/grid.png');
+	position: relative;
+}
+.place {
+	list-style-type: none;
+	margin: 0px 0px 0px -40px;
+	padding: 5px 14px;
+	border: 1px solid #000;
+	background-color: #fff;
+}
