@@ -106,7 +106,8 @@ function category_saveCallback(request, status, response) {
 		cat.parent = null;
 	}
 	if (!("id" in cat)) {
-		cat.id = parseInt(response);
+		let respCat = JSON.parse(response);
+		cat.id = respCat["id"];
 	}
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {

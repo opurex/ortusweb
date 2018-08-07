@@ -108,7 +108,8 @@ function _customers_saveCallbackClosure(originalFunc) {
 function _customers_saveCallback(request, status, response) {
 	let cust = vue.screen.data.customer;
 	if (!("id" in cust)) {
-		cust.id = parseInt(response);
+		let respCust = JSON.parse(response);
+		cust.id = respCust["id"];
 	}
 	if (cust.expireDate != null) {
 		cust.expireDate = cust.expireDate.getTime() / 1000

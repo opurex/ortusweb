@@ -168,7 +168,8 @@ function products_saveCallback(request, status, response) {
 	}
 	let prd = vue.screen.data.product;
 	if (!("id" in prd)) {
-		prd.id = parseInt(response);
+		let respPrd = JSON.parse(response);
+		prd.id = respPrd["id"];
 	}
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {
