@@ -146,6 +146,8 @@ dt {
 	color: #DDD;
 }
 
+/* Table styles */
+
 tr {
 	background-color: #fff;
 }
@@ -154,6 +156,15 @@ tr {
 }
 tbody tr:hover .z-oddcol {
 	background-color: #ebebeb;
+}
+
+.filters ul {
+	list-style-type: none;
+	padding: 0px;
+}
+.filters ul li {
+	display: inline-block;
+	margin: 0px 1em;
 }
 
 /* Archive entries like products not currently sold. */
@@ -176,4 +187,10 @@ tbody tr:hover .z-oddcol {
 	padding: 5px 14px;
 	border: 1px solid #000;
 	background-color: #fff;
+}
+
+@media print {
+	.noprint {
+		display:none;
+	}
 }

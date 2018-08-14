@@ -23,7 +23,7 @@ Vue.component("vue-salesbyproduct", {
 			</div>
 		</form>
 	</nav>
-	<div class="box-body" id="report-content" v-if="data.table">
+	<div class="box-body" id="report-content">
 		<vue-table v-bind:table="data.table"></vue-table>
 	</div>
 </div>

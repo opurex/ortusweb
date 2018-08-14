@@ -9,7 +9,18 @@ function salesbyproduct_show() {
 	vue.screen.data = {
 		"start": start,
 		"stop": stop,
-		"table": null
+		"table": {
+			"title": null,
+			"columns": [
+				{label: "Catégorie", visible: true},
+				{label: "Reference", visible: true},
+				{label: "Désignation", visible: true},
+				{label: "Quantité", visible: true},
+				{label: "HT", visible: false},
+				{label: "Marge", visible: false},
+			],
+			"data": null,
+		},
 	}
 	vue.screen.component = "vue-salesbyproduct";
 }
@@ -128,7 +139,6 @@ function _salesbyproduct_render(categories, products) {
 	// Sort the categories
 	stats = stats.sort(tools_sort("dispOrder", "reference"));
 	// Prepare rendering
-	let headers = ["Catégorie", "Reference", "Désignation", "Quantité", "HT", "Marge"];
 	let lines = [];
 	for (let i = 0; i < stats.length; i++) {
 		let cat = stats[i].label;
@@ -144,14 +154,11 @@ function _salesbyproduct_render(categories, products) {
 			lines.push(line);
 		}
 	}
-	vue.screen.data.table = {
-		"headers": headers,
-		"lines": lines,
-		"title": "Ventes par produits du "
+	vue.screen.data.table.title = "Ventes par produits du "
 			+ vue.screen.data.start
 			+ " au "
-			+ vue.screen.data.stop
-	};
+			+ vue.screen.data.stop;
+	vue.screen.data.table.lines = lines;
 	gui_hideLoading();
 }
 
