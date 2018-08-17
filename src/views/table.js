@@ -9,6 +9,9 @@ Vue.component("vue-table", {
 				<label v-bind:for="'filter-column-' + index">{{col.label}}</label>
 			</li>
 		</ul>
+		<div v-if="table.lines">
+			<a class="btn btn-add" v-on:click="exportCsv">Exporter les résultats</a>
+		</div>
 	</div>
 	<h2 v-if="table.title">{{table.title}}</h2>
 	<table class="table table-bordered table-hover" v-if="table.lines">
@@ -28,5 +31,35 @@ Vue.component("vue-table", {
 		</tbody>
 	</table>
 </div>
-`});
+`,
+	methods: {
+		exportCsv: function() {
+			// Get data, exlude hidden columns
+			let csvData = [];
+			csvData.push([]);
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				if (col.visible) {
+					csvData[0].push(col.label);
+				}
+			}
+			for (let i = 0; i < this.table.lines.length; i++) {
+				csvData.push([]);
+				for (let j = 0; j < this.table.lines[i].length; j++) {
+					if (this.table.columns[j].visible) {
+						csvData[i + 1].push(this.table.lines[i][j]);
+					}
+				}
+			}
+			// Generate csv (with some utf-8 tweak)
+			let encodedData = new CSV(csvData).encode();
+			encodedData = encodeURIComponent(encodedData).replace(/%([0-9A-F]{2})/g,
+				function toSolidBytes(match, p1) {
+					return String.fromCharCode('0x' + p1);
+				});
+			// Set href for download
+			let href = "data:text/csv;base64," + btoa(encodedData);
+			window.open(href, "csvexport");
+	}
+	}});
 
