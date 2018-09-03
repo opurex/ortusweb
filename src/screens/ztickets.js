@@ -5,7 +5,8 @@ function ztickets_show() {
 	stop = tools_dateToString(stop);
 	vue.screen.data = {
 		"start": start,
-		"stop": stop
+		"stop": stop,
+		"table": {columns: []}
 	}
 	vue.screen.component = "vue-zticket-list";
 }
@@ -35,6 +36,7 @@ function _ztickets_filterCallback(request, status, response) {
 	}
 	let zTickets = JSON.parse(response);
 	let stores = appData.db.transaction(["cashRegisters", "taxes", "categories", "paymentmodes"], "readonly");
+	let cashRegisters = [];
 	let taxes = [];
 	let categories = [];
 	let paymentModes = [];
@@ -56,7 +58,15 @@ function _ztickets_filterCallback(request, status, response) {
 							categories.push(cursor.value);
 							cursor.continue();
 						} else {
-							_parseZTickets(paymentModes, taxes, categories, zTickets);
+							stores.objectStore("cashRegisters").openCursor().onsuccess = function(event) {
+								let cursor = event.target.result;
+								if (cursor) {
+									cashRegisters.push(cursor.value);
+									cursor.continue();
+								} else {
+									_parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets);
+								}
+							}
 						}
 					}
 				}
@@ -65,7 +75,7 @@ function _ztickets_filterCallback(request, status, response) {
 	}
 }
 
-function _parseZTickets(paymentModes, taxes, categories, zTickets) {
+function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets) {
 	// Collect the listed taxes, payment modes and cat taxes
 	let catTaxes = [];
 	let total = {
@@ -92,6 +102,11 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 			total.catTaxTotal.push({"base": 0.0, "amount": 0.0});
 		}
 	}
+	let cashRegistersById = [];
+	for (let i = 0; i < cashRegisters.length; i++) {
+		let cr = cashRegisters[i];
+		cashRegistersById[cr.id] = cr;
+	}
 	let renderZs = [];
 	let keptPayments = [];
 	let keptTaxes = [];
@@ -116,8 +131,12 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 		let z = zTickets[i];
 		let openDate = new Date(z.openDate * 1000);
 		let closeDate = new Date(z.closeDate * 1000);
+		let cashRegister = "";
+		if (z.cashRegister in cashRegistersById) {
+			cashRegister = cashRegistersById[z.cashRegister].label;
+		}
 		let renderZ = {
-			"cashRegister": "",
+			"cashRegister": cashRegister,
 			"sequence": z.sequence,
 			"openDate": tools_dateTimeToString(openDate),
 			"closeDate": tools_dateTimeToString(closeDate),
@@ -269,18 +288,67 @@ function _parseZTickets(paymentModes, taxes, categories, zTickets) {
 		total.catTaxTotal[i].base = total.catTaxTotal[i].base.toLocaleString();
 		total.catTaxTotal[i].amount = total.catTaxTotal[i].amount.toLocaleString();
 	}
-	vue.screen.data = {
-		"paymentModes": paymentModes,
-		"taxes": taxes,
-		"categories": categories,
-		"catTaxes": catTaxes,
-		"z": renderZs,
-		"total": total,
-		"start": vue.screen.data.start,
-		"stop": vue.screen.data.stop,
-		"startDisp": vue.screen.data.start,
-		"stopDisp": vue.screen.data.stop
-	};
+	// Set table
+	vue.screen.data.table.title = "Tickets Z du " + vue.screen.data.start + " au " + vue.screen.data.stop;
+	vue.screen.data.table.columns = [
+		{label: "Caisse", visible: true},
+		{label: "N°", visible: false},
+		{label: "Ouverture", visible: true},
+		{label: "Clôture", visible: true},
+		{label: "Fond ouverture", visible: false},
+		{label: "Fond clôture", visible: true},
+		{label: "Fond attendu", visible: true},
+		{label: "Tickets", visible: true},
+		{label: "CA", visible: true, class: "z-oddcol"},
+		{label: "CA mois", visible: false, class: "z-oddcol"},
+		{label: "CA année", visible: false, class: "z-oddcol"}
+	];
+	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.tickets, total.cs, "", ""];
+	for (let i = 0; i < paymentModes.length; i++) {
+		let pm = paymentModes[i];
+		vue.screen.data.table.columns.push({label: pm.label, visible: true});
+		vue.screen.data.table.footer.push(total.paymentModeTotal[i]);
+	}
+	for (let i = 0; i < taxes.length; i++) {
+		let tax = taxes[i];
+		vue.screen.data.table.columns.push({label: tax.label + " base", visible: true, class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: tax.label + " TVA", visible: true, class: "z-oddcol"});
+		vue.screen.data.table.footer.push(total.taxTotal[i].base);
+		vue.screen.data.table.footer.push(total.taxTotal[i].amount);
+	}
+	for (let i = 0; i < categories.length; i++) {
+		let cat = categories[i];
+		vue.screen.data.table.columns.push({label: cat.label, visible: true});
+		vue.screen.data.table.footer.push(total.categoryTotal[i]);
+	}
+	for (let i = 0; i < catTaxes.length; i++) {
+		let catTax = catTaxes[i];
+		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " base", visible: true, class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " TVA", visible: false, class: "z-oddcol"});
+		vue.screen.data.table.footer.push(total.catTaxTotal[i].base);
+		vue.screen.data.table.footer.push(total.catTaxTotal[i].amount);
+	}
+	vue.screen.data.table.lines = [];
+	for (let i = 0; i < renderZs.length; i++) {
+		let z = renderZs[i];
+		let line = [z.cashRegister, z.sequence, z.openDate, z.closeDate, z.openCash, z.closeCash, z.expectedCash,
+			z.ticketCount, z.cs, z.csPeriod, z.csFYear];
+		for (let j = 0; j < z.payments.length; j++) {
+			line.push(z.payments[j].amount);
+		}
+		for (let j = 0; j < z.taxes.length; j++) {
+			line.push(z.taxes[j].base);
+			line.push(z.taxes[j].amount);
+		}
+		for (let j = 0; j < z.categories.length; j++) {
+			line.push(z.categories[j].amount);
+		}
+		for (let j = 0; j < z.catTaxes.length; j++) {
+			line.push(z.catTaxes[j].base);
+			line.push(z.catTaxes[j].amount);
+		}
+		vue.screen.data.table.lines.push(line);
+	}
 	gui_hideLoading();
 }
 
