@@ -18,17 +18,22 @@ Vue.component("vue-table", {
 		<thead>
 			<tr>
 				<template v-for="(col, index) in table.columns">
-				<th v-show="col.visible">{{col.label}}</th>
+				<th v-show="col.visible" v-bind:class="col.class">{{col.label}}</th>
 				</template>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="(line,index) in table.lines">
 				<template v-for="(cell, index2) in line">
-				<td v-show="table.columns[index2].visible">{{cell}}</td>
+				<td v-show="table.columns[index2].visible" v-bind:class="table.columns[index2].class">{{cell}}</td>
 				</template>
 			</tr>
 		</tbody>
+		<tfoot v-if="table.footer">
+			<tr>
+				<th v-for="(col, index) in table.footer" v-show="table.columns[index].visible" v-bind:class="table.columns[index].class">{{col}}</th>
+			</tr>
+		</tfoot>
 	</table>
 </div>
 `,
@@ -50,6 +55,15 @@ Vue.component("vue-table", {
 						csvData[i + 1].push(this.table.lines[i][j]);
 					}
 				}
+			}
+			if ("footer" in this.table) {
+				let line = [];
+				for (let i = 0; i < this.table.footer.length; i++) {
+					if (this.table.columns[i].visible) {
+						line.push(this.table.footer[i]);
+					}
+				}
+				csvData.push(line);
 			}
 			// Generate csv (with some utf-8 tweak)
 			let encodedData = new CSV(csvData).encode();
