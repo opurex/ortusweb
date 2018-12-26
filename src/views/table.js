@@ -25,7 +25,12 @@ Vue.component("vue-table", {
 		<tbody>
 			<tr v-for="(line,index) in table.lines">
 				<template v-for="(cell, index2) in line">
-				<td v-show="table.columns[index2].visible" v-bind:class="table.columns[index2].class">{{cell}}</td>
+				<td v-show="table.columns[index2].visible" v-bind:class="table.columns[index2].class">
+					<template v-if="cell.type == 'thumbnail'">
+					<img class="img img-thumbnail thumbnail" v-bind:src="cell.src" />
+					</template>
+					<template v-else>{{cell}}</template>
+				</td>
 				</template>
 			</tr>
 		</tbody>
@@ -44,14 +49,14 @@ Vue.component("vue-table", {
 			csvData.push([]);
 			for (let i = 0; i < this.table.columns.length; i++) {
 				let col = this.table.columns[i];
-				if (col.visible) {
+				if (col.visible && col.export !== false) {
 					csvData[0].push(col.label);
 				}
 			}
 			for (let i = 0; i < this.table.lines.length; i++) {
 				csvData.push([]);
 				for (let j = 0; j < this.table.lines[i].length; j++) {
-					if (this.table.columns[j].visible) {
+					if (this.table.columns[j].visible && this.table.columns[j].export !== false) {
 						csvData[i + 1].push(this.table.lines[i][j]);
 					}
 				}

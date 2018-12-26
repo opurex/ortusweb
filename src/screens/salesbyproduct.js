@@ -15,12 +15,14 @@ function salesbyproduct_show() {
 		"table": {
 			"title": null,
 			"columns": [
+				{label: "Image", visible: true, export: false},
 				{label: "Caisse", visible: false},
 				{label: "Catégorie", visible: true},
 				{label: "Reference", visible: false},
 				{label: "Désignation", visible: true},
 				{label: "Quantité", visible: true},
 				{label: "HT", visible: false},
+				{label: "Prix d'achat", visible: false},
 				{label: "Marge", visible: false},
 			],
 		},
@@ -195,13 +197,21 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 		let cat = stats[i].label;
 		for (let j = 0; j < stats[i].products.length; j++) {
 			prd = stats[i].products[j];
+			let img = null;
+			if (prd.hasImage) {
+				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken()};
+			} else {
+				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
+			}
 			if (!separateByCR) {
 				let qty = _salesbyproduct_data.productsQty[prd.id];
-				let line = ["", cat, prd.reference, prd.label, qty];
+				let line = [img, "", cat, prd.reference, prd.label, qty];
 				line.push((prd.priceSell * qty).toLocaleString());
 				if (prd.priceBuy > 0) {
+					line.push(prd.priceBuy.toLocaleString());
 					line.push(((prd.priceSell - prd.priceBuy) * qty).toLocaleString());
 				} else {
+					line.push("");
 					line.push("");
 				}
 				lines.push(line);
@@ -210,11 +220,13 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 					let cr = cashRegisters[k];
 					if (cr.id in _salesbyproduct_data.productsQty[prd.id]) {
 						let qty = _salesbyproduct_data.productsQty[prd.id][cr.id];
-						let line = [cr.label, cat, prd.reference, prd.label, qty];
+						let line = [img, cr.label, cat, prd.reference, prd.label, qty];
 						line.push((prd.priceSell * qty).toLocaleString());
 						if (prd.priceBuy > 0) {
+							line.push(prd.priceBuy.toLocaleString());
 							line.push(((prd.priceSell - prd.priceBuy) * qty).toLocaleString());
 						} else {
+							line.push("");
 							line.push("");
 						}
 						lines.push(line);
