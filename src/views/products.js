@@ -16,6 +16,11 @@ Vue.component("vue-product-list", {
 				<option value="invisible">Hors vente</option>
 				<option value="all">Tout</option>
 			</select>
+			<label for="sort" class="control-label">Trier par</label>
+			<select class="form-control" id="sort" name="sort" v-model="data.sort" v-on:change="sort">
+				<option value="dispOrder">Ordre</option>
+				<option value="label">Désignation</option>
+			</select>
 		</div>
 	</nav>
 	<div class="box-body">
@@ -56,6 +61,9 @@ Vue.component("vue-product-list", {
 		},
 		editUrl: function(prd) {
 			return "?p=product&id=" + prd.id;
+		},
+		sort: function(event) {
+			products_sortProducts(event.target.value);
 		}
 	}
 });

@@ -2,35 +2,24 @@ function products_show() {
 	gui_showLoading();
 	let catStore = appData.db.transaction(["categories"], "readonly").objectStore("categories");
 	let categories = [];
+	vue.screen.data = {
+		"categories": [],
+		"products": [],
+		"filterVisible": "visible",
+		"sort": "dispOrder"
+	};
+	vue.screen.component = "vue-product-list";
 	catStore.openCursor().onsuccess = function(event) {
 		let cursor = event.target.result;
 		if (cursor) {
 			categories.push(cursor.value);
 			cursor.continue();
 		} else {
-			_products_initView(categories);
+			vue.screen.data.categories = categories.sort(tools_sort("dispOrder", "reference"));
+			products_selectCategory(vue.screen.data.categories[0]["id"]);
+			gui_hideLoading();
 		}
 	}
-}
-function _products_initView(categories) {
-	gui_hideLoading();
-	// Init view and categories filter
-	var sortedCats = categories.sort(tools_sort("dispOrder", "reference"));
-	var elements = {
-		"categories": sortedCats,
-		"imgUrl": function() {
-			return function (text, render) {
-				return login_getHostUrl() + "/api/image/category/" + render(text) + "?Token=" + login_getToken();
-			}
-		}
-	};
-	vue.screen.data = {
-		"categories": sortedCats,
-		"products": [],
-		"filterVisible": "visible"
-	};
-	vue.screen.component = "vue-product-list";
-	products_selectCategory(sortedCats[0]["id"]);
 }
 
 function products_categoryChanged() {
@@ -56,6 +45,18 @@ function products_selectCategory(catId) {
 function products_showProducts(products) {
 	gui_hideLoading();
 	vue.screen.data.products = products;
+	products_sortProducts(vue.screen.data.sort);
+}
+
+function products_sortProducts(sort) {
+	switch (vue.screen.data.sort) {
+		case "dispOrder":
+			vue.screen.data.products = vue.screen.data.products.sort(tools_sort("dispOrder", "reference"));
+			break;
+		case "label":
+			vue.screen.data.products = vue.screen.data.products.sort(tools_sort("label"));
+			break;
+	}
 }
 
 function products_showProduct(prdId) {

@@ -3,24 +3,34 @@ Vue.component("vue-category-list", {
 	template: `<div>
 <div class="box">
 	<nav class="navbar navbar-default">
-		<div class="container-fluid" role="group">
+		<div class="navbar-form navbar-left">
 			<a class="btn btn-add" href="?p=category">Ajouter une catégorie</a>
+		</div>
+		<div class="navbar-form navbar-left">
+			<label for="sort" class="control-label">Trier par</label>
+			<select class="form-control" id="sort" name="sort" v-model="data.sort" v-on:change="sort">
+				<option value="dispOrder">Ordre</option>
+				<option value="label">Désignation</option>
+			</select>
 		</div>
 	</nav>
 	<div class="box-body">
 		<table class="table table-bordered table-hover">
+			<col />
+			<col style="width:10%; min-width: 5em;" />
+			<col style="width:10%; min-width: 5em;" />
 			<thead>
 				<tr>
-					<th>
-					Désignation
-					</th>
+					<th>Désignation</th>
+					<th>Ordre d'affichage</th>
+					<th>Opération</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="category in data.categories">
-					<td>
-						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(category)" />{{category.label}}<div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a></div>
-					</td>
+					<td><img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(category)" />{{category.label}}</td>
+					<td>{{category.dispOrder}}</td>
+					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a></div></td>
 				</tr>
 			</tbody>
 		</table>
@@ -37,6 +47,9 @@ Vue.component("vue-category-list", {
 		},
 		editUrl: function(cat) {
 			return "?p=category&id=" + cat.id;
+		},
+		sort: function(event) {
+			categories_sortCategories(event.target.value);
 		}
 	}
 });

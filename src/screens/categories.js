@@ -2,21 +2,29 @@ function categories_show() {
 	gui_showLoading();
 	let catStore = appData.db.transaction(["categories"], "readonly").objectStore("categories");
 	let categories = [];
+	vue.screen.data = {categories: [], sort: "dispOrder"};
+	vue.screen.component = "vue-category-list"
 	catStore.openCursor().onsuccess = function(event) {
 		let cursor = event.target.result;
 		if (cursor) {
 			categories.push(cursor.value);
 			cursor.continue();
 		} else {
-			_categories_showCategories(categories);
+			vue.screen.data.categories = categories.sort(tools_sort("dispOrder", "reference"));
+			gui_hideLoading();
 		}
 	}
 }
-function _categories_showCategories(categories) {
-	var sortedCats = categories.sort(tools_sort("dispOrder", "reference"));
-	vue.screen.data = {categories: sortedCats};
-	vue.screen.component = "vue-category-list"
-	gui_hideLoading();
+
+function categories_sortCategories(sort) {
+	switch (vue.screen.data.sort) {
+		case "dispOrder":
+			vue.screen.data.categories = vue.screen.data.categories.sort(tools_sort("dispOrder", "reference"));
+			break;
+		case "label":
+			vue.screen.data.categories = vue.screen.data.categories.sort(tools_sort("label"));
+			break;
+	}
 }
 
 function categories_showCategory(id) {
