@@ -54,6 +54,10 @@ function menu_init() {
 			{"name": "Configuration",
 			"items": [
 				{"target": _menu_getTargetUrl("floors"), "name": "Plan de tables", "icon": _menu_getIcon("menu_floors.png")},
+				{"target": _menu_getTargetUrl("cashregisters"), "name": "Caisses", "icon": _menu_getIcon("menu_cashregister.png")},
+				{"target": _menu_getTargetUrl("paymentmodes"), "name": "Modes de paiement", "icon": _menu_getIcon("menu_paymentmode.png")},
+				{"target": _menu_getTargetUrl("users"), "name": "Utilisateurs", "icon": _menu_getIcon("menu_user.png")},
+				{"target": _menu_getTargetUrl("roles"), "name": "Permissions", "icon": _menu_getIcon("menu_role.png")},
 			]},
 		]
 	}

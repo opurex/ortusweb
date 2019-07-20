@@ -22,6 +22,9 @@ function route(screen) {
 	case "customers":
 		customers_show();
 		break;
+	case "paymentmodes":
+		paymentmodes_show();
+		break;
 	case "sales_z":
 		ztickets_show();
 		break;
@@ -40,8 +43,29 @@ function route(screen) {
 	case "customer":
 		customers_showCustomer(_get("id"));
 		break;
+	case "paymentmode":
+		paymentmodes_showPaymentMode(_get("id"));
+		break;
 	case "floors":
 		floors_show();
+		break;
+	case "users":
+		users_show();
+		break;
+	case "user":
+		users_showUser(_get("id"));
+		break;
+	case "roles":
+		roles_show();
+		break;
+	case "role":
+		roles_showRole(_get("id"));
+		break;
+	case "cashregisters":
+		cashregisters_show();
+		break;
+	case "cashregister":
+		cashregisters_showCashRegister(_get("id"));
 		break;
 	case "home":
 	default:
