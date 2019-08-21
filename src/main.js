@@ -67,6 +67,12 @@ function route(screen) {
 	case "cashregister":
 		cashregisters_showCashRegister(_get("id"));
 		break;
+	case "resources":
+		resources_show();
+		break;
+	case "resource":
+		resources_showResource(_get("label"));
+		break;
 	case "home":
 	default:
 		home_show();
