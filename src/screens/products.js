@@ -9,7 +9,8 @@ function products_show(catId) {
 		"categories": [],
 		"products": [],
 		"filterVisible": "visible",
-		"sort": "dispOrder"
+		"sort": "dispOrder",
+		"selectedCatId": null
 	};
 	vue.screen.component = "vue-product-list";
 	catStore.openCursor().onsuccess = function(event) {
@@ -21,7 +22,7 @@ function products_show(catId) {
 		} else {
 			vue.screen.data.categories = categories.sort(tools_sort("dispOrder", "reference"));
 			if (vue.screen.data.categories.length > 0) {
-				products_showCategory(vue.screen.data.categories[0].id);
+				vue.screen.data.selectedCatId = vue.screen.data.categories[0].id;
 			}
 			gui_hideLoading();
 		}

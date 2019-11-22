@@ -1,8 +1,5 @@
 Vue.component("vue-product-list", {
 	props: ["data"],
-	data: function() {
-		return {newUrl: "?p=product"};
-	},
 	template: `<div>
 <div class="box">
 	<nav class="navbar navbar-default">
@@ -11,7 +8,7 @@ Vue.component("vue-product-list", {
 		</div>
 		<div class="navbar-form navbar-left">
 			<label for="filter-category" class="control-label">Catégorie</label>
-			<select class="form-control" id="filter-category" name="category" v-on:change="switchCategory">
+			<select class="form-control" id="filter-category" name="category" v-model="data.selectedCatId">
 				<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
 			</select>
 			<select class="form-control" id="filter-invisible" v-model="data.filterVisible">
@@ -68,9 +65,18 @@ Vue.component("vue-product-list", {
 		sort: function(event) {
 			products_sortProducts(event.target.value);
 		},
-		switchCategory: function(event) {
-			products_showCategory(event.target.value);
-			this.newUrl = "?p=product&category=" + event.target.value;
+	},
+	computed: {
+		newUrl: function() {
+			return "?p=product&category=" + this.selectedCatIdTrick;
+		},
+		selectedCatIdTrick: function() {
+			return this.data.selectedCatId;
+		}
+	},
+	watch: {
+		selectedCatIdTrick: function(newCatId, oldCatID) {
+			products_showCategory(newCatId);
 		}
 	},
 });
