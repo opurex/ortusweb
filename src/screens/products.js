@@ -97,7 +97,7 @@ function products_showProduct(prdId, catId) {
 						if (catId != null && categoryFound == true) {
 							prdCatId = catId;
 						}
-						let prd = Product_default(prdCatId);
+						let prd = Product_default(prdCatId, null);
 						_products_showProduct(prd, categories, taxes);
 					}
 				}
@@ -115,6 +115,9 @@ function _products_showProduct(product, categories, taxes) {
 		deleteImageButton: "Supprimer",
 		hadImage: product.hasImage // Save for later check
 	}
+	if (product.tax == null) {
+		product.tax = taxes[0].id;
+	}
 	vue.screen.component = "vue-product-form";
 	product_updatePrice();
 }
@@ -128,6 +131,10 @@ function product_updatePrice() {
 			tax = vue.screen.data.taxes[i];
 			break;
 		}
+	}
+	if (tax == null) {
+		tax = vue.screen.data.taxes[0];
+		product.tax = tax.id;
 	}
 	let taxRate = tax.rate;
 	let priceSell = Number(sellVat / (1.0 + taxRate)).toFixed(5);
