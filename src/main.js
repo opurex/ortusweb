@@ -38,7 +38,7 @@ function route(screen) {
 		categories_showCategory(_get("id"));
 		break;
 	case "product":
-		products_showProduct(_get("id"));
+		products_showProduct(_get("id"), _get("category"));
 		break;
 	case "customer":
 		customers_showCustomer(_get("id"));

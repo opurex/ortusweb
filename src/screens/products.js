@@ -1,4 +1,7 @@
-function products_show() {
+function products_show(catId) {
+	if (arguments.length < 1) {
+		catId = null;
+	}
 	gui_showLoading();
 	let catStore = appData.db.transaction(["categories"], "readonly").objectStore("categories");
 	let categories = [];
@@ -11,22 +14,21 @@ function products_show() {
 	vue.screen.component = "vue-product-list";
 	catStore.openCursor().onsuccess = function(event) {
 		let cursor = event.target.result;
+		let selectedCat = null;
 		if (cursor) {
 			categories.push(cursor.value);
 			cursor.continue();
 		} else {
 			vue.screen.data.categories = categories.sort(tools_sort("dispOrder", "reference"));
-			products_selectCategory(vue.screen.data.categories[0]["id"]);
+			if (vue.screen.data.categories.length > 0) {
+				products_showCategory(vue.screen.data.categories[0].id);
+			}
 			gui_hideLoading();
 		}
 	}
 }
 
-function products_categoryChanged() {
-	let catId = parseInt(document.getElementById("filter-category").value);
-	products_selectCategory(catId);
-}
-function products_selectCategory(catId) {
+function products_showCategory(catId) {
 	gui_showLoading();
 	let prdStore = appData.db.transaction(["products"], "readonly").objectStore("products");
 	let products = [];
@@ -59,17 +61,24 @@ function products_sortProducts(sort) {
 	}
 }
 
-function products_showProduct(prdId) {
+function products_showProduct(prdId, catId) {
 	gui_showLoading();
 	let stores = appData.db.transaction(["products", "categories", "taxes"], "readonly");
 	let catStore = stores.objectStore("categories");
 	let categories = [];
 	let taxStore = stores.objectStore("taxes");
 	let taxes = [];
+	if (typeof(catId) == "string") {
+		catId = parseInt(catId);
+	}
+	let categoryFound = false;
 	catStore.openCursor().onsuccess = function(event) {
 		let cursor = event.target.result;
 		if (cursor) {
 			categories.push(cursor.value);
+			if (catId != null && cursor.value.id == catId) {
+				categoryFound = true;
+			}
 			cursor.continue();
 		} else {
 			taxStore.openCursor().onsuccess = function(event) {
@@ -84,7 +93,12 @@ function products_showProduct(prdId) {
 							_products_showProduct(event.target.result, categories, taxes);
 						}
 					} else {
-						_products_showProduct(Product_default(categories[0].id, taxes[0].id), categories, taxes);
+						let prdCatId = categories[0].id;
+						if (catId != null && categoryFound == true) {
+							prdCatId = catId;
+						}
+						let prd = Product_default(prdCatId);
+						_products_showProduct(prd, categories, taxes);
 					}
 				}
 			}
