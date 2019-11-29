@@ -81,6 +81,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	let total = {
 		"tickets": 0,
 		"cs": 0.0,
+		"errorTotal": 0.0,
 		"paymentModeTotal": [],
 		"taxTotal": [],
 		"categoryTotal": [],
@@ -135,6 +136,10 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		if (z.cashRegister in cashRegistersById) {
 			cashRegister = cashRegistersById[z.cashRegister].label;
 		}
+		let closeError = 0.0;
+		if (z.closeCash != null && z.expectedCash != null) {
+			closeError = z.closeCash - z.expectedCash;
+		}
 		let renderZ = {
 			"cashRegister": cashRegister,
 			"sequence": z.sequence,
@@ -143,6 +148,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 			"openCash": (z.openCash != null) ? z.openCash.toLocaleString() : "",
 			"closeCash": (z.closeCash != null) ? z.closeCash.toLocaleString() : "",
 			"expectedCash": (z.expectedCash != null) ? z.expectedCash.toLocaleString() : "",
+			"closeError": closeError > 0 ? "+" + closeError.toLocaleString() : closeError.toLocaleString(),
 			"ticketCount": z.ticketCount,
 			"cs": z.cs.toLocaleString(),
 			"csPeriod": z.csPeriod.toLocaleString(),
@@ -154,6 +160,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		}
 		total.tickets += z.ticketCount;
 		total.cs += z.cs;
+		total.errorTotal += closeError;
 		for (let j = 0; j < paymentModes.length; j++) {
 			let pm = paymentModes[j];
 			let found = false;
@@ -296,14 +303,15 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		{label: "Ouverture", visible: true},
 		{label: "Clôture", visible: true},
 		{label: "Fond ouverture", visible: false},
-		{label: "Fond clôture", visible: true},
-		{label: "Fond attendu", visible: true},
+		{label: "Fond clôture", visible: false},
+		{label: "Fond attendu", visible: false},
+		{label: "Erreur de caisse", visible: true},
 		{label: "Tickets", visible: true},
 		{label: "CA", visible: true, class: "z-oddcol"},
 		{label: "CA mois", visible: false, class: "z-oddcol"},
 		{label: "CA année", visible: false, class: "z-oddcol"}
 	];
-	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.tickets, total.cs, "", ""];
+	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal, total.tickets, total.cs, "", ""];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
 		vue.screen.data.table.columns.push({label: pm.label, visible: true});
@@ -332,7 +340,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	for (let i = 0; i < renderZs.length; i++) {
 		let z = renderZs[i];
 		let line = [z.cashRegister, z.sequence, z.openDate, z.closeDate, z.openCash, z.closeCash, z.expectedCash,
-			z.ticketCount, z.cs, z.csPeriod, z.csFYear];
+			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear];
 		for (let j = 0; j < z.payments.length; j++) {
 			line.push(z.payments[j].amount);
 		}
