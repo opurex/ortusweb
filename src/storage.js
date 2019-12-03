@@ -134,6 +134,12 @@ var storage_hasData = function() {
 	return (localStorage.getItem("syncDate") != null);
 }
 
+var storage_readStore = function(storeName, callback) {
+	storage_readStores([storeName], function(data) {
+		callback(data[storeName]);
+	});
+}
+
 var storage_readStores = function(storeNames, callback) {
 	let data = {};
 	let finished = [];
@@ -167,5 +173,30 @@ var storage_readStores = function(storeNames, callback) {
 		let storeName = storeNames[i];
 		let store = stores.objectStore(storeName);
 		store.openCursor().onsuccess = successClosure(storeName, i);
+	}
+}
+
+var storage_write = function(storeName, record, successCallback, errorCallback) {
+	let store = appData.db.transaction([storeName], "readwrite").objectStore(storeName);
+	let req = store.put(record);
+	req.onsuccess = successCallback;
+	req.onerror = errorCallback;
+}
+
+var storage_getProductsFromCategory = function(catId, callback, sortFields) {
+	if (arguments.length < 3) {
+		sortFields = ["dispOrder", "reference"];
+	}
+	let prdStore = appData.db.transaction(["products"], "readonly").objectStore("products");
+	let products = [];
+	prdStore.index("category").openCursor(IDBKeyRange.only(catId)).onsuccess = function(event) {
+		let cursor = event.target.result;
+		if (cursor) {
+			products.push(cursor.value);
+			cursor.continue();
+		} else {
+			let sortedPrds = products.sort(tools_sort(sortFields[0], sortFields[1]));
+			callback(sortedPrds);
+		}
 	}
 }

@@ -3,8 +3,6 @@ function products_show(catId) {
 		catId = null;
 	}
 	gui_showLoading();
-	let catStore = appData.db.transaction(["categories"], "readonly").objectStore("categories");
-	let categories = [];
 	vue.screen.data = {
 		"categories": [],
 		"products": [],
@@ -13,99 +11,45 @@ function products_show(catId) {
 		"selectedCatId": null
 	};
 	vue.screen.component = "vue-product-list";
-	catStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		let selectedCat = null;
-		if (cursor) {
-			categories.push(cursor.value);
-			cursor.continue();
-		} else {
-			vue.screen.data.categories = categories.sort(tools_sort("dispOrder", "reference"));
-			if (vue.screen.data.categories.length > 0) {
-				vue.screen.data.selectedCatId = vue.screen.data.categories[0].id;
-			}
-			gui_hideLoading();
+	storage_readStore("categories", function(categories) {
+		vue.screen.data.categories = categories;
+		if (vue.screen.data.categories.length > 0) {
+			vue.screen.data.selectedCatId = vue.screen.data.categories[0].id;
 		}
-	}
-}
-
-function products_showCategory(catId) {
-	gui_showLoading();
-	let prdStore = appData.db.transaction(["products"], "readonly").objectStore("products");
-	let products = [];
-	prdStore.index("category").openCursor(IDBKeyRange.only(catId)).onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			products.push(cursor.value);
-			cursor.continue();
-		} else {
-			let sortedPrds = products.sort(tools_sort("dispOrder", "reference"));
-			products_showProducts(sortedPrds);
-		}
-	}
-}
-
-function products_showProducts(products) {
-	gui_hideLoading();
-	vue.screen.data.products = products;
-	products_sortProducts(vue.screen.data.sort);
-}
-
-function products_sortProducts(sort) {
-	switch (vue.screen.data.sort) {
-		case "dispOrder":
-			vue.screen.data.products = vue.screen.data.products.sort(tools_sort("dispOrder", "reference"));
-			break;
-		case "label":
-			vue.screen.data.products = vue.screen.data.products.sort(tools_sort("label"));
-			break;
-	}
+		gui_hideLoading();
+	});
 }
 
 function products_showProduct(prdId, catId) {
 	gui_showLoading();
-	let stores = appData.db.transaction(["products", "categories", "taxes"], "readonly");
-	let catStore = stores.objectStore("categories");
-	let categories = [];
-	let taxStore = stores.objectStore("taxes");
-	let taxes = [];
 	if (typeof(catId) == "string") {
 		catId = parseInt(catId);
 	}
 	let categoryFound = false;
-	catStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			categories.push(cursor.value);
-			if (catId != null && cursor.value.id == catId) {
+	storage_readStores(["categories", "taxes"], function(data) {
+		let categories = data["categories"];
+		let taxes = data["taxes"];
+		for (let i = 0; i < categories.length; i++) {
+			if (catId != null && categories[i].id == catId) {
 				categoryFound = true;
 			}
-			cursor.continue();
-		} else {
-			taxStore.openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					taxes.push(cursor.value);
-					cursor.continue();
-				} else {
-					if (prdId != null) {
-						let prdStore = stores.objectStore("products");
-						prdStore.get(parseInt(prdId)).onsuccess = function(event) {
-							_products_showProduct(event.target.result, categories, taxes);
-						}
-					} else {
-						let prdCatId = categories[0].id;
-						if (catId != null && categoryFound == true) {
-							prdCatId = catId;
-						}
-						let prd = Product_default(prdCatId, null);
-						_products_showProduct(prd, categories, taxes);
-					}
-				}
-			}
 		}
-	}
+		if (prdId != null) {
+			let prdStore = appData.db.transaction(["products"], "readonly").objectStore("products");
+			prdStore.get(parseInt(prdId)).onsuccess = function(event) {
+				_products_showProduct(event.target.result, categories, taxes);
+			}
+		} else {
+			let prdCatId = categories[0].id;
+			if (catId != null && categoryFound == true) {
+				prdCatId = catId;
+			}
+			let prd = Product_default(prdCatId, null);
+			_products_showProduct(prd, categories, taxes);
+		}
+	});
 }
+
 function _products_showProduct(product, categories, taxes) {
 	gui_hideLoading();
 	vue.screen.data = {
@@ -217,22 +161,18 @@ function products_saveCallback(request, status, response) {
 }
 
 function _products_saveCommit(prd) {
+console.info("on save " + prd.dispOrder + " " + typeof(prd.dispOrder));
 	if (prd.hasImage) {
 		// Force image refresh
 		prd.hasImage = false;
 		prd.hasImage = true;
 	}
 	// Update in local database
-	let prdStore = appData.db.transaction(["products"], "readwrite").objectStore("products");
-	delete prd.margin;
-	let req = prdStore.put(prd);
-	req.onsuccess = function(event) {
+	storage_write("products", prd, function(event) {
 		gui_hideLoading();
 		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
+	}, function(event) {
 		gui_hideLoading();
 		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
+	});
 }
-

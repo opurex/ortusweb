@@ -53,17 +53,20 @@ Vue.component("vue-product-list", {
 </div>`,
 	methods: {
 		imageSrc: function(prd) {
-			if (prd.hasImage) {
-				return login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken();
-			} else {
-				return login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken();
-			}
+			return srvcall_imageUrl("product", prd);
 		},
 		editUrl: function(prd) {
 			return "?p=product&id=" + prd.id;
 		},
 		sort: function(event) {
-			products_sortProducts(event.target.value);
+			switch (this.data.sort) {
+				case "dispOrder":
+					this.data.products = this.data.products.sort(tools_sort("dispOrder", "reference"));
+					break;
+				case "label":
+					this.data.products = this.data.products.sort(tools_sort("label"));
+					break;
+			}
 		},
 	},
 	computed: {
@@ -76,8 +79,11 @@ Vue.component("vue-product-list", {
 	},
 	watch: {
 		selectedCatIdTrick: function(newCatId, oldCatID) {
-			products_showCategory(newCatId);
-		}
+			let thiss = this;
+			storage_getProductsFromCategory(newCatId, function(products) {
+				thiss.data.products = products;
+			});
+		},
 	},
 });
 
@@ -109,7 +115,7 @@ Vue.component("vue-product-form", {
 					</dd>
 
 					<dt><label for="edit-dispOrder">Ordre</label></dt>
-					<dd><input class="form-control" id="edit-dispOrder" type="number" v-model="data.product.dispOrder" /></dd>
+					<dd><input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" /></dd>
 
 					<dt><label for="edit-visible">En vente</label></dt>
 					<dd><input class="form-control" id="edit-visible" type="checkbox" v-model="data.product.visible"></dd>
@@ -186,11 +192,7 @@ Vue.component("vue-product-form", {
 			product_updatePrice();
 		},
 		imageSrc: function(prd) {
-			if (prd.hasImage) {
-				return login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken();
-			} else {
-				return login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken();
-			}
+			return srvcall_imageUrl("product", prd);
 		}
 	}
 });

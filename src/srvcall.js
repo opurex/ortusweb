@@ -70,6 +70,14 @@ function srvcall_delete(target, callback) {
 	_srvcall_send(target, "DELETE", null, callback);
 }
 
+function srvcall_imageUrl(modelClass, model) {
+	if (model.hasImage) {
+		return login_getHostUrl() + "/api/image/" + modelClass + "/" + model.id + "?Token=" + login_getToken();
+	} else {
+		return login_getHostUrl() + "/api/image/" + modelClass + "/default?Token=" + login_getToken();
+	}
+}
+
 /** Helper class to get the default behaviour for faulty responses.
  * @return False if the response is ok to be used (it has not been catched).
  * True if the response has been catched and has already been proceeded. */
