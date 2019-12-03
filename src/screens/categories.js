@@ -1,30 +1,11 @@
 function categories_show() {
 	gui_showLoading();
-	let catStore = appData.db.transaction(["categories"], "readonly").objectStore("categories");
-	let categories = [];
 	vue.screen.data = {categories: [], sort: "dispOrder"};
 	vue.screen.component = "vue-category-list"
-	catStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			categories.push(cursor.value);
-			cursor.continue();
-		} else {
-			vue.screen.data.categories = categories.sort(tools_sort("dispOrder", "reference"));
-			gui_hideLoading();
-		}
-	}
-}
-
-function categories_sortCategories(sort) {
-	switch (vue.screen.data.sort) {
-		case "dispOrder":
-			vue.screen.data.categories = vue.screen.data.categories.sort(tools_sort("dispOrder", "reference"));
-			break;
-		case "label":
-			vue.screen.data.categories = vue.screen.data.categories.sort(tools_sort("label"));
-			break;
-	}
+	storage_readStore("categories", function(categories) {
+		vue.screen.data.categories = categories;
+		gui_hideLoading();
+	});
 }
 
 function categories_showCategory(id) {
@@ -35,26 +16,14 @@ function categories_showCategory(id) {
 		let catReq = catStore.get(parseInt(id));
 		catReq.onsuccess = function(event) {
 			let category = event.target.result;
-			catStore.openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					categories.push(cursor.value);
-					cursor.continue();
-				} else {
-					_categories_showCategory(category, categories);
-				}
-			}
+			storage_readStore("categories", function(categories) {
+				_categories_showCategory(category, categories);
+			});
 		}
 	} else {
-		catStore.openCursor().onsuccess = function(event) {
-			let cursor = event.target.result;
-			if (cursor) {
-				categories.push(cursor.value);
-				cursor.continue();
-			} else {
-				_categories_showCategory(Category_default(), categories);
-			}
-		}
+		storage_readStore("categories", function(categories) {
+			_categories_showCategory(Category_default(), categories);
+		});
 	}
 }
 function _categories_showCategory(category, categories) {
@@ -149,13 +118,12 @@ function _category_saveCommit(cat) {
 	let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
 	document.getElementById("edit-image").value = "";
 	let req = catStore.put(cat);
-	req.onsuccess = function(event) {
+	storage_write("categories", cat, function(event) {
 		gui_hideLoading();
 		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
+	}, function(event) {
 		gui_hideLoading();
 		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
+	});
 }
 

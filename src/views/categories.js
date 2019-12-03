@@ -39,18 +39,21 @@ Vue.component("vue-category-list", {
 </div>`,
 	methods: {
 		imageSrc: function(cat) {
-			if (cat.hasImage) {
-				return login_getHostUrl() + "/api/image/category/" + cat.id + "?Token=" + login_getToken();
-			} else {
-				return login_getHostUrl() + "/api/image/category/default?Token=" + login_getToken();
-			}
+			return srvcall_imageUrl("category", cat);
 		},
 		editUrl: function(cat) {
 			return "?p=category&id=" + cat.id;
 		},
 		sort: function(event) {
-			categories_sortCategories(event.target.value);
-		}
+			switch (this.data.sort) {
+				case "dispOrder":
+					this.data.categories = this.data.categories.sort(tools_sort("dispOrder", "reference"));
+					break;
+				case "label":
+					this.data.categories = this.data.categories.sort(tools_sort("label"));
+			break;
+			}
+		},
 	}
 });
 
