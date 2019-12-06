@@ -43,6 +43,7 @@ function menu_init() {
 			"items": [
 				{"target": _menu_getTargetUrl("categories"), "name": "Categories", "icon": _menu_getIcon("menu_category.png")},
 				{"target": _menu_getTargetUrl("products"), "name": "Produits", "icon": _menu_getIcon("menu_product.png")},
+				{"target": _menu_getTargetUrl("tariffareas"), "name": "Zones tarifaires", "icon": _menu_getIcon("menu_tariffarea.png")},
 				{"target": _menu_getTargetUrl("customers"), "name": "Clients", "icon": _menu_getIcon("menu_customer.png")},
 			]},
 			{"name": "Ventes",

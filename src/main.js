@@ -19,6 +19,9 @@ function route(screen) {
 	case "products":
 		products_show();
 		break;
+	case "tariffareas":
+		tariffareas_show();
+		break;
 	case "customers":
 		customers_show();
 		break;
@@ -39,6 +42,9 @@ function route(screen) {
 		break;
 	case "product":
 		products_showProduct(_get("id"), _get("category"));
+		break;
+	case "tariffarea":
+		tariffareas_showArea(_get("id"));
 		break;
 	case "customer":
 		customers_showCustomer(_get("id"));

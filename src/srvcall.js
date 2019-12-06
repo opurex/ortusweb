@@ -71,7 +71,7 @@ function srvcall_delete(target, callback) {
 }
 
 function srvcall_imageUrl(modelClass, model) {
-	if (model.hasImage) {
+	if (arguments.length == 2 && model.hasImage) {
 		return login_getHostUrl() + "/api/image/" + modelClass + "/" + model.id + "?Token=" + login_getToken();
 	} else {
 		return login_getHostUrl() + "/api/image/" + modelClass + "/default?Token=" + login_getToken();
