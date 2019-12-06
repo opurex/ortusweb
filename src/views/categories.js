@@ -54,6 +54,9 @@ Vue.component("vue-category-list", {
 			break;
 			}
 		},
+	},
+	mounted: function() {
+		this.sort();
 	}
 });
 

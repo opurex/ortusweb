@@ -1,9 +1,9 @@
 function categories_show() {
 	gui_showLoading();
 	vue.screen.data = {categories: [], sort: "dispOrder"};
-	vue.screen.component = "vue-category-list"
 	storage_readStore("categories", function(categories) {
 		vue.screen.data.categories = categories;
+		vue.screen.component = "vue-category-list"
 		gui_hideLoading();
 	});
 }
