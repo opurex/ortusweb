@@ -18,8 +18,12 @@ function gui_showProgress(current, total) {
 
 /** Private method to set the vue app data to display a message. */
 function _gui_showMessage(messageClass, message) {
+	let msg = message
+	if ((typeof message) != "object") {
+		msg = [message];
+	}
 	vue.message.type = messageClass;
-	vue.message.message = message;
+	vue.message.message = msg;
 }
 /** Set the vue app data to hide the message box. */
 function gui_closeMessageBox() {

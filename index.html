@@ -72,7 +72,7 @@
 <vue-loading v-bind:loading="loading"></vue-loading>
 <vue-message v-bind:message="message"></vue-message>
 <!-- Main components -->
-<vue-login v-bind:login="login"></vue-login>
+<vue-login v-bind:login="login" v-show="ready"></vue-login>
 <div id="main" v-if="login.loggedIn && ready">
 	<vue-menu v-bind:menu="menu"></vue-menu>
 	<div v-if="false">As you can see this site doesn't work without javascript.</div>

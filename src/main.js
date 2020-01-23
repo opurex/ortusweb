@@ -140,7 +140,8 @@ function start() {
 			appData.db = event.target.result;
 			_start_done();
 		}, function(event) {
-			gui_showError("Impossible d'accéder aux stockage des données locales.");
+			gui_showError(["Impossible d'accéder aux stockage des données locales (aussi appelé données de site).",
+				"Ce problème provient la plupart du temps du mode de navigation privée. Si vous l'utilisez, essayez avec le mode de navigation normal et utilisez le bouton \"déconnexion\" de l'écran d'accueil pour vider les données en partant."]);
 			return;
 		});
 	} else {
