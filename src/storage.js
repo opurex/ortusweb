@@ -183,6 +183,32 @@ var storage_write = function(storeName, record, successCallback, errorCallback) 
 	req.onerror = errorCallback;
 }
 
+var storage_get = function(storeName, id, callback) {
+	// Multi read
+	if (Array.isArray(id)) {
+		let size = id.length;
+		let data = [];
+		let callbackCalled = false;
+		let store = appData.db.transaction(storeName, "readonly").objectStore(storeName);
+		let success = function(event) {
+			data.push(event.target.result);
+			if (data.length == size && callbackCalled == false) {
+				callbackCalled = true;
+				callback(data);
+			}
+		}
+		for (let i = 0; i < size; i++) {
+			store.get(id[i]).onsuccess = success;
+		}
+	} else {
+		// Single record read
+		let store = appData.db.transaction([storeName], "readonly").objectStore(storeName);
+		store.get(id).onsuccess = function(event) {
+			callback(event.target.result);
+		}
+	}
+}
+
 var storage_getProductsFromCategory = function(catId, callback, sortFields) {
 	if (arguments.length < 3) {
 		sortFields = ["dispOrder", "reference"];

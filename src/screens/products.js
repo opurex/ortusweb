@@ -20,7 +20,10 @@ function products_show(catId) {
 	});
 }
 
-function products_showProduct(prdId, catId) {
+function products_showProduct(prdId, catId, isCompo) {
+	if (arguments.length < 3) {
+		isCompo = false;
+	}
 	gui_showLoading();
 	if (typeof(catId) == "string") {
 		catId = parseInt(catId);
@@ -44,8 +47,13 @@ function products_showProduct(prdId, catId) {
 			if (catId != null && categoryFound == true) {
 				prdCatId = catId;
 			}
-			let prd = Product_default(prdCatId, null);
-			_products_showProduct(prd, categories, taxes);
+			if (!isCompo) {
+				let prd = Product_default(prdCatId, null);
+				_products_showProduct(prd, categories, taxes);
+			} else {
+				let prd = Composition_default(prdCatId, null);
+				_products_showProduct(prd, categories, taxes);
+			}
 		}
 	});
 }
@@ -63,7 +71,34 @@ function _products_showProduct(product, categories, taxes) {
 	if (product.tax == null) {
 		product.tax = taxes[0].id;
 	}
-	vue.screen.component = "vue-product-form";
+	if (!product.composition) {
+		vue.screen.component = "vue-product-form";
+	} else {
+		if (product.compositionGroups.length == 0) {
+			vue.screen.data.product.compositionGroups.push(CompositionGroup_default());
+		}
+		vue.screen.data.index = 0;
+		vue.screen.data.precache = [];
+		let prds = [];
+		let prdIds = []
+		for (let i = 0; i < product.compositionGroups.length; i++) {
+			let grp = product.compositionGroups[i];
+			for (let j = 0; j < grp.compositionProducts.length; j++) {
+				let prdId = grp.compositionProducts[j].product;
+				if (!(prdId in prds)) {
+					prds[prdId] = true; // Avoid duplicated ids.
+					prdIds.push(prdId);
+				}
+			}
+		}
+		storage_get("products", prdIds, function(products) {
+			for (let j = 0; j < products.length; j++) {
+				let cachePrd = products[j];
+				vue.screen.data.precache[cachePrd.id] = cachePrd;
+			}
+			vue.screen.component = "vue-product-composition-form";
+		});
+	}
 	product_updatePrice();
 }
 
@@ -104,6 +139,42 @@ function product_toggleImage() {
 		vue.screen.data.product.hasImage = true;
 		vue.screen.data.deleteImage = false;
 		vue.screen.data.deleteImageButton = "Supprimer";
+	}
+}
+
+function product_composition_addGroup(label) {
+	let grp = CompositionGroup_default();
+	grp.label = label;
+	vue.screen.data.product.compositionGroups.push(grp);
+}
+
+function product_composition_switchGroup(index) {
+	vue.screen.data.index = index; // ugly way to access selectedGroupIndex from the vue.
+}
+
+function product_composition_addProduct(product) {
+	let group = vue.screen.data.product.compositionGroups[vue.screen.data.index];
+	for (let i = 0; i < group.compositionProducts.length; i++) {
+		let cmpPrdId = group.compositionProducts[i].product;
+		if (cmpPrdId == product.id) {
+			return;
+		}
+	}
+	vue.screen.data.product.compositionGroups[vue.screen.data.index].compositionProducts.push(CompositionProduct_default(product));
+}
+
+function product_composition_deleteGroup(index) {
+	vue.screen.data.product.compositionGroups.splice(index, 1);
+}
+
+function product_composition_delProduct(prdId) {
+	let group = vue.screen.data.product.compositionGroups[vue.screen.data.index];
+	for (let i = 0; i < group.compositionProducts.length; i++) {
+		let cmpPrdId = group.compositionProducts[i].product;
+		if (cmpPrdId == prdId) {
+			group.compositionProducts.splice(i, 1);
+			return;
+		}
 	}
 }
 

@@ -21,3 +21,24 @@ function Product_default(categoryId, taxId) {
 	};
 }
 
+function Composition_default(categoryId, taxId) {
+	let prd = Product_default(categoryId, taxId);
+	prd.composition = true;
+	prd.compositionGroups = [];
+	return prd;
+}
+
+function CompositionGroup_default() {
+	return {
+		"label": "",
+		"dispOrder": 0,
+		"compositionProducts": [],
+	}
+}
+
+function CompositionProduct_default(product) {
+	return {
+		"dispOrder": product.dispOrder,
+		"product": product.id,
+	}
+}

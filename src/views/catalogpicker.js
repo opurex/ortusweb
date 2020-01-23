@@ -1,5 +1,5 @@
 Vue.component("vue-catalog-picker", {
-	props: ["categories", "prdPickCallback"],
+	props: ["categories", "prdPickCallback", "excludeCompositions"],
 	data: function() {
 		return { products: [], selectedCatId: null };
 	},
@@ -44,7 +44,16 @@ Vue.component("vue-catalog-picker", {
 		selectedCatId: function(newCatId, oldCatID) {
 			let thiss = this;
 			storage_getProductsFromCategory(newCatId, function(products) {
-				thiss.products = products;
+				if (thiss.excludeCompositions) {
+					thiss.products = [];
+					for (let i = 0; i < products.length; i++) {
+						if (!products[i].composition) {
+							thiss.products.push(products[i]);
+						}
+					}
+				} else {
+					thiss.products = products;
+				}
 			});
 		},
 	},
