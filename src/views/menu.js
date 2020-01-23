@@ -1,7 +1,7 @@
 Vue.component("vue-menu", {
 	props: ["menu"],
 	template: `<nav id="menu" class="navbar navbar-fixed-top navbar-inverse container-fluid"><div class="navbar-header">
-	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false">
+	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false" v-show="menu.visible">
 	<span class="sr-only">Toggle menu</span>
 	<span class="icon-bar"></span>
 	<span class="icon-bar"></span>
@@ -12,7 +12,7 @@ Vue.component("vue-menu", {
 	</a>
 </div>
 <div class="collapse navbar-collapse" id="main-menu">
-	<ul class="nav navbar-nav">
+	<ul class="nav navbar-nav" v-show="menu.visible">
 		<li class="dropdown" v-for="section in menu.sections">
 			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-extended="false">{{section.name}}</a>
 			<ul class="dropdown-menu">
@@ -61,6 +61,7 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("roles"), "name": "Permissions", "icon": _menu_getIcon("menu_role.png")},
 				{"target": _menu_getTargetUrl("resources"), "name": "Personnalisation", "icon": _menu_getIcon("menu_resources.png")},
 			]},
-		]
+		],
+		"visible": true,
 	}
 }

@@ -9,6 +9,9 @@ function home_show() {
 			date: tools_dateToString(syncDate),
 			time: tools_timeToString(syncDate)
 		}
+		vue.menu.visible = true;
+	} else {
+		vue.menu.visible = false;
 	}
 	vue.screen.component = "vue-home";
 }
@@ -62,6 +65,7 @@ function home_syncError(model, i, event) {
 }
 
 function home_syncComplete() {
+	vue.menu.visible = true;
 	gui_hideLoading();
 	home_show();
 }

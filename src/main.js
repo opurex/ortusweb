@@ -134,6 +134,7 @@ function start() {
 		https: login_getHttps(),
 		password: ''
 	}
+	vue.menu.visible = true;
 	// Open database if not already done
 	if (appData.db == null) {
 		storage_open(function(event) {
