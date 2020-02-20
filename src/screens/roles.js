@@ -59,6 +59,7 @@ function _roles_showRole(role, paymentModes) {
 				{value: "fr.pasteque.pos.panels.JPanelPayments", name: "Effectuer des mouvements de caisse"},
 				{value: "fr.pasteque.pos.sales.JPanelTicketEdits", name: "Contrôler les ventes (Desktop)"},
 				{value: "sales.EditTicket", name: "Contrôler les ventes (Android)"},
+				{value: "button.print", name: "Imprimer une commande"},
 				{value: "button.opendrawer", name: "Ouvrir le tiroir caisse hors encaissement (Desktop)"},
 			],
 			tickets: [
@@ -69,6 +70,7 @@ function _roles_showRole(role, paymentModes) {
 				{value: "sales.PrintTicket", name: "Réimprimer un ticket"},
 			],
 			misc: [
+				{value: "fr.pasteque.pos.customers.JPanelCustomer", name: "Créer des comptes client"},
 				{value: "Menu.ChangePassword", name: "Changer son mot de passe"},
 				{value: "fr.pasteque.pos.config.JPanelConfiguration", name: "Accéder à l'écran de configuration (Desktop)"},
 				{value: "fr.pasteque.pos.panels.JPanelPrinter", name: "Historique d'impression (Desktop)"},

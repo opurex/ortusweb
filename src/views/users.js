@@ -35,14 +35,9 @@ Vue.component("vue-user-list", {
 </div>`,
 	methods: {
 		imageSrc: function(user) {
-			if (user.hasImage) {
-				return login_getHostUrl() + "/api/image/user/" + user.id + "?Token=" + login_getToken();
-			} else {
-				return login_getHostUrl() + "/api/image/user/default?Token=" + login_getToken();
-			}
+			return srvcall_imageUrl("user", user);
 		},
 		roleName: function(user) {
-console.info(user.role);
 			return this.data.roles[user.role].name;
 		},
 		editUrl: function(user) {
