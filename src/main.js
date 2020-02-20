@@ -70,6 +70,12 @@ function route(screen) {
 	case "role":
 		roles_showRole(_get("id"));
 		break;
+	case "discountprofiles":
+		discountprofiles_show();
+		break;
+	case "discountprofile":
+		discountprofiles_showProfile(_get("id"));
+		break;
 	case "cashregisters":
 		cashregisters_show();
 		break;
