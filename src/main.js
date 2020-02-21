@@ -88,6 +88,12 @@ function route(screen) {
 	case "resource":
 		resources_showResource(_get("label"));
 		break;
+	case "currencies":
+		currencies_show();
+		break;
+	case "currency":
+		currencies_showCurrency(_get("id"));
+		break;
 	case "home":
 	default:
 		home_show();
