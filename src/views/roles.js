@@ -69,6 +69,14 @@ Vue.component("vue-role-form", {
 					</template>
 				</dl>
 			</fieldset>
+			<fieldset class="form-group">
+				<legend>Divers</legend>
+				<dl class="dl-horizontal" v-for="miscPerm in data.permissions.misc">
+					<dt><label v-bind:for="'edit-ticket-' + miscPerm.value">{{miscPerm.name}}</label></dt>
+					<dd><input class="form-control" v-bind:id="'edit-ticket-' + miscPerm.value" type="checkbox" v-bind:value="miscPerm.value" v-model="data.role.permissions" /></dd>
+				</dl>
+			</fieldset>
+
 
 			<div class="form-group">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
