@@ -70,6 +70,56 @@ function srvcall_delete(target, callback) {
 	_srvcall_send(target, "DELETE", null, callback);
 }
 
+function srvcall_multicall(calls, callback) {
+	let results = {};
+	let finished = [];
+	let callbackCalled = false;
+	for (let i = 0; i < calls.length; i++) {
+		results[calls[i].id] = {request: null, status: null, response: null};
+		finished.push(false);
+	}
+	let callCallback = function(id, index) {
+		return function(request, status, response) {
+				let result = results[id];
+				result.request = request;
+				result.status = status;
+				result.response = response;
+				finished[index] = true;
+				for (let k = 0; k < finished.length; k++) {
+					if (finished[k] == false) {
+						return;
+					}
+				}
+				if (callbackCalled == false) {
+					callbackCalled = true;
+					callback(results);
+				}
+		};
+	}
+	for (let i = 0; i < calls.length; i++) {
+		let singleCall = calls[i];
+		switch (singleCall.method.toUpperCase()) {
+			case "GET":
+				srvcall_get(singleCall.target, callCallback(id, i));
+				break;
+			case "POST":
+				srvcall_post(singleCall.target, singleCall.data, callCallback(singleCall.id, i));
+				break;
+			case "PUT":
+				srvcall_put(singleCall.target, singleCall.data, callCallback(singleCall.id, i));
+				break;
+			case "PATCH":
+				srvcall_patch(singleCall.target, singleCall.data, callCallback(singleCall.id, i));
+				break;
+			case "DELETE":
+				srvcall_delete(singleCall.target, callCallback(singleCall.id, i));
+				break;
+			default:
+				console.error("Unkown method call " + singleCall.method);
+		}
+	}
+}
+
 function srvcall_imageUrl(modelClass, model) {
 	if (arguments.length == 2 && model.hasImage) {
 		return login_getHostUrl() + "/api/image/" + modelClass + "/" + model.id + "?Token=" + login_getToken();

@@ -81,12 +81,15 @@ Vue.component("vue-paymentmode-form", {
 			<h2>Valeurs faciales</h2>
 			<table class="table table-bordered table-hover">
 				<thead>
-					<tr><th>Valeur</th><th></th></tr>
+					<tr><th></th><th>Valeur</th><th></th></tr>
 				</thead>
 				<tbody>
-					<tr v-for="value in data.paymentMode.values">
+					<tr v-for="(value, index) in data.paymentMode.values">
+						<td><img v-if="value.hasImage" v-bind:id="'value-image-' + index" class="img img-thumbnail" v-bind:src="imageValueSrc(data.paymentMode, value)" />
+					<input v-bind:id="'edit-value-image-' + value.value" type="file" accept="image/*" />
+					<a v-if="data.hadValueImage[value.value]" class="btn btn-del" v-on:click="toggleValueImage(value);return false;" >{{data.deleteValueImageButton[value.value]}}</a></td>
 						<td><input type="number" v-model="value.value" step="0.01" /></td>
-						<td><div class="btn-group pull-right" role="group"><button class="btn btn-delete">X</button></div></td>
+						<td><div class="btn-group pull-right" role="group"><button type="button" class="btn btn-delete" v-on:click="deleteValue(index)">X</button></div></td>
 					</tr>
 				</tbody>
 				<tfoot>
@@ -100,13 +103,13 @@ Vue.component("vue-paymentmode-form", {
 					<tr><th>Excédent min.</th><th>Mode de rendu</th><th></th></tr>
 				</thead>
 				<tbody>
-					<tr v-for="ret in data.paymentMode.returns">
+					<tr v-for="(ret, index) in data.paymentMode.returns">
 						<td><input type="number" v-model="ret.minAmount" step="0.01" /></td>
 						<td><select v-model="ret.returnMode" required="true">
 							<option disabled value="">Sélectionner</option>
 							<option v-for="pm in data.paymentModes" :key="pm.id" v-bind:value="pm.id">{{pm.label}}</option>
 						</select></td>
-						<td>X</td>
+						<td><button type="button" class="btn btn-delete" v-on:click="deleteReturn(index)">X</button></td>
 					</tr>
 				</tbody>
 				<tfoot>
@@ -126,11 +129,18 @@ Vue.component("vue-paymentmode-form", {
 </div>`,
 	methods: {
 		imageSrc: function(pm) {
-			if (pm.hasImage) {
-				return login_getHostUrl() + "/api/image/paymentmode/" + pm.id + "?Token=" + login_getToken();
+			return srvcall_imageUrl("paymentmode", pm);
+		},
+		imageValueSrc: function(pm, pmValue) {
+			if (pmValue.hasImage) {
+				return login_getHostUrl() + "/api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value + "?Token=" + login_getToken();
 			} else {
-				return login_getHostUrl() + "/api/image/paymentmode/default?Token=" + login_getToken();
+				return login_getHostUrl() + "/api/image/paymentmodevalue/default?Token=" + login_getToken();
 			}
+		},
+		toggleValueImage: function(value) {
+			paymentmodes_toggleValueImage(value);
+			return false;
 		},
 		addValue(event) {
 			let val = PaymentModeValue_default(this.data.paymentMode);
@@ -139,6 +149,12 @@ Vue.component("vue-paymentmode-form", {
 		addReturn(event) {
 			let ret = PaymentModeReturn_default(this.data.paymentMode);
 			this.data.paymentMode.returns.push(ret);
-		}
+		},
+		deleteValue: function(index) {
+			paymentmodes_removeValue(index);
+		},
+		deleteReturn: function(index) {
+			paymentmodes_removeReturn(index);
+		},
 	}
 });

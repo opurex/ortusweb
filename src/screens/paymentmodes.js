@@ -47,12 +47,24 @@ function paymentmodes_showPaymentMode(id) {
 	}
 }
 function _paymentmodes_showPaymentMode(paymentMode, paymentModes) {
+	let hadValueImage = {};
+	let deleteValueImage = {};
+	let deleteValueImageButton = {};
+	for (let i = 0; i < paymentMode.values.length; i++) {
+		let pmValue = paymentMode.values[i];
+		hadValueImage[pmValue.value] = pmValue.hasImage;
+		deleteValueImage[pmValue.value] = false;
+		deleteValueImageButton[pmValue.value] = "Supprimer";
+	}
 	vue.screen.data = {
 		paymentMode: paymentMode,
 		paymentModes: paymentModes,
 		deleteImage: false,
 		deleteImageButton: "Supprimer",
-		hadImage: paymentMode.hasImage // Save for later check
+		hadImage: paymentMode.hasImage, // Save for later check
+		hadValueImage: hadValueImage,
+		deleteValueImage: deleteValueImage,
+		deleteValueImageButton: deleteValueImageButton,
 	}
 	vue.screen.component = "vue-paymentmode-form";
 	gui_hideLoading();
@@ -69,6 +81,30 @@ function paymentmodes_toggleImage() {
 		vue.screen.data.deleteImage = false;
 		vue.screen.data.deleteImageButton = "Supprimer"
 	}
+}
+
+function paymentmodes_toggleValueImage(pmValue) {
+	if (pmValue.hasImage) {
+		pmValue.hasImage = false;
+		vue.screen.data.deleteValueImage[pmValue.value] = true;
+		let imgTag = document.getElementById("edit-image-" + pmValue.value);
+		if (imgTag != null) {
+			imgTag.value = "";
+		}
+		vue.screen.data.deleteValueImageButton[pmValue.value] = "Restaurer";
+	} else {
+		pmValue.hasImage = true;
+		vue.screen.data.deleteValueImage[pmValue.value] = false;
+		vue.screen.data.deleteValueImageButton[pmValue.value] = "Supprimer"
+	}
+}
+
+function paymentmodes_removeValue(index) {
+	vue.screen.data.paymentMode.values.splice(index, 1);
+}
+
+function paymentmodes_removeReturn(index) {
+	vue.screen.data.paymentMode.returns.splice(index, 1);
 }
 
 function paymentmodes_savePaymentMode() {
@@ -100,26 +136,63 @@ function paymentmodes_saveCallback(request, status, response) {
 		let respPM = JSON.parse(response);
 		pm.id = respPM["id"];
 	}
+	// Send image update requests
+	let calls = [];
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {
 		pm.hasImage = false;
-		srvcall_delete("api/image/paymentmode/" + pm.id, function(request, status, response) {
-			_paymentmodes_saveCommit(pm);
-		});
+		calls.push({id: "pmImg", method: "DELETE", target: "api/image/paymentmode/" + pm.id});
 	} else if (imgTag.files.length != 0) {
 		pm.hasImage = true;
 		if (vue.screen.data.hadImage) {
-			srvcall_patch("api/image/paymentmode/" + pm.id, imgTag.files[0], function(request, status, response) {
-				_paymentmodes_saveCommit(pm);
+			calls.push({id: "pmImg",
+					method: "PATCH",
+					target: "api/image/paymentmode/" + pm.id, data: imgTag.files[0]
 			});
 		} else {
-			srvcall_put("api/image/paymentmode/" + pm.id, imgTag.files[0], function(request, status, response) {
-				_paymentmodes_saveCommit(pm);
+			calls.push({id: "pmImg",
+					method: "PUT",
+					target: "api/image/paymentmode/" + pm.id,
+					data: imgTag.files[0]
 			});
 		}
-	} else {
+	}
+	for (let i = 0; i < pm.values.length; i++) {
+		let pmValue = pm.values[i];
+		let imgValueTag = document.getElementById("edit-value-image-" + pmValue.value);
+		if (pmValue.value in vue.screen.data.deleteValueImage && vue.screen.data.deleteValueImage[pmValue.value]) {
+			pmValue.hasImage = false;
+			calls.push({id: "pmValueImg-" + pmValue.value,
+					method: "DELETE",
+					target: "api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value
+			});
+		} else if (imgValueTag.files.length != 0) {
+			pmValue.hasImage = true;
+			if (pmValue.value in vue.screen.data.hadValueImage && vue.screen.data.hadValueImage[pmValue.value]) {
+				calls.push({id: "pmValueImg-" + pmValue.value,
+						method: "PATCH",
+						target: "api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value,
+						data: imgValueTag.files[0]
+				});
+			} else {
+				calls.push({id: "pmValueImg-" + pmValue.value,
+						method: "PUT",
+						target: "api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value,
+						data: imgValueTag.files[0]
+				});
+			}
+		}
+	}
+	if (calls.length > 0) {
+		srvcall_multicall(calls, _paymentmodes_savePreCommit);
+	}
+ else {
 		_paymentmodes_saveCommit(pm);
 	}
+}
+
+function _paymentmodes_savePreCommit(calls) {
+	_paymentmodes_saveCommit(vue.screen.data.paymentMode);
 }
 
 function _paymentmodes_saveCommit(pm) {
@@ -128,9 +201,21 @@ function _paymentmodes_saveCommit(pm) {
 		pm.hasImage = false;
 		pm.hasImage = true;
 	}
+	for (let i = 0; i < pm.values.length; i++) {
+		let pmValue = pm.values[i];
+		if (pmValue.hasImage) {
+			pmValue.hasImage = false;
+			pmValue.hasImage = true;
+		}
+	}
 	// Update in local database
 	let pmStore = appData.db.transaction(["paymentmodes"], "readwrite").objectStore("paymentmodes");
 	document.getElementById("edit-image").value = "";
+	for (let i = 0; i < pm.values.length; i++) {
+		let pmValue = pm.values[i];
+		let imgValueTag = document.getElementById("edit-value-image-" + pmValue.value);
+		imgValueTag.value = "";
+	}
 	let req = pmStore.put(pm);
 	req.onsuccess = function(event) {
 		gui_hideLoading();
