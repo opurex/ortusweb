@@ -1,5 +1,36 @@
 Vue.component("vue-product-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			currentCategoryId: this.data.selectedCatId,
+			sorting: this.data.sort,
+			filterVisible: this.data.filterVisible,
+			sortedProducts: [], // in data instead of computed because asychronous
+			productsTable: {
+				columns: [
+					{label: "Image", export: false, visible: true},
+					{label: "Référence", visible: false},
+					{label: "Désignation", visible: true},
+					{label: "Catégorie", visible: false},
+					{label: "Code barre", visible: false},
+					{label: "Recharge pré-payement", visible: false},
+					{label: "Vente au poids", visible: false},
+					{label: "Poids/Volume", visible: false},
+					{label: "Contenance", visible: false},
+					{label: "Prix d'achat HT", visible: false},
+					{label: "Prix de vente HT", visible: false},
+					{label: "Prix de vente TTC", visible: true},
+					{label: "Marge", visible: false},
+					{label: "TVA", visible: false},
+					{label: "Remise automatique", visible: false},
+					{label: "Taux de remise", visible: false},
+					{label: "Ordre", visible: false},
+					{label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div>
 <div class="box">
 	<nav class="navbar navbar-default">
@@ -9,46 +40,23 @@ Vue.component("vue-product-list", {
 		</div>
 		<div class="navbar-form navbar-left">
 			<label for="filter-category" class="control-label">Catégorie</label>
-			<select class="form-control" id="filter-category" name="category" v-model="data.selectedCatId">
+			<select class="form-control" id="filter-category" name="category" v-model="currentCategoryId">
 				<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
 			</select>
-			<select class="form-control" id="filter-invisible" v-model="data.filterVisible">
+			<select class="form-control" id="filter-invisible" v-model="filterVisible">
 				<option value="visible">En vente</option>
 				<option value="invisible">Hors vente</option>
 				<option value="all">Tout</option>
 			</select>
 			<label for="sort" class="control-label">Trier par</label>
-			<select class="form-control" id="sort" name="sort" v-model="data.sort" v-on:change="sort">
+			<select class="form-control" id="sort" name="sort" v-model="sorting">
 				<option value="dispOrder">Ordre</option>
 				<option value="label">Désignation</option>
 			</select>
 		</div>
 	</nav>
 	<div class="box-body">
-		<table class="table table-bordered table-hover">
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th>Prix de vente TTC</th>
-					<th>Ordre d'affichage</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody id="product-list">
-				<tr v-for="product in data.products" v-bind:class="{'invisible-data': !product.visible}" v-if="data.filterVisible == 'all' || (product.visible && data.filterVisible == 'visible') || (!product.visible && data.filterVisible == 'invisible')">
-					<td>
-						<img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(product)" /><span v-if="!product.visible">(archive) </span><span><img v-if="product.composition" src="res/img/composition_icon.png" alt="Composition" />{{product.label}}</span>
-					</td>
-					<td>{{product.taxedPrice.toLocaleString()}}</td>
-					<td>{{product.dispOrder}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(product)">Edit</a></div></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="productsTable"></vue-table>
 	</div>
 </div>
 </div>`,
@@ -59,35 +67,97 @@ Vue.component("vue-product-list", {
 		editUrl: function(prd) {
 			return "?p=product&id=" + prd.id;
 		},
-		sort: function(event) {
-			switch (this.data.sort) {
+		sortAndAssign: function(products) {
+			let lines = [];
+			let cats = {};
+			let taxes = {};
+			for (let i = 0; i < this.data.categories.length; i++) {
+				let cat = this.data.categories[i];
+				cats[cat.id] = cat;
+			}
+			for (let i = 0; i < this.data.taxes.length; i++) {
+				let tax = this.data.taxes[i];
+				taxes[tax.id] = tax;
+			}
+			for (let i = 0; i < products.length; i++) {
+				let prd = products[i];
+				if ((this.filterVisible == "visible" && !prd.visible)
+						|| (this.filterVisible == "invisible" && prd.visible)) {
+					continue
+				}
+				let cat = "";
+				if (prd.category in cats) {
+					cat = cats[prd.category].label;
+				}
+				let tax = "";
+				if (prd.tax in taxes) {
+					tax = taxes[prd.tax].label;
+				}
+				let scaleType = "-";
+				switch (prd.scaleType) {
+					case 1:
+						scaleType = "Poids";
+						break;
+					case 2:
+						scaleType = "Volume";
+						break;
+				}
+				let line = [
+					{type: "thumbnail", src: this.imageSrc(prd)},
+					prd.reference, prd.label, cat, prd.barcode,
+					{type: "bool", value: prd.prepay}, {type: "bool", value: prd.scaled},
+					scaleType, prd.scaleValue,
+					(prd.priceBuy != null) ? prd.priceBuy.toLocaleString() : "-",
+					(prd.priceSell != null) ? prd.priceSell.toLocaleString() : "-",
+					prd.taxedPrice.toLocaleString(),
+					(prd.priceBuy != null && prd.priceSell != null) ? (prd.priceSell - prd.priceBuy).toLocaleString() : "?",
+					tax, {type: "bool", value: prd.discountEnabled},
+					(prd.discountRate * 100).toLocaleString() + "%",
+					prd.dispOrder, {type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Edit</a></div>"},
+				];
+				lines.push(line);
+			}
+			switch (this.sorting) {
 				case "dispOrder":
-					this.data.products = this.data.products.sort(tools_sort("dispOrder", "reference"));
+					lines = lines.sort(tools_sort(16, 1));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("dispOrder", "reference"));
 					break;
 				case "label":
-					this.data.products = this.data.products.sort(tools_sort("label"));
+					lines = lines.sort(tools_sort(2));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("label"));
 					break;
 			}
+		},
+		loadProducts: function() {
+			let thiss = this;
+			storage_getProductsFromCategory(this.currentCategoryId, function(products) {
+				thiss.sortAndAssign(products);
+			});
 		},
 	},
 	computed: {
 		newUrl: function() {
-			return "?p=product&category=" + this.selectedCatIdTrick;
+			return "?p=product&category=" + this.currentCategoryId;
 		},
 		newCompoUrl: function() {
-			return "?p=productCompo&category=" + this.selectedCatIdTrick;
+			return "?p=productCompo&category=" + this.currentCategoryId;
 		},
-		selectedCatIdTrick: function() {
-			return this.data.selectedCatId;
-		}
+	},
+	mounted: function() {
+		this.loadProducts();
 	},
 	watch: {
-		selectedCatIdTrick: function(newCatId, oldCatID) {
-			let thiss = this;
-			storage_getProductsFromCategory(newCatId, function(products) {
-				thiss.data.products = products;
-			});
+		sorting: function (newSort, oldSort) {
+			this.sortAndAssign(this.sortedProducts);
 		},
+		currentCategoryId: function(newCatId, oldCatID) {
+			this.loadProducts();
+		},
+		filterVisible: function(newVisible, oldVisible) {
+			this.sortAndAssign(this.sortedProducts);
+		}
 	},
 });
 

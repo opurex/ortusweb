@@ -3,19 +3,19 @@ function products_show(catId) {
 		catId = null;
 	}
 	gui_showLoading();
-	vue.screen.data = {
-		"categories": [],
-		"products": [],
-		"filterVisible": "visible",
-		"sort": "dispOrder",
-		"selectedCatId": null
-	};
-	vue.screen.component = "vue-product-list";
-	storage_readStore("categories", function(categories) {
-		vue.screen.data.categories = categories;
-		if (vue.screen.data.categories.length > 0) {
-			vue.screen.data.selectedCatId = vue.screen.data.categories[0].id;
+	storage_readStores(["categories", "taxes"], function(data) {
+		let selectedCatId = catId;
+		if (data.categories.length > 0 && selectedCatId == null) {
+			selectedCatId = data.categories[0].id;
 		}
+		vue.screen.data = {
+			"categories": data.categories,
+			"taxes": data.taxes,
+			"filterVisible": "visible",
+			"sort": "dispOrder",
+			"selectedCatId": selectedCatId,
+		}
+		vue.screen.component = "vue-product-list";
 		gui_hideLoading();
 	});
 }
