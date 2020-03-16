@@ -164,10 +164,15 @@ tbody tr:hover .z-oddcol {
 .filters ul {
 	list-style-type: none;
 	padding: 0px;
+	display: flex;
+	flex-wrap: wrap;
 }
 .filters ul li {
-	display: inline-block;
 	margin: 0px 1em;
+	width: 15rem;
+}
+.filters ul li label {
+	display: inline;
 }
 
 /* Archive entries like products not currently sold. */
