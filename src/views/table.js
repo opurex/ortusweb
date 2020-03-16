@@ -29,6 +29,10 @@ Vue.component("vue-table", {
 					<template v-if="cell.type == 'thumbnail'">
 					<img class="img img-thumbnail thumbnail" v-bind:src="cell.src" />
 					</template>
+					<template v-else-if="cell.type == 'bool'">
+					<input type="checkbox" disabled="1" v-bind:checked="cell.value" />
+					</template>
+					<template v-else-if="cell.type == 'html'"><span v-html="cell.value"></span></template>
 					<template v-else>{{cell}}</template>
 				</td>
 				</template>
