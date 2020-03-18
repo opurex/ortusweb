@@ -1,14 +1,22 @@
 Vue.component("vue-user-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=user">Ajouter un utilisateur</a>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="user-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des utilisateurs</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" href="?p=user">Ajouter un utilisateur</a></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col style="width:15%; min-width: 5em;" />
 			<col style="width:15%; min-width: 5em;" />
@@ -23,15 +31,15 @@ Vue.component("vue-user-list", {
 			</thead>
 			<tbody>
 				<tr v-for="user in data.users">
-					<td><img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(user)" />{{user.name}}</td>
+					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(user)" />{{user.name}}</td>
 					<td>{{data.roles[user.role].name}}</td>
 					<td>{{user.card}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(user)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(user)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(user) {
@@ -49,62 +57,73 @@ Vue.component("vue-user-list", {
 Vue.component("vue-user-form", {
 	props: ["data"],
 	data: function() { return {"passwordFieldType": "password"}; },
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'un utilisateur</h1>
-		<form id="edit-category-form" onsubmit="javascript:user_saveUser(); return false;">
-			<dl class="dl-horizontal">
-				<dt><label for="edit-name">Nom</label></dt>
-				<dd><input class="form-control" id="edit-name" type="text" v-model="data.user.name" required="true" /></dd>
-
-				<dt><label for="edit-image">Image</label></dt>
-				<dd>
-					<img v-if="data.user.hasImage" id="user-image" class="img img-thumbnail" v-bind:src="imageSrc(data.user)" />
-					<input id="edit-image" type="file" accept="image/*" />
-					<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:user_toggleImage();return false;" >{{data.deleteImageButton}}</a>
-				</dd>
-
-				<dt><label for="edit-parent">Rôle</label></dt>
-				<dd>
-					<select class="form-control" id="edit-parent" v-model="data.user.role">
-						<option disabled value="">Selectionner</option>
-						<option v-for="role in data.roles" :key="role.id" v-bind:value="role.id">{{role.name}}</option>
-					</select>
-				</dd>
-
-				<dt><label for="edit-card">Carte</label></dt>
-				<dd><input class="form-control" id="edit-card" type="text" v-model="data.user.card" /></dd>
-
-				<dt v-if="!data.user.id"><label for="edit-password">Mot de passe</label></dt>
-				<dd v-if="!data.user.id"><input class="form-control" id="edit-password" :type="passwordFieldType" v-model="data.user.password" /><button class="btn" type="button" v-on:click="togglePasswordVisibility">Afficher/masquer</button></dd>
-
-				<dt><label for="edit-dispOrder">Actif</label></dt>
-				<dd><input class="form-control" id="edit-active" type="checkbox" v-model="data.user.active"></dd>
-
-			</dl>
-
+	template: `<div class="user-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=users">Liste des utilisateurs</a></li>
+				<li><h1>Édition d'un utilisateur</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-category-form" class="form-large" onsubmit="javascript:user_saveUser(); return false;">
 			<div class="form-group">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<label for="edit-name">Nom</label>
+				<input id="edit-name" type="text" v-model="data.user.name" required="true" />
 			</div>
-			</form>
-		</div>
-	</div>
-	<div class="box" style="margin-top:1ex" v-if="data.user.id">
-	<div class="box-body">
-		<h2>Réinitialiser le mot de passe</h2>
-		<form id="edit-reset-user-password" onsubmit="javascript:users_updatePassword(); return false;">
-			<dl class="dl-horizontal">
-				<dt><label for="edit-reset-password">Nouveau mot de passe</label></dt>
-				<dd><input :type="passwordFieldType" id="edit-reset-password" class="form-control" /><button class="btn" type="button" v-on:click="togglePasswordVisibility">Afficher/masquer</button></dd>
-			</dl>
 			<div class="form-group">
+				<label for="edit-image">Image</label>
+				<img v-if="data.user.hasImage" id="user-image" class="img img-thumbnail" v-bind:src="imageSrc(data.user)" />
+				<input id="edit-image" type="file" accept="image/*" />
+				<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:user_toggleImage();return false;" >{{data.deleteImageButton}}</a>
+			</div>
+			<div class="form-group">
+				<label for="edit-role">Rôle</label>
+				<select id="edit-role" v-model="data.user.role">
+					<option disabled value="">Selectionner</option>
+					<option v-for="role in data.roles" :key="role.id" v-bind:value="role.id">{{role.name}}</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="edit-card">Carte</label>
+				<input id="edit-card" type="text" v-model="data.user.card" />
+			</div>
+			<div class="form-group" v-if="!data.user.id">
+				<label for="edit-password">Mot de passe</label>
+				<input id="edit-password" :type="passwordFieldType" v-model="data.user.password" />
+				<button class="btn" type="button" v-on:click="togglePasswordVisibility">Afficher/masquer</button>
+			</div>
+			<div class="form-group">
+				<input class="form-control" id="edit-active" type="checkbox" v-model="data.user.active">
+				<label for="edit-dispOrder">Actif</label>
+			</div>
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
 		</form>
-	</div>
-</div>
-</div>
+	</article>
+</section>
+
+<section class="box box-tiny" v-if="data.user.id">
+	<header>
+		<h2>Réinitialiser le mot de passe</h2>
+	</header>
+	<article class="box-body">
+		<form id="edit-reset-user-password" class="form-tiny" onsubmit="javascript:users_updatePassword(); return false;">
+			<div class="form-group">
+				<label for="edit-reset-password">Nouveau mot de passe</label>
+				<input :type="passwordFieldType" id="edit-reset-password" />
+				<button class="btn" type="button" v-on:click="togglePasswordVisibility">Afficher/masquer</button>
+			</div>
+			<div class="form-control">
+				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+			</div>
+		</form>
+	</article>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(user) {

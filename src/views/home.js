@@ -1,35 +1,30 @@
 Vue.component("vue-home", {
 	props: ["data"],
-	template: `<div><div class="col-md-8">
-	<div class="box">
-		<div class="box-body">
-			<h1>Pasteque-jsadmin <small>Interface d'administration</small></h1>
-			<p>Bonjour {{data.user}}. Vous êtes connectés sur {{data.server}}.</p>
-			<p>Vous êtes dans votre interface d'administration où vous pouvez créer vos produits, catégories, accéder à vos statistiques de ventes etc.</p>
-			<p><button class="btn btn-primary" onclick="javascript:home_logout();">Déconnexion</button></p>
-			<h2>Vos données</h2>
-			<p v-if="data.syncDate">Les données ont été chargées le {{data.syncDate.date}} à {{data.syncDate.time}}. Cliquez sur le bouton ci-dessous pour actualiser vos données, en particulier si vous accédez à cette interface depuis plusieurs ordinateurs.</p>
-			<p v-else><strong>Aucune donnée n'a été chargée</strong>. Cliquez sur le bouton ci-dessous pour charger vos données et accéder au menu.</p>
-			<p><button class="btn btn-primary" onclick="javascript:home_sendSync();">Recharger les données</button></p>
-			<h2>Documentation</h2>
-			<p>Il y a plusieurs sources de documentation :</p>
-			<ul>
-				<li><a href="https://fr.wikibooks.org/wiki/Logiciel_Past%C3%A8que">Manuel d’installation, de configuration et d’utilisation sur wikibooks</a></li>
-				<li><a href="https://ask.pasteque.org/">Les forums communautaires</a></li>
-				<li><a href="http://https://framagit.org/groups/pasteque">Le bug tracker</a></li>
-			</ul>
-		</div>
-	</div>
-</div>
-<div class="col-md-4">
-	<div class="box">
-		<div class="box-body">
-			<div class="twitter-feed">
-				<a class="twitter-timeline" href="https://twitter.com/pastequepos" data-widget-id="584374065407885312">Tweets de @pastequepos</a>
-			</div>
-		</div>
-	</div>
-</div>
+	template: `<div class="home">
+<section class="box box-medium">
+	<article class="box-body">
+		<h1>Pasteque-jsadmin <small>Interface d'administration</small></h1>
+		<p>Bonjour {{data.user}}. Vous êtes connectés sur {{data.server}}.</p>
+		<p>Vous êtes dans votre interface d'administration où vous pouvez créer vos produits, catégories, accéder à vos statistiques de ventes etc.</p>
+		<p><button class="btn btn-primary" onclick="javascript:home_logout();">Déconnexion</button></p>
+		<h2>Vos données</h2>
+		<p v-if="data.syncDate">Les données ont été chargées le {{data.syncDate.date}} à {{data.syncDate.time}}. Cliquez sur le bouton ci-dessous pour actualiser vos données, en particulier si vous accédez à cette interface depuis plusieurs ordinateurs.</p>
+		<p v-else><strong>Aucune donnée n'a été chargée</strong>. Cliquez sur le bouton ci-dessous pour charger vos données et accéder au menu.</p>
+		<p><button class="btn btn-primary" onclick="javascript:home_sendSync();">Recharger les données</button></p>
+		<h2>Documentation</h2>
+		<p>Il y a plusieurs sources de documentation :</p>
+		<ul>
+			<li><a href="https://fr.wikibooks.org/wiki/Logiciel_Past%C3%A8que">Manuel d’installation, de configuration et d’utilisation sur wikibooks</a></li>
+			<li><a href="https://ask.pasteque.org/">Les forums communautaires</a></li>
+			<li><a href="http://https://framagit.org/groups/pasteque">Le bug tracker</a></li>
+		</ul>
+	</article>
+</section>
+<aside class="box box-tiny">
+	<article class="box-body twitter-feed">
+		<a class="twitter-timeline" href="https://twitter.com/pastequepos" data-widget-id="584374065407885312">Tweets de @pastequepos</a>
+	</article>
+</aside>
 </div>
 `,
 	mounted: function() {

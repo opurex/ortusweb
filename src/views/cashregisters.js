@@ -1,14 +1,22 @@
 Vue.component("vue-cashregister-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=cashregister">Ajouter une caisse</a>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="cashregister-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des caisses</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" href="?p=cashregister">Ajouter une caisse</a></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col />
 			<col style="width:10%; min-width: 5em;" />
@@ -23,12 +31,12 @@ Vue.component("vue-cashregister-list", {
 				<tr v-for="cashRegister in data.cashRegisters">
 					<td>{{cashRegister.reference}}</td>
 					<td>{{cashRegister.label}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(cashRegister)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(cashRegister)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>`,
 	methods: {
 		editUrl: function(cr) {
@@ -39,26 +47,33 @@ Vue.component("vue-cashregister-list", {
 
 Vue.component("vue-cashregister-form", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'une caisse</h1>
-		<form id="edit-category-form" onsubmit="javascript:cashregister_saveCashRegister(); return false;">
-			<dl class="dl-horizontal">
-				<dt><label for="edit-reference">Référence</label></dt>
-				<dd><input class="form-control" id="edit-reference" type="text" v-model="data.cashRegister.reference" required="true" /></dd>
-
-				<dt><label for="edit-label">Désignation</label></dt>
-				<dd><input class="form-control" id="edit-label" type="text" v-model="data.cashRegister.label" required="true" /></dd>
-			</dl>
-
+	template: `<div class="cashregister-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=cashregisters">Liste des caisses</a></li>
+				<li><h1>Édition d'une caisse</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-category-form" class="form-large" onsubmit="javascript:cashregister_saveCashRegister(); return false;">
 			<div class="form-group">
+				<label for="edit-reference">Référence</label>
+				<input id="edit-reference" type="text" v-model="data.cashRegister.reference" required="true" />
+			</div>
+			<div class="form-group">
+				<label for="edit-label">Désignation</label>
+				<input id="edit-label" type="text" v-model="data.cashRegister.label" required="true" />
+			</div>
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
-			</form>
-		</div>
-	</div>
-</div>
+		</form>
+	</article>
+</section>
 </div>`,
 	methods: {
 	}

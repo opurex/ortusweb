@@ -1,21 +1,31 @@
 Vue.component("vue-category-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=category">Ajouter une catégorie</a>
-		</div>
-		<div class="navbar-form navbar-left">
-			<label for="sort" class="control-label">Trier par</label>
-			<select class="form-control" id="sort" name="sort" v-model="data.sort" v-on:change="sort">
-				<option value="dispOrder">Ordre</option>
-				<option value="label">Désignation</option>
-			</select>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="category-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des catégories</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" href="?p=category">Ajouter une catégorie</a></li>
+			</ul>
+			<ul>
+				<li>
+					<label for="sort">Trier par</label>
+					<select id="sort" name="sort" v-model="data.sort" v-on:change="sort">
+						<option value="dispOrder">Ordre</option>
+						<option value="label">Désignation</option>
+					</select>
+				</li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col style="width:10%; min-width: 5em;" />
 			<col style="width:10%; min-width: 5em;" />
@@ -28,14 +38,14 @@ Vue.component("vue-category-list", {
 			</thead>
 			<tbody>
 				<tr v-for="category in data.categories">
-					<td><img class="img img-thumbnail thumbnail pull-left" v-bind:src="imageSrc(category)" />{{category.label}}</td>
+					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(category)" />{{category.label}}</td>
 					<td>{{category.dispOrder}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(cat) {
@@ -62,46 +72,55 @@ Vue.component("vue-category-list", {
 
 Vue.component("vue-category-form", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'une categorie</h1>
-		<form id="edit-category-form" onsubmit="javascript:category_saveCategory(); return false;">
-			<dl class="dl-horizontal">
-				<dt><label for="edit-label">Désignation</label></dt>
-				<dd><input class="form-control" id="edit-label" type="text" v-model="data.category.label" required="true" /></dd>
-
-				<dt><label for="edit-image">Image</label></dt>
-				<dd>
-					<img v-if="data.category.hasImage" id="category-image" class="img img-thumbnail" v-bind:src="imageSrc(data.category)" />
-					<input id="edit-image" type="file" accept="image/*" />
-					<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:category_toggleImage();return false;" >{{data.deleteImageButton}}</a>
-				</dd>
-
-				<dt><label for="edit-reference">Référence</label></dt>
-				<dd><input class="form-control" id="edit-reference" type="text" v-model="data.category.reference" required="true" /></dd>
-
-				<dt><label for="edit-parent">Parent</label></dt>
-				<dd>
-					<select class="form-control" id="edit-parent" v-model="data.category.parent">
-						<option disabled value="">Selectionner</option>
-						<option value="">Aucun</option>
-						<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
-					</select>
-				</dd>
-
-				<dt><label for="edit-dispOrder">Ordre</label></dt>
-				<dd><input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.category.dispOrder"></dd>
-
-			</dl>
+	template: `<div class="category-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=categories">Liste des catégories</a></li>
+				<li><h1>Édition d'une catégorie</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-category-form" class="form-large" onsubmit="javascript:category_saveCategory(); return false;">
+			<div class="form-group">
+				<label for="edit-label">Désignation</label>
+				<input id="edit-label" type="text" v-model="data.category.label" required="true" />
+			</div>
+			<div class="form-group">
+				<label for="edit-image">Image</label>
+				<img v-if="data.category.hasImage" id="category-image" v-bind:src="imageSrc(data.category)" />
+				<input id="edit-image" type="file" accept="image/*" />
+				<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:category_toggleImage();" >{{data.deleteImageButton}}</button>
+			</div>
 
 			<div class="form-group">
+				<label for="edit-reference">Référence</label>
+				<input id="edit-reference" type="text" v-model="data.category.reference" required="true" />
+			</div>
+
+			<div class="form-group">
+				<label for="edit-parent">Parent</label></dt>
+				<select id="edit-parent" v-model="data.category.parent">
+					<option disabled value="">Selectionner</option>
+					<option value="">Aucun</option>
+					<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="edit-dispOrder">Ordre</label>
+				<input id="edit-dispOrder" type="number" v-model.number="data.category.dispOrder">
+			</div>
+
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
-			</form>
-		</div>
-	</div>
-</div>
+		</form>
+	</article>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(cat) {

@@ -1,21 +1,31 @@
 Vue.component("vue-tariffarea-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=tariffarea">Ajouter une zone</a>
-		</div>
-		<div class="navbar-form navbar-left">
-			<label for="sort" class="control-label">Trier par</label>
-			<select class="form-control" id="sort" name="sort" v-model="data.sort" v-on:change="sort">
-				<option value="dispOrder">Ordre</option>
-				<option value="label">Désignation</option>
-			</select>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="tariffarea-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des zones tarifaires</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" href="?p=tariffarea">Ajouter une zone</a></li>
+			</ul>
+			<ul>
+				<li>
+					<label for="sort">Trier par</label>
+					<select id="sort" name="sort" v-model="data.sort" v-on:change="sort">
+						<option value="dispOrder">Ordre</option>
+						<option value="label">Désignation</option>
+					</select>
+				</li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col style="width:10%; min-width: 5em;" />
 			<col style="width:10%; min-width: 5em;" />
@@ -30,12 +40,12 @@ Vue.component("vue-tariffarea-list", {
 				<tr v-for="tariffarea in data.tariffareas">
 					<td>{{tariffarea.label}}</td>
 					<td>{{tariffarea.dispOrder}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(tariffarea)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(tariffarea)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>
 `,
 	methods: {
@@ -63,27 +73,36 @@ Vue.component("vue-tariffarea-form", {
 	data: function() {
 		return {"null": null, "productCache": []};
 	},
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'une zone tarifaire</h1>
-		<form id="edit-category-form" onsubmit="javascript:tariffareas_saveArea(); return false;">
-			<dl class="dl-horizontal">
-				<dt><label for="edit-label">Désignation</label></dt>
-				<dd><input class="form-control" id="edit-label" type="text" v-model="data.tariffarea.label" required="true" /></dd>
-
-				<dt><label for="edit-reference">Référence</label></dt>
-				<dd><input class="form-control" id="edit-reference" type="text" v-model="data.tariffarea.reference" required="true" /></dd>
-
-				<dt><label for="edit-dispOrder">Ordre</label></dt>
-				<dd><input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.tariffarea.dispOrder"></dd>
-
-			</dl>
+	template: `<div class="tariffarea-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=tariffareas">Liste des zones tarifaires</a></li>
+				<li><h1>Édition d'une zone tarifaire</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-category-form" class="form-large" onsubmit="javascript:tariffareas_saveArea(); return false;">
+			<div class="form-group">
+				<label for="edit-label">Désignation</label>
+				<input id="edit-label" type="text" v-model="data.tariffarea.label" required="true" />
+			</div>
+			<div class="form-group">
+				<label for="edit-reference">Référence</label>
+				<input id="edit-reference" type="text" v-model="data.tariffarea.reference" required="true" />
+			</div>
+			<div class="form-group">
+				<label for="edit-dispOrder">Ordre</label>
+				<input id="edit-dispOrder" type="number" v-model.number="data.tariffarea.dispOrder">
+			</div>
 
 			<h2>Prix</h2>
 			<vue-catalog-picker v-bind:categories="data.categories" v-bind:prdPickCallback="pickProduct" />
 
-			<table class="table table-bordered table-hover">
+			<table>
 				<col />
 				<col style="width:10%; min-width: 5em;" />
 				<col style="width:10%; min-width: 5em;" />
@@ -100,10 +119,10 @@ Vue.component("vue-tariffarea-form", {
 				</thead>
 				<tbody>
 					<tr v-for="price in data.tariffarea.prices">
-						<td><img class="img img-thumbnail thumbnail pull-left"  v-bind:src="imageSrc(price.product)" />{{label(price.product)}}</td>
+						<td><img class="thumbnail thumbnail-text"  v-bind:src="imageSrc(price.product)" />{{label(price.product)}}</td>
 						<td>{{priceSell(price.product)}}</td>
-						<td><input class="form-control" type="number" v-model.number="price.price" step="0.01" /></td>
-						<td><select class="form-control" v-model="price.tax">
+						<td><input type="number" v-model.number="price.price" step="0.01" /></td>
+						<td><select v-model="price.tax">
 							<option v-bind:value="null">Inchangée</option>
 							<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 						</select></td>
@@ -112,13 +131,12 @@ Vue.component("vue-tariffarea-form", {
 				</tbody>
 			</table>
 
-			<div class="form-group">
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
-			</form>
-		</div>
-	</div>
-</div>
+		</form>
+	</article>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(prdId) {

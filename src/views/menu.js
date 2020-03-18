@@ -1,27 +1,43 @@
 Vue.component("vue-menu", {
 	props: ["menu"],
-	template: `<nav id="menu" class="navbar navbar-fixed-top navbar-inverse container-fluid"><div class="navbar-header">
-	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false" v-show="menu.visible">
-	<span class="sr-only">Toggle menu</span>
-	<span class="icon-bar"></span>
-	<span class="icon-bar"></span>
-	<span class="icon-bar"></span>
-	</button>
+	data: function() {
+		return {
+			openedMenu: null,
+		};
+	},
+	template: `<nav id="menu" class="navbar">
+	<input type="checkbox" id="menu-collapser" aria-expanded="false" v-show="menu.visible">
+	<label for="menu-collapser">Menu</label>
 	<a class="navbar-brand" href="?p=home">
 		<img alt="Logo Pastèque" class="img-responsive img-thumbnail" src="res/img/logo.png">
 	</a>
-</div>
-<div class="collapse navbar-collapse" id="main-menu">
-	<ul class="nav navbar-nav" v-show="menu.visible">
-		<li class="dropdown" v-for="section in menu.sections">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-extended="false">{{section.name}}</a>
-			<ul class="dropdown-menu">
+	<ul id="main-menu" v-show="menu.visible">
+		<li class="dropdown" v-bind:class="{expanded: (openedMenu == index)}" v-for="section, index in menu.sections">
+			<button  v-on:click="expandMenu(index)" aria-haspopup="true" v-bind:aria-expanded="isExpanded(index)">{{section.name}}</button>
+			<ul class="dropdown-menu" v-if="openedMenu == index">
 				<li v-for="item in section.items"><a v-bind:style="item.icon" v-bind:href="item.target">{{item.name}}</a></li>
 			</ul>
 		</li>
 	</ul>
-</div></nav>
-`});
+</nav>
+`,
+	methods: {
+		expandMenu: function(index) {
+			if (this.openedMenu == index) {
+				this.openedMenu = null;
+			} else {
+				this.openedMenu = index;
+			}
+		},
+		isExpanded: function(index) {
+			if (this.openedMenu == index) {
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+	},
+});
 
 // TODO: this section should be moved in the controller
 function _menu_getTargetUrl(target) {

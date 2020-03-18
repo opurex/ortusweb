@@ -1,29 +1,33 @@
 Vue.component("vue-salesdetails", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<form id="tickets-filter" onsubmit="javascript:salesdetails_filter();return false;">
-			<div class="navbar-form navbar-left">
-				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
-					<label for="start">Du</label>
-					<input type="text" class="form-control" v-model="data.start" />
-				</div>
-				<div data-date-autoclose="true" data-date-format="dd/mm/yyyy" class="col-sm-10 col-md-offset-1 input-group date">
-					<label for="stop">au</label>
-					<input type="text" class="form-control" v-model="data.stop" />
-				</div>
-			</div>
-			<div class="row actions">
+	template: `<div class="salesdetails">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Détail des ventes</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<form id="tickets-filter" onsubmit="javascript:salesdetails_filter();return false;">
 				<div class="form-group">
+					<label for="start">Du</label>
+					<input type="date" v-model="data.start" />
+				</div>
+				<div class="form-group">
+					<label for="stop">au</label>
+					<input type="date" class="form-control" v-model="data.stop" />
+				</div>
+				<div class="form-control">
 					<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
 				</div>
-			</div>
-		</form>
-	</nav>
-	<div class="box-body" id="report-content">
+			</form>
+		</nav>
+	</header>
+	<article class="box-body" id="report-content">
 		<vue-table v-bind:table="data.table"></vue-table>
-	</div>
-</div>
+	</article>
+</section>
 </div>
 `});

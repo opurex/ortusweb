@@ -1,0 +1,418 @@
+/* Content */
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+#content {
+	padding-top: 4rem;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.box {
+	margin: 1em;
+}
+
+.box-tiny {
+	min-width: 14rem;
+	max-width: 20rem;
+}
+
+
+.box-medium {
+	min-width: 40rem;
+	max-width: 80rem;
+}
+
+.box-large {
+	width: 100%;
+}
+
+aside.box {
+	min-width: 20rem;
+	max-width: 40rem;
+}
+
+@media (max-width:22rem) {
+	.box.box-tiny {
+		margin: 0;
+		min-width: 100%;
+	}
+	aside.box {
+		margin: 0.5em, 0, 0, 0;
+		min-width: 100%;
+	}
+}
+
+@media (max-width:42rem) {
+	.box.box-medium,
+	.box.box-large {
+		margin: 0;
+		min-width: 100%;
+	}
+}
+
+/* Messages */
+
+#message-box {
+	padding: 8px 15px;
+	margin: 0px 30px 20px 30px;
+	position: fixed;
+	top: 3ex;
+	right: 3ex;
+	z-index: 2000;
+	cursor: pointer;
+}
+
+/* Common form */
+
+.form-group {
+	margin-bottom: 1em;
+}
+
+.form-group input[type=checkbox] + label {
+	vertical-align: text-bottom;
+}
+.form-group input:not([type=checkbox]),
+.form-group select {
+	min-height: 2.5em;
+}
+
+/* Navbar form */
+
+nav form {
+	display: flex;
+	flex-wrap: wrap;
+}
+nav .form-group {
+	margin-right: 0.5em;
+}
+nav .form-group input[type=checkbox] + label {
+	margin-right: 0.25em;
+}
+
+/* Form tiny */
+
+.form-tiny .form-group input,
+.form-tiny .form-group textarea,
+fieldset.form-tiny .form-group input,
+fieldset.form-tiny .form-group textarea {
+	width: 100%;
+}
+
+.form-tiny .form-group input[type=checkbox],
+fieldset.form-tiny .form-group input[type=checkbox] {
+	width: auto;
+	margin: auto;
+}
+
+fieldset.form-tiny .form-group {
+	display: inherit;
+}
+
+fieldset.form-tiny {
+	max-width: 15em;
+}
+
+/* Form large */
+
+.box-large .form-large,
+.form-large.form-mosaic {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.box-large .form-large fieldset {
+	min-width: 30rem;
+}
+
+.form-large .form-group {
+	display: flex;
+	align-items: center;
+}
+
+.box-medium .form-large .form-group {
+	max-width: 40rem;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.form-large .form-group label {
+	width: 7em;
+	text-align: right;
+	padding-right: 1em;
+}
+.form-large .form-group input,
+.form-large .form-group select,
+.form-large .form-group textarea {
+	flex: 10;
+}
+.form-large .form-group input[type=checkbox] {
+	margin-left: 12em;
+	flex: 0;
+}
+.form-large .form-group input[type=checkbox] + label {
+	width: auto;
+}
+
+/* Form filters */
+
+.filters ul {
+	list-style-type: none;
+	padding: 0px;
+	display: flex;
+	flex-wrap: wrap;
+}
+.filters ul li {
+	margin: 0px 1em;
+	width: 15rem;
+}
+.filters ul li label {
+	display: inline;
+}
+
+/* Table */
+
+.box-body table {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin-bottom: 0.5rem;
+}
+
+td nav {
+	display: flex;
+	justify-content: center;
+}
+
+td, th {
+	padding: 0.5em;
+}
+
+/* Misc */
+
+nav button,
+.btn {
+	cursor: pointer;
+}
+
+@media print {
+	.noprint {
+		display:none;
+	}
+}
+
+/* Loading filter */
+
+#loading {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	padding-top: 15%;
+	z-index: 999;
+}
+
+/* Login form */
+
+.login-box {
+	max-width: 30rem;
+	margin: 3em auto;
+	position: relative;
+}
+#login-logo {
+	position: absolute;
+	text-align: center;
+	float: left;
+	left: -15rem;
+}
+.login-box .login-box-body {
+	padding: 2em;
+}
+
+@media (max-height: 30rem) {
+	#login {
+		margin: 1em auto;
+	}
+}
+
+@media (max-width: 60rem) and (min-height: 35rem) {
+	#login-logo {
+		position: relative;
+		float: none;
+		left: 0;
+		margin-bottom: 0;
+	}
+	#login nav {
+		margin-top: 0;
+	}
+}
+
+@media (max-height: 35rem) and (max-width: 60rem) {
+	#login-logo {
+		display: none;
+	}
+}
+
+/* Navigation bar (main menu and box menu) */
+
+nav.navbar {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.navbar ul {
+	display: flex;
+	flex-wrap: wrap;
+	list-style-type: none;
+}
+
+#menu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1030;
+	width: 100%;
+}
+
+#menu .navbar-brand {
+	display: block;
+}
+
+#main-menu .dropdown-menu {
+	position: absolute;
+	flex-direction: column;
+}
+
+#menu-collapser {
+	display: none;
+}
+
+@media (min-width: 42rem) {
+	#menu-collapser + label {
+		display: none !important;
+	}
+}
+
+@media (max-width: 42rem) {
+	#menu {
+		display: inherit;
+	}
+	#menu-collapser + label {
+		float: right;
+	}
+	#menu .navbar-brand {
+		float: left;
+	}
+	#menu-collapser:not(:checked) ~ #main-menu {
+		display: none;
+	}
+	#main-menu {
+		flex-direction: column;
+		width: 100%;
+	}
+	#main-menu li button,
+	#main-menu .dropdown-menu {
+		width: 100%;
+	}
+}
+
+/* Browser bar */
+
+.browser ul {
+	display: flex;
+	list-style-type: none;
+}
+
+/* Catalog picker */
+
+.catalog-picker {
+	display: flex;
+	align-items: stretch;
+	margin-bottom: 0.5rem;
+}
+
+.catalog-picker ul.catalog-picker-categories {
+	flex: 1;
+	min-width: 8rem;
+	max-width: 20rem;
+}
+
+.catalog-picker ul.catalog-picker-products {
+	flex: 3;
+}
+
+.catalog-picker ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+.catalog-picker li {
+	display: inline-block;
+}
+
+.catalog-picker button {
+	position: relative;
+	width: 4.5rem;
+	height: 4.5rem;
+	margin: 0.25rem;
+	vertical-align: bottom;
+}
+.catalog-picker button img {
+	max-width: 100%;
+	max-height: 100%;
+}
+.catalog-picker label {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	margin: 0px;
+	width: 100%;
+	overflow: hidden;
+}
+.catalog-label-long {
+	font-size: small;
+}
+.catalog-label-verylong {
+	font-size: x-small;
+}
+
+.catalog-picker-categories,
+.catalog-picker-products {
+	overflow-y: scroll;
+	border: 1px solid #000;
+	padding: 0.2rem;
+}
+
+.qty-cell {
+	text-align: center;
+}
+.qty {
+	width: 4em;
+	text-align: center;
+}
+
+/* Restaurant map */
+
+.floor-display {
+	width: 640px;
+	height: 480px;
+	border-top: 1px solid #888;
+	border-left: 1px solid #888;
+	position: relative;
+}
+.place {
+	list-style-type: none;
+	margin: 0px 0px 0px -40px;
+	padding: 5px 14px;
+}

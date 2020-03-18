@@ -1,8 +1,8 @@
 Vue.component("vue-table", {
 	props: ["table"],
-	template: `
-<div class="box">
+	template: `<div class="table">
 	<div class="filters noprint">
+		<p>Afficher/masquer des colonnes</p>
 		<ul class="filter-columns">
 			<li v-for="(col, index) in table.columns">
 				<input v-model="col.visible" v-bind:id="'filter-column-' + index" type="checkbox" />

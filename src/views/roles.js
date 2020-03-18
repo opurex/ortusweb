@@ -1,14 +1,22 @@
 Vue.component("vue-role-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=role">Ajouter un rôle</a>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="role-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des rôles</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<a class="btn btn-add" href="?p=role">Ajouter un rôle</a>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col style="width:15%; min-width: 5em;" />
 			<thead>
@@ -19,12 +27,12 @@ Vue.component("vue-role-list", {
 			<tbody>
 				<tr v-for="role in data.roles">
 					<td>{{role.name}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(role)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(role)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>`,
 	methods: {
 		editUrl: function(role) {
@@ -35,56 +43,60 @@ Vue.component("vue-role-list", {
 
 Vue.component("vue-role-form", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'un rôle</h1>
-		<form id="edit-category-form" onsubmit="javascript:role_saveRole(); return false;">
-			<fieldset class="form-group">
+	template: `<div class="role-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=roles">Liste des rôles</a></li>
+				<li><h1>Édition d'un rôle</h1></li>
+			</ul>
+		</nav>
+	</header>	
+	<article class="box-body">
+		<form id="edit-category-form" class="form-large form-mosaic" onsubmit="javascript:role_saveRole(); return false;">
+			<fieldset class="form-tiny">
 				<legend>Affichage</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-label">Désignation</label></dt>
-					<dd><input class="form-control" id="edit-name" type="text" v-model="data.role.name" required="true" /></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-label">Désignation</label>
+					<input id="edit-name" type="text" v-model="data.role.name" required="true" />
+				</div>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset class="form-tiny">
 				<legend>Sessions de caisse</legend>
-				<dl class="dl-horizontal" v-for="sessPerm in data.permissions.session">
-					<dt><label v-bind:for="'edit-session-' + sessPerm.value">{{sessPerm.name}}</label></dt>
-					<dd><input class="form-control" v-bind:id="'edit-session-' + sessPerm.value" type="checkbox" v-bind:value="sessPerm.value" v-model="data.role.permissions" /></dd>
+				<div class="form-group" v-for="sessPerm in data.permissions.session">
+					<input v-bind:id="'edit-session-' + sessPerm.value" type="checkbox" v-bind:value="sessPerm.value" v-model="data.role.permissions" />
+					<label v-bind:for="'edit-session-' + sessPerm.value">{{sessPerm.name}}</label>
 				</dl>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset class="form-tiny">
 				<legend>Ventes</legend>
-				<dl class="dl-horizontal" v-for="ticketsPerm in data.permissions.tickets">
-					<dt><label v-bind:for="'edit-ticket-' + ticketsPerm.value">{{ticketsPerm.name}}</label></dt>
-					<dd><input class="form-control" v-bind:id="'edit-ticket-' + ticketsPerm.value" type="checkbox" v-bind:value="ticketsPerm.value" v-model="data.role.permissions" /></dd>
+				<div class="form-group" v-for="ticketsPerm in data.permissions.tickets">
+					<input v-bind:id="'edit-ticket-' + ticketsPerm.value" type="checkbox" v-bind:value="ticketsPerm.value" v-model="data.role.permissions" />
+					<label v-bind:for="'edit-ticket-' + ticketsPerm.value">{{ticketsPerm.name}}</label>
 				</dl>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset class="form-tiny">
 				<legend>Modes de paiement</legend>
-				<dl class="dl-horizontal" v-for="pm in data.paymentModes">
-					<dt><label v-bind:for="'edit-pm-' + pm.code">{{pm.label}}</label></dt>
-					<dd><input class="form-control" v-bind:id="'edit-pm-' + pm.code" type="checkbox" v-bind:value="'payment.' + pm.code" v-model="data.role.permissions" /></dd>
-					</template>
+				<div class="form-group" v-for="pm in data.paymentModes">
+					<input v-bind:id="'edit-pm-' + pm.code" type="checkbox" v-bind:value="'payment.' + pm.code" v-model="data.role.permissions" />
+					<label v-bind:for="'edit-pm-' + pm.code">{{pm.label}}</label>
 				</dl>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset class="form-tiny">
 				<legend>Divers</legend>
-				<dl class="dl-horizontal" v-for="miscPerm in data.permissions.misc">
-					<dt><label v-bind:for="'edit-ticket-' + miscPerm.value">{{miscPerm.name}}</label></dt>
-					<dd><input class="form-control" v-bind:id="'edit-ticket-' + miscPerm.value" type="checkbox" v-bind:value="miscPerm.value" v-model="data.role.permissions" /></dd>
-				</dl>
+				<div class="form-group" v-for="miscPerm in data.permissions.misc">
+					<input v-bind:id="'edit-ticket-' + miscPerm.value" type="checkbox" v-bind:value="miscPerm.value" v-model="data.role.permissions" />
+					<label v-bind:for="'edit-ticket-' + miscPerm.value">{{miscPerm.name}}</label>
+				</div>
 			</fieldset>
-
-
-			<div class="form-group">
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
-			</form>
-		</div>
-	</div>
-</div>
+		</form>
+	</article>
+</section>
 </div>`,
 	methods: {
 	}

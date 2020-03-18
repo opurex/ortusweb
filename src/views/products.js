@@ -31,34 +31,49 @@ Vue.component("vue-product-list", {
 			},
 		};
 	},
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" v-bind:href="newUrl">Ajouter un produit</a>
-			<a class="btn btn-add" v-bind:href="newCompoUrl">Ajouter une composition</a>
-		</div>
-		<div class="navbar-form navbar-left">
-			<label for="filter-category" class="control-label">Catégorie</label>
-			<select class="form-control" id="filter-category" name="category" v-model="currentCategoryId">
-				<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
-			</select>
-			<select class="form-control" id="filter-invisible" v-model="filterVisible">
-				<option value="visible">En vente</option>
-				<option value="invisible">Hors vente</option>
-				<option value="all">Tout</option>
-			</select>
-			<label for="sort" class="control-label">Trier par</label>
-			<select class="form-control" id="sort" name="sort" v-model="sorting">
-				<option value="dispOrder">Ordre</option>
-				<option value="label">Désignation</option>
-			</select>
-		</div>
-	</nav>
+	template: `<div class="product-list">
+<section class="box box-large">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des produits</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" v-bind:href="newUrl">Ajouter un produit</a></li>
+				<li><a class="btn btn-add" v-bind:href="newCompoUrl">Ajouter une composition</a></li>
+			</ul>
+			<ul>
+				<li>
+					<label for="filter-category">Catégorie</label>
+					<select id="filter-category" name="category" v-model="currentCategoryId">
+						<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
+					</select>
+				</li>
+				<li>
+					<label for="filter-invisible">État</label>
+					<select id="filter-invisible" v-model="filterVisible">
+						<option value="visible">En vente</option>
+						<option value="invisible">Hors vente</option>
+						<option value="all">Tout</option>
+					</select>
+				</li>
+				<li>
+					<label for="sort">Trier par</label>
+					<select id="sort" name="sort" v-model="sorting">
+						<option value="dispOrder">Ordre</option>
+						<option value="label">Désignation</option>
+					</select>
+				</li>
+			</ul>
+		</nav>
+	</header>
 	<div class="box-body">
 		<vue-table v-bind:table="productsTable"></vue-table>
 	</div>
-</div>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(prd) {
@@ -163,102 +178,117 @@ Vue.component("vue-product-list", {
 
 Vue.component("vue-product-form", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
+	template: `<div class="product-form">
+<section class="box box-large">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=products">Liste des produits</a></li>
+				<li><h1>Édition d'un produit</h1></li>
+			</ul>
+		</nav>
+	</header>
 	<div class="box-body">
-		<h1>Édition d'un produit</h1>
-		<form id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
-			<fieldset class="form-group">
+		<form class="form-large" id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
+			<fieldset>
 				<legend>Affichage</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-label">Désignation</label></dt>
-					<dd><input class="form-control" id="edit-label" type="text" v-model="data.product.label" required="true" /></dd>
-
-					<dt><label for="edit-image">Image</label></dt>
-					<dd>
-						<img v-if="data.product.hasImage" id="product-image" class="img img-thumbnail" v-bind:src="imageSrc(data.product)" />
-						<input id="edit-image" type="file" accept="image/*" />
-						<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:product_toggleImage();return false;" >{{data.deleteImageButton}}</a>
-					</dd>
-
-					<dt><label for="edit-category">Catégorie</label></dt>
-					<dd>
-						<select class="form-control" id="edit-category" v-model="data.product.category">
-							<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
-						</select>
-					</dd>
-
-					<dt><label for="edit-dispOrder">Ordre</label></dt>
-					<dd><input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" /></dd>
-
-					<dt><label for="edit-visible">En vente</label></dt>
-					<dd><input class="form-control" id="edit-visible" type="checkbox" v-model="data.product.visible"></dd>
-
-					<dt><label for="edit-prepay">Recharge prépayé</label></dt>
-					<dd><input class="form-control" id="edit-prepay" type="checkbox" v-model="data.product.prepay" /></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-label">Désignation</label>
+					<input id="edit-label" type="text" v-model="data.product.label" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-image">Image</label>
+					<img v-if="data.product.hasImage" id="product-image" class="img img-thumbnail" v-bind:src="imageSrc(data.product)" />
+					<input id="edit-image" type="file" accept="image/*" />
+					<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:product_toggleImage();return false;" >{{data.deleteImageButton}}</button>
+				</div>
+				<div class="form-group">
+					<label for="edit-category">Catégorie</label></dt>
+					<select class="form-control" id="edit-category" v-model="data.product.category">
+						<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="edit-dispOrder">Ordre</label>
+					<input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" />
+				</div>
+				<div class="form-group">
+					<input id="edit-visible" type="checkbox" v-model="data.product.visible">
+					<label for="edit-visible">En vente</label>
+				</div>
+				<div class="form-group">
+					<input id="edit-prepay" type="checkbox" v-model="data.product.prepay" />
+					<label for="edit-prepay">Recharge prépayé</label>
+				</div>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset>
 				<legend>Prix</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-priceSell">Prix de vente HT</label></dt>
-					<dd><input type="number" id="edit-priceSell" name="priceSell" class="form-control" v-model="data.product.priceSell" step="0.01" disabled="true"></dd>
-
-					<dt><label for="edit-tax">TVA</label></dt>
-					<dd>
-						<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice">
-							<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
-						</select>
-					</dd>
-
-					<dt><label for="edit-taxedPrice">Prix de vente TTC</label></dt>
-					<dd><input type="number" id="edit-taxedPrice" class="form-control" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" /></dd>
-
-					<dt><label for="edit-priceBuy">Prix d'achat</label></dt>
-					<dd><input type="number" id="edit-priceBuy" name="priceBuy" class="form-control" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" /></dd>
-
-					<dt><label for="edit-margin">Marge</label></dt>
-					<dd><input type="text" id="edit-margin" name="margin" class="form-control" v-model="data.product.margin" disabled="true" /></dd>
-
-					<dt><label for="edit-scaled">Vente au poids</label></dt>
-					<dd><input class="form-control" id="edit-scaled" type="checkbox" name="scaled" v-model="data.product.scaled"></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-priceSell">Prix de vente HT</label>
+					<input type="number" id="edit-priceSell" name="priceSell" class="form-control" v-model="data.product.priceSell" step="0.01" disabled="true">
+				</div>
+				<div class="form-group">
+					<label for="edit-tax">TVA</label>
+					<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice">
+						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="edit-taxedPrice">Prix de vente TTC</label>
+					<input type="number" id="edit-taxedPrice" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
+				</div>
+				<div class="form-group">
+					<label for="edit-priceBuy">Prix d'achat</label>
+					<input type="number" id="edit-priceBuy" name="priceBuy" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
+				</div>
+				<div class="form-group">
+					<label for="edit-margin">Marge</label>
+					<input type="text" id="edit-margin" name="margin" v-model="data.product.margin" disabled="true" />
+				</div>
+				<div class="form-group">
+					<input id="edit-scaled" type="checkbox" name="scaled" v-model="data.product.scaled"></dd>
+					<label for="edit-scaled">Vente au poids</label>
+				</div>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset>
 				<legend>Référencement</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-reference">Référence</label></dt>
-					<dd><input class="form-control" id="edit-reference" type="text" v-model="data.product.reference" required="true" /></dd>
-
-					<dt><label for="edit-barcode">Code barre</label></dt>
-					<dd><input class="form-control" id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" /></dd>
-
-					<dt><label for="edit-scaleType">Volume</label></dt>
-					<dd>
-<select class="form-control" id="edit-scaleType" v-model="data.product.scaleType">
-<option value="0">Pas de volumétrie</option>
-<option value="1">Poids</option>
-<option value="2">Litre</option>
-</select>
-					</dd>
-
-					<dt><label for="edit-scaleValue">Contenance</label></dt>
-					<dd><input class="form-control" id="edit-scaleValue" type="number" step="any" v-model="data.product.scaleValue" /></dd>
-
-					<dt><label for="edit-discountEnabled">Remise auto</label></dt>
-					<dd><input class="form-control" id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" /></dd>
-
-					<dt><label for="edit-discountRate">Taux de remise</label></dt>
-					<dd><input class="form-control" id="edit-discountRate" type="number" v-model="data.product.discountRate" step="0.01" /></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-reference">Référence</label>
+					<input id="edit-reference" type="text" v-model="data.product.reference" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-barcode">Code barre</label>
+					<input id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" />
+				</div>
+				<div class="form-group">
+					<label for="edit-scaleType">Volume</label>
+					<select id="edit-scaleType" v-model="data.product.scaleType">
+						<option value="0">Pas de volumétrie</option>
+						<option value="1">Poids</option>
+						<option value="2">Litre</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="edit-scaleValue">Contenance</label>
+					<input id="edit-scaleValue" type="number" step="any" v-model="data.product.scaleValue" />
+				</div>
+				<div class="form-group">
+					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
+					<label for="edit-discountEnabled">Remise auto</label>
+				</div>
+				<div class="form-group">
+					<label for="edit-discountRate">Taux de remise</label>
+					<input id="edit-discountRate" type="number" v-model="data.product.discountRate" step="0.01" />
+				</div>
 			</fieldset>
 
-		<div class="form-group">
-			<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
-		</div>
-	</form>
-</div>
-</div>
+			<div class="form-control">
+				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+			</div>
+		</form>
+	</div>
+</section>
 </div>
 `,
 	methods: {
@@ -274,76 +304,89 @@ Vue.component("vue-product-form", {
 Vue.component("vue-product-composition-form", {
 	props: ["data"],
 	data: function() { return {"selectedGroupIndex": 0, "productCache": []} },
-	template: `<div>
-<div class="box">
+	template: `<div class="composition-form">
+<section class="box box-large">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=products">Liste des produits</a></li>
+				<li><h1>Édition d'un produit</h1></li>
+			</ul>
+		</nav>
+	</header>
 	<div class="box-body">
-		<h1>Édition d'un produit</h1>
-		<form id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
-			<fieldset class="form-group">
+		<form class="form-large" id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
+			<fieldset>
 				<legend>Affichage</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-label">Désignation</label></dt>
-					<dd><input class="form-control" id="edit-label" type="text" v-model="data.product.label" required="true" /></dd>
-
-					<dt><label for="edit-image">Image</label></dt>
-					<dd>
-						<img v-if="data.product.hasImage" id="product-image" class="img img-thumbnail" v-bind:src="imageSrc(data.product)" />
-						<input id="edit-image" type="file" accept="image/*" />
-						<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:product_toggleImage();return false;" >{{data.deleteImageButton}}</a>
-					</dd>
-
-					<dt><label for="edit-category">Catégorie</label></dt>
-					<dd>
-						<select class="form-control" id="edit-category" v-model="data.product.category">
-							<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
-						</select>
-					</dd>
-
-					<dt><label for="edit-dispOrder">Ordre</label></dt>
-					<dd><input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" /></dd>
-
-					<dt><label for="edit-visible">En vente</label></dt>
-					<dd><input class="form-control" id="edit-visible" type="checkbox" v-model="data.product.visible"></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-label">Désignation</label>
+					<input id="edit-label" type="text" v-model="data.product.label" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-image">Image</label>
+					<img v-if="data.product.hasImage" id="product-image" v-bind:src="imageSrc(data.product)" />
+					<input id="edit-image" type="file" accept="image/*" />
+					<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:product_toggleImage();" >{{data.deleteImageButton}}</button>
+				</div>
+				<div class="form-group">
+					<label for="edit-category">Catégorie</label>
+					<select id="edit-category" v-model="data.product.category">
+						<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="edit-dispOrder">Ordre</label>
+					<input id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" />
+				</div>
+				<div class="form-group">
+					<input class="form-control" id="edit-visible" type="checkbox" v-model="data.product.visible">
+					<label for="edit-visible">En vente</label>
+				</div>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset>
 				<legend>Prix</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-priceSell">Prix de vente HT</label></dt>
-					<dd><input type="number" id="edit-priceSell" name="priceSell" class="form-control" v-model="data.product.priceSell" step="0.01" disabled="true"></dd>
-
-					<dt><label for="edit-tax">TVA</label></dt>
-					<dd>
-						<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice">
-							<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
-						</select>
-					</dd>
-
-					<dt><label for="edit-taxedPrice">Prix de vente TTC</label></dt>
-					<dd><input type="number" id="edit-taxedPrice" class="form-control" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" /></dd>
-
-					<dt><label for="edit-priceBuy">Prix d'achat</label></dt>
-					<dd><input type="number" id="edit-priceBuy" name="priceBuy" class="form-control" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" /></dd>
-
-					<dt><label for="edit-margin">Marge</label></dt>
-					<dd><input type="text" id="edit-margin" name="margin" class="form-control" v-model="data.product.margin" disabled="true" /></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-priceSell">Prix de vente HT</label>
+					<input type="number" id="edit-priceSell" name="priceSell" v-model="data.product.priceSell" step="0.01" disabled="true">
+					<label for="edit-tax">TVA</label>
+				</div>
+				<div class="form-group">
+					<select id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice">
+						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="edit-taxedPrice">Prix de vente TTC</label></dt>
+					<input type="number" id="edit-taxedPrice" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
+				</div>
+				<div class="form-group">
+					<label for="edit-priceBuy">Prix d'achat</label>
+					<input type="number" id="edit-priceBuy" name="priceBuy" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
+				</div>
+				<div class="form-group">
+					<label for="edit-margin">Marge</label></dt>
+					<input type="text" id="edit-margin" name="margin" v-model="data.product.margin" disabled="true" />
+				</div>
 			</fieldset>
-			<fieldset class="form-group">
+			<fieldset>
 				<legend>Référencement</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-reference">Référence</label></dt>
-					<dd><input class="form-control" id="edit-reference" type="text" v-model="data.product.reference" required="true" /></dd>
-
-					<dt><label for="edit-barcode">Code barre</label></dt>
-					<dd><input class="form-control" id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" /></dd>
-
-					<dt><label for="edit-discountEnabled">Remise auto</label></dt>
-					<dd><input class="form-control" id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" /></dd>
-
-					<dt><label for="edit-discountRate">Taux de remise</label></dt>
-					<dd><input class="form-control" id="edit-discountRate" type="number" v-model="data.product.discountRate" step="0.01" /></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-reference">Référence</label>
+					<input id="edit-reference" type="text" v-model="data.product.reference" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-barcode">Code barre</label></dt>
+					<input id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" />
+				</div>
+				<div class="form-group">
+					<label for="edit-discountEnabled">Remise auto</label>
+					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
+				</div>
+				<div class="form-group">
+					<label for="edit-discountRate">Taux de remise</label>
+					<input id="edit-discountRate" type="number" v-model="data.product.discountRate" step="0.01" />
+				</div>
 			</fieldset>
 
 			<fieldset>

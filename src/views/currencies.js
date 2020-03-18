@@ -1,14 +1,22 @@
 Vue.component("vue-currency-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=currency">Ajouter une devise</a>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="currency-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des devises</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" href="?p=currency">Ajouter une devise</a></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col style="width:10%; min-width: 5em;" />
 			<col style="width:10%; min-width: 5em;" />
@@ -23,12 +31,12 @@ Vue.component("vue-currency-list", {
 				<tr v-for="currency in data.currencies">
 					<td>{{currency.label}}</td>
 					<td>{{currency.rate.toLocaleString()}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(currency)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(currency)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>`,
 	methods: {
 		editUrl: function(curr) {
@@ -39,55 +47,67 @@ Vue.component("vue-currency-list", {
 
 Vue.component("vue-currency-form", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'une devise</h1>
-		<form id="edit-currency-form" onsubmit="javascript:currency_saveCurrency(); return false;">
-			<fieldset class="form-group">
+	template: `<div class="currency-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=currencies">Liste des devises</a></li>
+				<li><h1>Édition d'une devise</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-currency-form" class="form-large" onsubmit="javascript:currency_saveCurrency(); return false;">
+			<fieldset>
 				<legend>Description</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-label">Désignation</label></dt>
-					<dd><input class="form-control" id="edit-label" type="text" v-model="data.currency.label" required="true" /></dd>
-
-					<dt><label for="edit-reference">Référence</label></dt>
-					<dd><input class="form-control" id="edit-reference" type="text" v-model="data.currency.reference" required="true" /></dd>
-
-					<dt><label for="edit-dispOrder">Taux de change</label></dt>
-					<dd><input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.currency.rate" min="0.00" step="0.01"></dd>
-
-					<dt><label for="edit-main">Devise principale</label></dt>
-					<dd><input class="form-control" id="edit-main" type="checkbox" name="main" v-model="data.currency.main" v-bind:disabled="data.wasMain" /></dd>
-
-					<dt><label for="edit-visible">Active</label></dt>
-					<dd><input class="form-control" id="edit-visible" type="checkbox" name="main" v-model="data.currency.visible"></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-label">Désignation</label>
+					<input id="edit-label" type="text" v-model="data.currency.label" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-reference">Référence</label>
+					<input id="edit-reference" type="text" v-model="data.currency.reference" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-dispOrder">Taux de change</label>
+					<input id="edit-dispOrder" type="number" v-model.number="data.currency.rate" min="0.00" step="0.01">
+				</div>
+				<div class="form-group">
+					<input id="edit-main" type="checkbox" name="main" v-model="data.currency.main" v-bind:disabled="data.wasMain" />
+					<label for="edit-main">Devise principale</label>
+				</div>
+				<div class="form-group">
+					<input id="edit-visible" type="checkbox" name="main" v-model="data.currency.visible">
+					<label for="edit-visible">Active</label>
+				</div>
 			</fieldset>
-
-			<fieldset class="form-group">
+			<fieldset>
 				<legend>Format</legend>
-				<dl class="dl-horizontal">
-					<dt><label for="edit-symbole">Symbole monétaire</label></dt>
-					<dd><input class="form-control" id="edit-symbol" type="text" v-model="data.currency.symbol" /></dd>
-
-					<dt><label for="edit-decimal">Séparateur de décimales</label></dt>
-					<dd><input class="form-control" id="edit-decimal" type="text" v-model="data.currency.decimalSeparator" /></dd>
-
-					<dt><label for="edit-thousand">Séparateur de milliers</label></dt>
-					<dd><input class="form-control" id="edit-thousand" type="text" v-model="data.currency.thousandsSeparator" /></dd>
-
-					<dt><label for="edit-format">Format</label></dt>
-					<dd><input class="form-control" id="edit-format" type="text" v-model="data.currency.format" /></dd>
-				</dl>
+				<div class="form-group">
+					<label for="edit-symbole">Symbole monétaire</label>
+					<input id="edit-symbol" type="text" v-model="data.currency.symbol" />
+				</div>
+				<div class="form-group">
+					<label for="edit-decimal">Séparateur de décimales</label>
+					<input id="edit-decimal" type="text" v-model="data.currency.decimalSeparator" />
+				</div>
+				<div class="form-group">
+					<label for="edit-thousand">Séparateur de milliers</label>
+					<input id="edit-thousand" type="text" v-model="data.currency.thousandsSeparator" />
+				</div>
+				<div class="form-group">
+					<label for="edit-format">Format</label>
+					<input id="edit-format" type="text" v-model="data.currency.format" />
+				</div>
 			</fieldset>
-
-			<div class="form-group">
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
-			</form>
-		</div>
-	</div>
-</div>
+		</form>
+	</article>
+</section>
 </div>`,
 	methods: {
 		imageSrc: function(cat) {

@@ -1,14 +1,22 @@
 Vue.component("vue-discountprofile-list", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<nav class="navbar navbar-default">
-		<div class="navbar-form navbar-left">
-			<a class="btn btn-add" href="?p=discountprofile">Ajouter un profil de remise</a>
-		</div>
-	</nav>
-	<div class="box-body">
-		<table class="table table-bordered table-hover">
+	template: `<div class="discountprofile-list">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><h1>Liste des profils de remise</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li><a class="btn btn-add" href="?p=discountprofile">Ajouter un profil de remise</a></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<table>
 			<col />
 			<col style="width:10%; min-width: 5em;" />
 			<col style="width:10%; min-width: 5em;" />
@@ -23,12 +31,12 @@ Vue.component("vue-discountprofile-list", {
 				<tr v-for="profile in data.discountProfiles">
 					<td>{{profile.label}}</td>
 					<td>{{percent(profile.rate)}}</td>
-					<td><div class="btn-group pull-right" role="group"><a class="btn btn-edit" v-bind:href="editUrl(profile)">Edit</a></div></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(profile)">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</div>
+	</article>
+</section>
 </div>`,
 	methods: {
 		percent: function(rate) {
@@ -42,26 +50,32 @@ Vue.component("vue-discountprofile-list", {
 
 Vue.component("vue-discountprofile-form", {
 	props: ["data"],
-	template: `<div>
-<div class="box">
-	<div class="box-body">
-		<h1>Édition d'un profil de remise</h1>
-		<form id="edit-discountprofile-form" onsubmit="javascript:discountprofile_saveProfile(); return false;">
-			<dl class="dl-horizontal">
-				<dt><label for="edit-label">Désignation</label></dt>
-				<dd><input class="form-control" id="edit-label" type="text" v-model="data.discountProfile.label" required="true" /></dd>
-
-				<dt><label for="edit-rate">Taux de remise</label></dt>
-				<dd><input class="form-control" id="edit-rate" type="number" v-model.number="data.discountProfile.rate" step="0.01" min="0.0" max="1.0" /></dd>
-
-			</dl>
-
+	template: `<div class="discountprofile-form">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=discountprofiles">Liste des profils de remise</a></li>
+				<li><h1>Édition d'un profil de remise</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-discountprofile-form" class="form-large" onsubmit="javascript:discountprofile_saveProfile(); return false;">
 			<div class="form-group">
+				<label for="edit-label">Désignation</label>
+				<input id="edit-label" type="text" v-model="data.discountProfile.label" required="true" />
+			</div>
+			<div class="form-group">
+				<label for="edit-rate">Taux de remise</label>
+				<input id="edit-rate" type="number" v-model.number="data.discountProfile.rate" step="0.01" min="0.0" max="1.0" />
+			</div>
+			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
-			</form>
-		</div>
-	</div>
-</div>
+		</form>
+	</article>
+</section>
 </div>`,
 });
