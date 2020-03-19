@@ -13,14 +13,14 @@ Vue.component("vue-zticket-list", {
 			<form id="ztickets-filter" onsubmit="javascript:ztickets_filter();return false;">
 				<div class="form-group">
 					<label for="start">Du</label>
-					<input type="date" class="form-control" v-model="data.start" />
+					<vue-inputdate v-model="data.start" />
 				</div>
 				<div class="form-group">
 					<label for="stop">au</label>
-					<input type="date" class="form-control" v-model="data.stop" />
+					<vue-inputdate v-model="data.stop" />
 				</div>
 				<div class="form-control">
-					<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
+					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 				</div>
 			</form>
 		</nav>

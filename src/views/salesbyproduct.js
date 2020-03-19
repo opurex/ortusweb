@@ -13,11 +13,11 @@ Vue.component("vue-salesbyproduct", {
 		<form id="tickets-filter" onsubmit="javascript:salesbyproduct_filter();return false;">
 			<div class="form-group">
 				<label for="start">Du</label>
-				<input type="date" v-model="data.start" />
+				<vue-inputdate v-model="data.start" />
 			</div>
 			<div class="form-group">
 				<label for="stop">au</label>
-				<input type="date" v-model="data.stop" />
+				<vue-inputdate v-model="data.stop" />
 			</div>
 			<div class="form-group">
 				<input id="include-archives" type="checkbox" v-model="data.includeArchives" />
@@ -32,7 +32,7 @@ Vue.component("vue-salesbyproduct", {
 				<label for="separate-by-cr">Détailler par caisse</label>
 			</div>
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
+				<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 			</div>
 		</form>
 	</nav>

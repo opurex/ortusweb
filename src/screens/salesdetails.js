@@ -3,9 +3,7 @@ var _salesdetails_data = {};
 
 function salesdetails_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
-	start = tools_dateToString(start);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
-	stop = tools_dateToString(stop);
 	vue.screen.data = {
 		"start": start,
 		"stop": stop,
@@ -32,18 +30,8 @@ function salesdetails_show() {
 }
 
 function salesdetails_filter() {
-	let start = vue.screen.data.start.split("/");
-	if (start.length != 3) {
-		start = new Date(new Date().getTime() - 604800000);
-	} else {
-		start = new Date(start[2], start[1] - 1, start[0]);
-	}
-	let stop = vue.screen.data.stop.split("/");
-	if (stop.length != 3) {
-		stop = new Date(new Date().getTime() + 86400000);
-	} else {
-		stop = new Date(stop[2], stop[1] - 1	, stop[0]);
-	}
+	let start = vue.screen.data.start;
+	let stop = vue.screen.data.stop;
 	_salesdetails_data = {"start": start.getTime() / 1000,
 		"stop": stop.getTime() / 1000,
 		"pages": 0,
@@ -144,9 +132,9 @@ function _salesdetails_render(cashRegisters, tickets) {
 		}
 	}
 	vue.screen.data.table.title = "Détail des ventes du "
-			+ vue.screen.data.start
+			+ tools_dateToString(vue.screen.data.start)
 			+ " au "
-			+ vue.screen.data.stop;
+			+ tools_dateToString(vue.screen.data.stop);
 	Vue.set(vue.screen.data.table, "lines", lines);
 	gui_hideLoading();
 }

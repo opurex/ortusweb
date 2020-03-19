@@ -1,8 +1,6 @@
 function ztickets_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
-	start = tools_dateToString(start);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
-	stop = tools_dateToString(stop);
 	vue.screen.data = {
 		"start": start,
 		"stop": stop,
@@ -12,18 +10,8 @@ function ztickets_show() {
 }
 
 function ztickets_filter() {
-	let start = vue.screen.data.start.split("/");
-	if (start.length != 3) {
-		start = new Date(new Date().getTime() - 604800000);
-	} else {
-		start = new Date(start[2], start[1] - 1, start[0]);
-	}
-	let stop = vue.screen.data.stop.split("/");
-	if (stop.length != 3) {
-		stop = new Date(new Date().getTime() + 86400000);
-	} else {
-		stop = new Date(stop[2], stop[1] - 1	, stop[0]);
-	}
+	let start = vue.screen.data.start;
+	let stop = vue.screen.data.stop;
 	start = start.getFullYear() + "-" + (start.getMonth() + 1) + "-" + start.getDate();
 	//stop = stop.getFullYear() + "-" + (stop.getMonth() + 1) + "-" + stop.getDate();
 	srvcall_get("api/cash/search/?dateStart=" + start + "&dateStop=" + (stop.getTime() / 1000), _ztickets_filterCallback);
@@ -296,7 +284,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		total.catTaxTotal[i].amount = total.catTaxTotal[i].amount.toLocaleString();
 	}
 	// Set table
-	vue.screen.data.table.title = "Tickets Z du " + vue.screen.data.start + " au " + vue.screen.data.stop;
+	vue.screen.data.table.title = "Tickets Z du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop);
 	vue.screen.data.table.columns = [
 		{label: "Caisse", visible: true},
 		{label: "N°", visible: false},
