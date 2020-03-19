@@ -80,11 +80,20 @@ aside.box {
 	min-height: 2.5em;
 }
 
+form > .form-control {
+	display: flex;
+	justify-content: end;
+}
+
 /* Navbar form */
 
 nav form {
 	display: flex;
 	flex-wrap: wrap;
+}
+#login nav form { /* Disable inline for login form */
+	display: inherit;
+	flex-wrap: inherit;
 }
 nav .form-group {
 	margin-right: 0.5em;
@@ -95,6 +104,7 @@ nav .form-group input[type=checkbox] + label {
 
 /* Form tiny */
 
+.form-tiny .form-group,
 .form-tiny .form-group input,
 .form-tiny .form-group textarea,
 fieldset.form-tiny .form-group input,
