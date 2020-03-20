@@ -36,6 +36,7 @@ Vue.component("vue-salesbyproduct", {
 			</div>
 		</form>
 	</nav>
+	</header>
 	<article class="box-body" id="report-content">
 		<vue-table v-bind:table="data.table"></vue-table>
 	</article>
