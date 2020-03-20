@@ -56,8 +56,8 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles)
 		"deleteImage": false,
 		"deleteImageButton": "Supprimer",
 		"hadImage": customer.hasImage, // Save for later check
-		"start": tools_dateToString(start),
-		"stop": tools_dateToString(stop),
+		"start": start,
+		"stop": stop,
 		"customerHistory": null
 	}
 	vue.screen.component = "vue-customer-form";
@@ -157,18 +157,8 @@ function _customers_saveCommit(cust) {
 }
 
 function customers_filterHistory() {
-	let start = vue.screen.data.start.split("/");
-	if (start.length != 3) {
-		start = new Date(new Date().getTime() - 604800000);
-	} else {
-		start = new Date(start[2], start[1] - 1, start[0]);
-	}
-	let stop = vue.screen.data.stop.split("/");
-	if (stop.length != 3) {
-		stop = new Date(new Date().getTime() + 86400000);
-	} else {
-		stop = new Date(stop[2], stop[1] - 1, stop[0]);
-	}
+	let start = vue.screen.data.start;
+	let stop = vue.screen.data.stop;
 	let custId = vue.screen.data.customer.id;
 	srvcall_get("api/ticket/search?dateStart=" + (start.getTime() / 1000) + "&dateStop=" + (stop.getTime() / 1000) + "&customer=" + custId, _customers_historyCallback);
 	gui_showLoading();
@@ -179,17 +169,26 @@ function _customers_historyCallback(request, status, response) {
 		return;
 	}
 	let tickets = JSON.parse(response);
-	let lines = [];
+	let table = {
+		title: "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
+		columns: [
+			{	label: "Date", visible: true },
+			{ label: "Produit", visible: true },
+			{ label: "Quantité", visible: true},
+		],
+		lines: [],
+	}
 	for (let i = 0; i < tickets.length; i++) {
 		let tkt = tickets[i];
 		let date = new Date(tkt.date * 1000);
 		for (let j = 0; j < tkt.lines.length; j++) {
-			lines.push({"date": tools_dateTimeToString(date),
-				"product": tkt.lines[j].productLabel,
-				"quantity": tkt.lines[j].quantity
-			});
+			table.lines.push([
+				tools_dateTimeToString(date),
+				tkt.lines[j].productLabel,
+				tkt.lines[j].quantity
+			]);
 		}
 	}
-	vue.screen.data.customerHistory = lines;
+	vue.screen.data.customerHistory = table;
 	gui_hideLoading();
 }

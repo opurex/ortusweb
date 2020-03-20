@@ -201,35 +201,20 @@ Vue.component("vue-customer-form", {
 			<form id="customer-history-filter" onsubmit="javascript:customers_filterHistory();return false;">
 				<div class="form-group">
 					<label for="start">Du</label>
-					<input type="date" id="start" v-model="data.start" />
+					<vue-inputdate id="start" v-model="data.start" />
 				</div>
 				<div class="form-group">
 					<label for="stop">au</label>
-					<input type="date" class="form-control" id="stop" v-model="data.stop" />
+					<vue-inputdate v-model="data.stop" />
 				</div>
 				<div class="form-control">
-					<button class="btn btn-primary btn-send" type="submit">Envoyer</button>
+					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 				</div>
 			</form>
 		</nav>
 	</header>
 	<article class="box-body" id="customer-history" v-if="data.customerHistory">
-		<table>
-			<thead>
-				<tr>
-					<th>Date</th>
-					<th>Produit</th>
-					<th>Quantité</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="line in data.customerHistory">
-					<td>{{line.date}}</td>
-					<td>{{line.product}}</td>
-					<td>{{line.quantity}}</td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="data.customerHistory"></vue-table>
 	</article>
 </section>
 
