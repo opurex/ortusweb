@@ -1,5 +1,4 @@
-
-var login_set = function(https, server, user, token) {
+var login_set = function(https, server, user) {
 	localStorage.setItem("user", user);
 	localStorage.setItem("server", server);
 	if (https) { localStorage.setItem("https", "1"); }
@@ -7,7 +6,7 @@ var login_set = function(https, server, user, token) {
 }
 
 var login_logout = function() {
-	sessionStorage.removeItem("token");
+	login_updateToken(null);
 }
 
 var login_getUser = function() {
@@ -40,17 +39,19 @@ var login_getToken = function() {
 }
 
 var login_updateToken = function(token) {
-	sessionStorage.setItem("token", token);
+	if (token != null) {
+		sessionStorage.setItem("token", token);
+		localStorage.setItem("shareToken", "1" + token); // Share with other tabs
+	} else {
+		vue.login.loggedIn = false;
+		sessionStorage.removeItem("token");
+		localStorage.setItem("shareToken", "0");
+	}
+	localStorage.removeItem("shareToken");
 }
 
 var login_revokeToken = function() {
-	sessionStorage.removeItem("token");
-}
-
-/** Check if a JWT token is available
- * (considering the user has already logged in once). */
-var login_isLogged = function() {
-	return (sessionStorage.getItem("token") != null)
+	login_updateToken(null);
 }
 
 var login_sendLogin = function() {
@@ -63,7 +64,7 @@ var login_sendLogin = function() {
 	}
 	var user = vue.login.user;
 	var password = vue.login.password;
-	login_set(https, server, user, null);
+	login_set(https, server, user);
 	// Check connection and version
 	srvcall_post("api/login", {"user": user, "password": password}, login_loginCallback);
 	gui_showLoading();
@@ -121,4 +122,46 @@ var login_show = function() {
 var _login_pendingOperation = null;
 var login_setPendingOperation = function(functionVar) {
 	_login_pendingOperation = functionVar;
+}
+
+/* Share the sessionStorage (token) operations between tabs */
+window.addEventListener("storage", function(event) {
+	let origin = event.url.split("?")[0];
+	let here = window.location.href.split("?")[0];
+	if (origin != here) {
+		return;
+	}
+	switch (event.key) {
+		case "requestSessionStorage":
+			if (event.newValue == "hey!") {
+				let token = sessionStorage.getItem("token");
+				if (token != null) {
+					localStorage.setItem("shareSession", token);
+					localStorage.removeItem("shareSession");
+				}
+			}
+			break;
+		case "shareSession":
+			if (event.newValue != null && sessionStorage.length == 0) {
+				let token = event.newValue;
+				sessionStorage.setItem("token", token);
+			}
+			break;
+		case "shareToken":
+			if (event.newValue != null) {
+				let code = event.newValue.charAt(0);
+				if (code == "1") {
+					sessionStorage.setItem("token", event.newValue.substring(1));
+				} else {
+					vue.login.loggedIn = false;
+					sessionStorage.removeItem("token");
+				}
+			}
+			break;
+	}
+});
+// Request session from other tabs
+if (sessionStorage.length == 0) {
+	localStorage.setItem("requestSessionStorage", "hey!");
+	localStorage.removeItem("requestSessionStorage");
 }

@@ -140,7 +140,7 @@ function boot() {
 function start() {
 	// Initialize default dynamic values
 	vue.login = {
-		loggedIn: login_isLogged(),
+		loggedIn: (login_getToken() != null),
 		server: login_getServer(),
 		user: login_getUser(),
 		https: login_getHttps(),
