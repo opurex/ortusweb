@@ -1,30 +1,31 @@
 function categories_show() {
 	gui_showLoading();
 	vue.screen.data = {categories: [], sort: "dispOrder"};
-	storage_readStore("categories", function(categories) {
-		vue.screen.data.categories = categories;
-		vue.screen.component = "vue-category-list"
-		gui_hideLoading();
+	storage_open(function(event) {
+		storage_readStore("categories", function(categories) {
+			vue.screen.data.categories = categories;
+			vue.screen.component = "vue-category-list"
+			storage_close();
+			gui_hideLoading();
+		});
 	});
 }
 
 function categories_showCategory(id) {
 	gui_showLoading();
-	let catStore = appData.db.transaction(["categories"], "readonly").objectStore("categories");
-	let categories = [];
-	if (id != null) {
-		let catReq = catStore.get(parseInt(id));
-		catReq.onsuccess = function(event) {
-			let category = event.target.result;
-			storage_readStore("categories", function(categories) {
-				_categories_showCategory(category, categories);
-			});
-		}
-	} else {
+	storage_open(function(event) {
 		storage_readStore("categories", function(categories) {
-			_categories_showCategory(Category_default(), categories);
+			if (id != null) {
+				storage_get("categories", parseInt(id), function(category) {
+					_categories_showCategory(category, categories);
+					storage_close();
+				});
+			} else {
+				storage_close();
+				_categories_showCategory(Category_default(), categories);
+			}
 		});
-	}
+	});
 }
 function _categories_showCategory(category, categories) {
 	vue.screen.data = {
@@ -115,15 +116,9 @@ function _category_saveCommit(cat) {
 		cat.hasImage = true;
 	}
 	// Update in local database
-	let catStore = appData.db.transaction(["categories"], "readwrite").objectStore("categories");
-	document.getElementById("edit-image").value = "";
-	let req = catStore.put(cat);
-	storage_write("categories", cat, function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}, function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	});
+	storage_open(function(event) {
+		storage_write("categories", cat,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteOpenDbError);
 }
 

@@ -1,35 +1,33 @@
 function discountprofiles_show() {
 	gui_showLoading();
 	vue.screen.data = {discountProfiles: []};
-	storage_readStore("discountprofiles", function(profiles) {
-		vue.screen.data.discountProfiles = profiles;
-		vue.screen.component = "vue-discountprofile-list"
-		gui_hideLoading();
+	storage_open(function(event) {
+		storage_readStore("discountprofiles", function(profiles) {
+			vue.screen.data.discountProfiles = profiles;
+			vue.screen.component = "vue-discountprofile-list"
+			gui_hideLoading();
+			storage_close();
+		});
 	});
 }
 
 function discountprofiles_showProfile(id) {
 	gui_showLoading();
-	let dpStore = appData.db.transaction(["discountprofiles"], "readonly").objectStore("discountprofiles");
-	let profiles = [];
 	if (id != null) {
-		let dpReq = dpStore.get(parseInt(id));
-		dpReq.onsuccess = function(event) {
-			let dp = event.target.result;
-			storage_readStore("discountprofiles", function(profiles) {
-				_discountprofiles_showProfile(dp, profiles);
+		storage_open(function(event) {
+			storage_get("discountprofiles", parseInt(id), function(dp) {
+				_discountprofiles_showProfile(dp);
+				storage_close();
 			});
-		}
-	} else {
-		storage_readStore("discountprofiles", function(profiles) {
-			_discountprofiles_showProfile(DiscountProfile_default(), profiles);
 		});
+	} else {
+		_discountprofiles_showProfile(DiscountProfile_default());
 	}
 }
-function _discountprofiles_showProfile(profile, profiles) {
+
+function _discountprofiles_showProfile(profile) {
 	vue.screen.data = {
 		discountProfile: profile,
-		discountProfiles: profiles,
 	}
 	vue.screen.component = "vue-discountprofile-form";
 	gui_hideLoading();
@@ -56,11 +54,8 @@ function discountprofile_saveCallback(request, status, response) {
 		profile.id = respProfile["id"];
 	}
 	// Update in local database
-	storage_write("discountprofiles", profile, function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}, function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	});
+	storage_open(function(event) {
+		storage_write("discountprofiles", profile,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }

@@ -1,30 +1,31 @@
 function currencies_show() {
 	gui_showLoading();
 	vue.screen.data = {currencies: []};
-	storage_readStore("currencies", function(currencies) {
-		vue.screen.data.currencies = currencies;
-		vue.screen.component = "vue-currency-list"
-		gui_hideLoading();
+	storage_open(function(event) {
+		storage_readStore("currencies", function(currencies) {
+			vue.screen.data.currencies = currencies;
+			vue.screen.component = "vue-currency-list"
+			storage_close();
+			gui_hideLoading();
+		});
 	});
 }
 
 function currencies_showCurrency(id) {
 	gui_showLoading();
-	let currStore = appData.db.transaction(["currencies"], "readonly").objectStore("currencies");
-	let currencies = [];
-	if (id != null) {
-		let currReq = currStore.get(parseInt(id));
-		currReq.onsuccess = function(event) {
-			let currency = event.target.result;
-			storage_readStore("currencies", function(currencies) {
-				_currencies_showCurrency(currency, currencies);
-			});
-		}
-	} else {
-		storage_readStore("currencies", function(currency) {
-			_currencies_showCurrency(Currency_default(), currencies);
+	storage_open(function(event) {
+		storage_readStore("currencies", function(currencies) {
+			if (id != null) {
+				storage_get("currencies", parseInt(id), function(currency) {
+					_currencies_showCurrency(currency, currencies);
+					storage_close();
+				});
+			} else {
+				_currencies_showCurrency(Currency_default(), currencies);
+				storage_close();
+			}
 		});
-	}
+	});
 }
 function _currencies_showCurrency(currency, currencies) {
 	let wasMain = false;
@@ -70,36 +71,33 @@ function currency_saveCallback(request, status, response) {
 		curr.id = respCurr["id"];
 	}
 	// Update in local database
-	let currStore = appData.db.transaction(["currencies"], "readwrite").objectStore("currencies");
-	if (!vue.screen.data.wasMain && curr.main) {
-		// Set main to false to the previously main currency
-		currStore.openCursor().onsuccess = function(event) {
-			let cursor = event.target.result;
-			if (cursor) {
-				let oldCurr = cursor.value;
-				if (oldCurr.main) {
-					oldCurr.main = false;
-					storage_write("currencies", oldCurr, function(event) {
-						_currency_saveCommit(curr);
-						return;
-					});
+	storage_open(function(event) {
+		if (!vue.screen.data.wasMain && curr.main) {
+			// Set main to false to the previously main currency
+			let currStore = appData.db.transaction(["currencies"], "readwrite").objectStore("currencies");
+			currStore.openCursor().onsuccess = function(event) {
+				let cursor = event.target.result;
+				if (cursor) {
+					let oldCurr = cursor.value;
+					if (oldCurr.main) {
+						oldCurr.main = false;
+						storage_write("currencies", oldCurr, function(event) {
+							_currency_saveCommit(curr);
+							return;
+						});
+					}
+					cursor.continue();
+				} else {
+					_currency_saveCommit(curr);
 				}
-				cursor.continue();
-			} else {
-				_currency_saveCommit(curr);
-			}
-		};
-	} else {
-		_currency_saveCommit(curr);
-	}
+			};
+		} else {
+			_currency_saveCommit(curr);
+		}
+	});
 }
 
 function _currency_saveCommit(curr) {
-	storage_write("currencies", curr, function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}, function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	});
+	storage_write("currencies", curr,
+		appData.localWriteDbSuccess, appData.localWriteDbError);
 }

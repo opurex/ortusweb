@@ -3,20 +3,23 @@ function products_show(catId) {
 		catId = null;
 	}
 	gui_showLoading();
-	storage_readStores(["categories", "taxes"], function(data) {
-		let selectedCatId = catId;
-		if (data.categories.length > 0 && selectedCatId == null) {
-			selectedCatId = data.categories[0].id;
-		}
-		vue.screen.data = {
-			"categories": data.categories,
-			"taxes": data.taxes,
-			"filterVisible": "visible",
-			"sort": "dispOrder",
-			"selectedCatId": selectedCatId,
-		}
-		vue.screen.component = "vue-product-list";
-		gui_hideLoading();
+	storage_open(function(event) {
+		storage_readStores(["categories", "taxes"], function(data) {
+			let selectedCatId = catId;
+			if (data.categories.length > 0 && selectedCatId == null) {
+				selectedCatId = data.categories[0].id;
+			}
+			vue.screen.data = {
+				"categories": data.categories,
+				"taxes": data.taxes,
+				"filterVisible": "visible",
+				"sort": "dispOrder",
+				"selectedCatId": selectedCatId,
+			}
+			vue.screen.component = "vue-product-list";
+			gui_hideLoading();
+			storage_close();
+		});
 	});
 }
 
@@ -29,32 +32,35 @@ function products_showProduct(prdId, catId, isCompo) {
 		catId = parseInt(catId);
 	}
 	let categoryFound = false;
-	storage_readStores(["categories", "taxes"], function(data) {
-		let categories = data["categories"];
-		let taxes = data["taxes"];
-		for (let i = 0; i < categories.length; i++) {
-			if (catId != null && categories[i].id == catId) {
-				categoryFound = true;
+	storage_open(function(event) {
+		storage_readStores(["categories", "taxes"], function(data) {
+			let categories = data["categories"];
+			let taxes = data["taxes"];
+			for (let i = 0; i < categories.length; i++) {
+				if (catId != null && categories[i].id == catId) {
+					categoryFound = true;
+				}
 			}
-		}
-		if (prdId != null) {
-			let prdStore = appData.db.transaction(["products"], "readonly").objectStore("products");
-			prdStore.get(parseInt(prdId)).onsuccess = function(event) {
-				_products_showProduct(event.target.result, categories, taxes);
-			}
-		} else {
-			let prdCatId = categories[0].id;
-			if (catId != null && categoryFound == true) {
-				prdCatId = catId;
-			}
-			if (!isCompo) {
-				let prd = Product_default(prdCatId, null);
-				_products_showProduct(prd, categories, taxes);
+			if (prdId != null) {
+				storage_get("products", parseInt(prdId), function(product) {
+					_products_showProduct(product, categories, taxes);
+					storage_close();
+				});
 			} else {
-				let prd = Composition_default(prdCatId, null);
-				_products_showProduct(prd, categories, taxes);
+				let prdCatId = categories[0].id;
+				if (catId != null && categoryFound == true) {
+					prdCatId = catId;
+				}
+				if (!isCompo) {
+					let prd = Product_default(prdCatId, null);
+					_products_showProduct(prd, categories, taxes);
+				} else {
+					let prd = Composition_default(prdCatId, null);
+					_products_showProduct(prd, categories, taxes);
+				}
+				storage_close();
 			}
-		}
+		});
 	});
 }
 
@@ -91,12 +97,15 @@ function _products_showProduct(product, categories, taxes) {
 				}
 			}
 		}
-		storage_get("products", prdIds, function(products) {
-			for (let j = 0; j < products.length; j++) {
-				let cachePrd = products[j];
-				vue.screen.data.precache[cachePrd.id] = cachePrd;
-			}
-			vue.screen.component = "vue-product-composition-form";
+		storage_open(function(event) {
+			storage_get("products", prdIds, function(products) {
+				for (let j = 0; j < products.length; j++) {
+					let cachePrd = products[j];
+					vue.screen.data.precache[cachePrd.id] = cachePrd;
+				}
+				vue.screen.component = "vue-product-composition-form";
+				storage_close();
+			});
 		});
 	}
 	product_updatePrice();
@@ -239,11 +248,8 @@ console.info("on save " + prd.dispOrder + " " + typeof(prd.dispOrder));
 		prd.hasImage = true;
 	}
 	// Update in local database
-	storage_write("products", prd, function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}, function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	});
+	storage_open(function(event) {
+		storage_write("products", prd,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }

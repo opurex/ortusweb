@@ -5,8 +5,25 @@ var login_set = function(https, server, user) {
 	else { localStorage.setItem("https", "0"); }
 }
 
+var _login_remoteLogout = function() {
+	sessionStorage.removeItem("token");
+	// Close the local database and restart
+	appData.db.close();
+	appData.db = null;
+	start();
+}
+
 var login_logout = function() {
-	login_updateToken(null);
+	sessionStorage.removeItem("token");
+	localStorage.setItem("logout", "1");
+	localStorage.removeItem("logout");
+	// Drop local database and restart
+	storage_drop(function() {
+		appData.db = null;
+		start();
+	}, function() {
+		console.error("Could not drop local database");
+	});
 }
 
 var login_getUser = function() {
@@ -156,6 +173,12 @@ window.addEventListener("storage", function(event) {
 					vue.login.loggedIn = false;
 					sessionStorage.removeItem("token");
 				}
+			}
+			break;
+		case "logout":
+			if (event.newValue != null) {
+				vue.login.loggedIn = false;
+				sessionStorage.removeItem("token");
 			}
 			break;
 	}

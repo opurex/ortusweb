@@ -17,14 +17,7 @@ function home_show() {
 }
 
 function home_logout() {
-	// Drop local database
-	storage_drop(appData.db, function() {
-		login_logout();
-		appData.db = null;
-		start();
-	}, function() {
-		console.error("Could not drop local database");
-	});
+	login_logout();
 }
 
 function home_sendSync() {
@@ -38,7 +31,9 @@ function home_syncCallback(request, status, response) {
 	}
 	var data = JSON.parse(response);
 	home_resetProgress(data);
-	storage_sync(appData.db, data, home_syncProgress, home_syncError, home_syncComplete);
+	storage_open(function(event) {
+		storage_sync(data, home_syncProgress, home_syncError, home_syncComplete);
+	});
 }
 
 /** Contains for each SYNC_MODELS: {"count": number of models, "done": index loaded}.
@@ -67,6 +62,7 @@ function home_syncError(model, i, event) {
 function home_syncComplete() {
 	vue.menu.visible = true;
 	gui_hideLoading();
+	storage_close();
 	home_show();
 }
 

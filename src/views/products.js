@@ -147,8 +147,11 @@ Vue.component("vue-product-list", {
 		},
 		loadProducts: function() {
 			let thiss = this;
-			storage_getProductsFromCategory(this.currentCategoryId, function(products) {
-				thiss.sortAndAssign(products);
+			storage_open(function(event) {
+				storage_getProductsFromCategory(thiss.currentCategoryId, function(products) {
+					thiss.sortAndAssign(products);
+					storage_close();
+				});
 			});
 		},
 	},

@@ -6,6 +6,12 @@ Vue.component("vue-message", {
 	props: ["message"],
 	template: `<div id="message-box"
 	v-if="message.type" v-bind:class="message.type"
-	onclick="javascript:gui_closeMessageBox();"><p v-for="msg in message.message">{{msg}}</p></div>
+	onclick="javascript:gui_closeMessageBox();">
+		<p v-for="msg in message.message">{{msg}}</p>
+		<template v-if="message.stack">
+		<p>Informations techniques :</p>
+		<pre class="stacktrace" v-if="message.stack">{{message.stack}}</pre>
+		</template>
+</div>
 `
 });

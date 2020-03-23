@@ -1,69 +1,38 @@
 function users_show() {
 	gui_showLoading();
-	let stores = appData.db.transaction(["users", "roles"], "readonly");
-	let userStore = stores.objectStore("users");
-	let users = [];
-	let roles = []
 	vue.screen.data = {users: [], roles: []};
 	vue.screen.component = "vue-user-list"
-	userStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			users.push(cursor.value);
-			cursor.continue();
-		} else {
-			let roleStore = stores.objectStore("roles");
-			roleStore.openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					roles.push(cursor.value);
-					cursor.continue();
-				} else {
-					let roleByIds = {};
-					for (let i = 0; i < roles.length; i++) {
-						roleByIds[roles[i].id] = roles[i];
-					}
-					vue.screen.data.roles = roleByIds;
-					vue.screen.data.users = users;
-					gui_hideLoading();
-				}
+	storage_open(function(event) {
+		storage_readStores(["users", "roles"], function(data) {
+			let rolesByIds = {};
+			for (let i = 0; i < data["roles"].length; i++) {
+				rolesByIds[data["roles"][i].id] = data["roles"][i];
 			}
-		}
-	}
+			vue.screen.data.roles = rolesByIds;
+			vue.screen.data.users = data["users"];
+			gui_hideLoading();
+			storage_close();
+		});
+	});
 }
 
 function users_showUser(id) {
 	gui_showLoading();
-	let db = appData.db.transaction(["users", "roles"], "readonly");
-	let userStore = db.objectStore("users");
-	let roleStore = db.objectStore("roles");
-	let roles = [];
-	if (id != null) {
-		let userReq = userStore.get(parseInt(id));
-		userReq.onsuccess = function(event) {
-			let user = event.target.result;
-			roleStore.openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					roles.push(cursor.value);
-					cursor.continue();
-				} else {
+	storage_open(function(event) {
+		storage_readStore("roles", function(roles) {
+			if (id != null) {
+				storage_get("users", parseInt(id), function(user) {
 					_users_showUser(user, roles);
-				}
-			}
-		}
-	} else {
-		roleStore.openCursor().onsuccess = function(event) {
-			let cursor = event.target.result;
-			if (cursor) {
-				roles.push(cursor.value);
-				cursor.continue();
+					storage_close();
+				});
 			} else {
 				_users_showUser(User_default(), roles);
+				storage_close();
 			}
-		}
-	}
+		});
+	});
 }
+
 function _users_showUser(user, roles) {
 	let roleByIds = {};
 	for (let i = 0; i < roles.length; i++) {
@@ -84,7 +53,7 @@ function user_saveUser() {
 }
 
 function user_saveCallback(request, status, response) {
-	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
+	if (srvcall_callbackCatch(request, status, response, user_saveUser)) {
 		return;
 	}
 	if (status == 400) {
@@ -102,16 +71,10 @@ function user_saveCallback(request, status, response) {
 
 function _user_saveCommit(user) {
 	// Update in local database
-	let userStore = appData.db.transaction(["users"], "readwrite").objectStore("users");
-	let req = userStore.put(user);
-	req.onsuccess = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
+	storage_open(function(event) {
+		storage_write("users", user,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }
 
 function users_updatePassword() {
@@ -122,7 +85,7 @@ function users_updatePassword() {
 }
 
 function user_updPwdCallback(request, status, response) {
-	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
+	if (srvcall_callbackCatch(request, status, response, users_updatePassword)) {
 		return;
 	}
 	if (status == 400) {
@@ -138,15 +101,15 @@ function user_updPwdCallback(request, status, response) {
 		gui_showMessage("Le mot de passe a été réinitialisé.");
 		gui_hideLoading();
 		// Store the updated password localy even if it is not encrypted yet (until next sync)
-		let user = vue.screen.data.user;
-		user.password = document.getElementById("edit-reset-password").value;
-		let userStore = appData.db.transaction(["users"], "readwrite").objectStore("users");
-		let req = userStore.put(user);
-		req.onsuccess = function(event) {
-		}
-		req.onerror = function(event) {
-			gui_hideLoading();
-			gui_showError("Le mot de passe a été réinitialisé mais une erreur est survenue<br />" + event.target.error);
-		}
+		storage_open(function(event) {
+			let user = vue.screen.data.user;
+			user.password = document.getElementById("edit-reset-password").value;
+			storage_write("users", user, appData.localWriteDbSuccess,
+				function(event) {
+					gui_hideLoading();
+					gui_showError("Le mot de passe a été réinitialisé mais une erreur est survenue<br />" + event.target.error);
+					storage_close();
+				});
+		});
 	}
 }

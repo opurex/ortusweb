@@ -1,51 +1,33 @@
 function paymentmodes_show() {
 	gui_showLoading();
-	let pmStore = appData.db.transaction(["paymentmodes"], "readonly").objectStore("paymentmodes");
-	let paymentModes = [];
 	vue.screen.data = {paymentModes: [], sort: "dispOrder"};
-	vue.screen.component = "vue-paymentmode-list"
-	pmStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			paymentModes.push(cursor.value);
-			cursor.continue();
-		} else {
+	vue.screen.component = "vue-paymentmode-list";
+	storage_open(function(event) {
+		storage_readStore("paymentmodes", function(paymentModes) {
 			vue.screen.data.paymentModes = paymentModes.sort(tools_sort("dispOrder", "reference"));
 			gui_hideLoading();
-		}
-	}
+			storage_close();
+		});
+	});
 }
 
 function paymentmodes_showPaymentMode(id) {
 	gui_showLoading();
-	let pmStore = appData.db.transaction(["paymentmodes"], "readonly").objectStore("paymentmodes");
-	let paymentModes = [];
-	if (id != null) {
-		let pmReq = pmStore.get(parseInt(id));
-		pmReq.onsuccess = function(event) {
-			let paymentMode = event.target.result;
-			pmStore.openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					paymentModes.push(cursor.value);
-					cursor.continue();
-				} else {
+	storage_open(function(event) {
+		storage_readStore("paymentmodes", function(paymentModes) {
+			if (id!= null) {
+				storage_get("paymentmodes", parseInt(id), function(paymentMode) {
 					_paymentmodes_showPaymentMode(paymentMode, paymentModes);
-				}
-			}
-		}
-	} else {
-		pmStore.openCursor().onsuccess = function(event) {
-			let cursor = event.target.result;
-			if (cursor) {
-				paymentModes.push(cursor.value);
-				cursor.continue();
+					storage_close();
+				});
 			} else {
 				_paymentmodes_showPaymentMode(PaymentMode_default(), paymentModes);
+				storage_close();
 			}
-		}
-	}
+		});
+	});
 }
+
 function _paymentmodes_showPaymentMode(paymentMode, paymentModes) {
 	let hadValueImage = {};
 	let deleteValueImage = {};
@@ -196,6 +178,7 @@ function _paymentmodes_savePreCommit(calls) {
 }
 
 function _paymentmodes_saveCommit(pm) {
+	document.getElementById("edit-image").value = "";
 	if (pm.hasImage) {
 		// Force image refresh
 		pm.hasImage = false;
@@ -207,22 +190,12 @@ function _paymentmodes_saveCommit(pm) {
 			pmValue.hasImage = false;
 			pmValue.hasImage = true;
 		}
-	}
-	// Update in local database
-	let pmStore = appData.db.transaction(["paymentmodes"], "readwrite").objectStore("paymentmodes");
-	document.getElementById("edit-image").value = "";
-	for (let i = 0; i < pm.values.length; i++) {
-		let pmValue = pm.values[i];
 		let imgValueTag = document.getElementById("edit-value-image-" + pmValue.value);
 		imgValueTag.value = "";
 	}
-	let req = pmStore.put(pm);
-	req.onsuccess = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
+	// Update in local database
+	storage_open(function(event) {
+		storage_write("paymentmodes", pm,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }

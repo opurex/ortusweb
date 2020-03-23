@@ -43,17 +43,20 @@ Vue.component("vue-catalog-picker", {
 	watch: {
 		selectedCatId: function(newCatId, oldCatID) {
 			let thiss = this;
-			storage_getProductsFromCategory(newCatId, function(products) {
-				if (thiss.excludeCompositions) {
-					thiss.products = [];
-					for (let i = 0; i < products.length; i++) {
-						if (!products[i].composition) {
-							thiss.products.push(products[i]);
+			storage_open(function(event) {
+				storage_getProductsFromCategory(newCatId, function(products) {
+					if (thiss.excludeCompositions) {
+						thiss.products = [];
+						for (let i = 0; i < products.length; i++) {
+							if (!products[i].composition) {
+								thiss.products.push(products[i]);
+							}
 						}
+					} else {
+						thiss.products = products;
 					}
-				} else {
-					thiss.products = products;
-				}
+					storage_close();
+				});
 			});
 		},
 	},

@@ -1,7 +1,40 @@
 /** The vue.js app. */
 var vue = null;
 var appData = {
-	db: null
+	db: null,
+	generalDbError: function(event) {
+		gui_showError(["Impossible d'accéder aux stockage des données locales (aussi appelé données de site).",
+			"Ce problème provient la plupart du temps du mode de navigation privée. Si vous l'utilisez, essayez avec le mode de navigation normal et utilisez le bouton \"déconnexion\" de l'écran d'accueil pour vider les données en partant."]);
+		return;
+	},
+	readDbError: function(event) {
+console.info(event.stack);
+		gui_showError(["Impossible de lire les données locales. Pour aider à résoudre ce problème, vous pouvez envoyer les informations suivantes à votre prestataire Pastèque si le problème persiste.",
+			"Nom : " + event.error.name,
+			"Message : " + event.error.message], event.stack);
+		gui_hideLoading();
+		storage_close();
+	},
+	localWriteDbSuccess: function(event) {
+		gui_hideLoading();
+		gui_showMessage("Les modifications ont été enregistrées");
+		storage_close();
+	},
+	localWriteDbError: function(event) {
+		gui_hideLoading();
+		gui_showError(["Les modifications ont été enregistrées mais une erreur est survenue. Veuillez recharger les données depuis l'écran d'accueil pour prendre en compte les changements.",
+			"Si le problème est recurrent, vous pouvez envoyer les informations suivantes à votre prestataire Pastèque pour aider à résoudre le problème.",
+			"Nom : " + event.error.name,
+			"Message : "  + event.error.message]);
+		storage_close();
+	},
+	localWriteOpenDbError: function(event) {
+		gui_hideLoading();
+		gui_showError(["Les modifications ont été enregistrées mais une erreur est survenue. Veuillez recharger les données depuis l'écran d'accueil pour prendre en compte les changements.",
+			"Si le problème est recurrent, vous pouvez envoyer les informations suivantes à votre prestataire Pastèque pour aider à résoudre le problème.",
+			"Nom : " + event.error.name,
+			"Message : "  + event.error.message]);
+	}
 };
 
 function route(screen) {
@@ -147,15 +180,11 @@ function start() {
 		password: ''
 	}
 	vue.menu.visible = true;
-	// Open database if not already done
+	// Initialize the database if required
 	if (appData.db == null) {
 		storage_open(function(event) {
-			appData.db = event.target.result;
+			storage_close();
 			_start_done();
-		}, function(event) {
-			gui_showError(["Impossible d'accéder aux stockage des données locales (aussi appelé données de site).",
-				"Ce problème provient la plupart du temps du mode de navigation privée. Si vous l'utilisez, essayez avec le mode de navigation normal et utilisez le bouton \"déconnexion\" de l'écran d'accueil pour vider les données en partant."]);
-			return;
 		});
 	} else {
 		_start_done();

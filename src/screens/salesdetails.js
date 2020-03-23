@@ -74,17 +74,12 @@ function _salesdetails_filterCallback(request, status, response) {
 
 function _salesdetails_dataRetreived() {
 	gui_showLoading();
-	let stores = appData.db.transaction(["cashRegisters", "taxes"], "readonly");
-	let cashRegisters = [];
-	stores.objectStore("cashRegisters").openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			cashRegisters.push(cursor.value);
-			cursor.continue();
-		} else {
+	storage_open(function(event) {
+		storage_readStore("cashRegisters", function(cashRegisters) {
 			_salesdetails_render(cashRegisters, _salesdetails_data.tickets);
-		}
-	}
+			storage_close();
+		});
+	});
 }
 
 function _salesdetails_render(cashRegisters, tickets) {

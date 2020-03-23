@@ -2,29 +2,33 @@ function tariffareas_show() {
 	gui_showLoading();
 	let areas = [];
 	vue.screen.data = {tariffareas: [], sort: "dispOrder"};
-	storage_readStore("tariffareas", function(areas) {
-		vue.screen.data.tariffareas = areas;
-		vue.screen.component = "vue-tariffarea-list";
-		gui_hideLoading();
+	storage_open(function(event) {
+		storage_readStore("tariffareas", function(areas) {
+			vue.screen.data.tariffareas = areas;
+			vue.screen.component = "vue-tariffarea-list";
+			gui_hideLoading();
+			storage_close();
+		});
 	});
 }
 
 function tariffareas_showArea(id) {
 	gui_showLoading();
-	let taStore = appData.db.transaction(["tariffareas"], "readonly").objectStore("tariffareas");
-	if (id != null) {
-		taStore.get(parseInt(id)).onsuccess = function(event) {
-			let tariffarea = event.target.result;
-			storage_readStores(["categories", "taxes"], function(data) {
-				_tariffareas_showArea(tariffarea, data["categories"], data["taxes"]);
-			});
-		};
-	} else {
+	storage_open(function(event) {
 		storage_readStores(["categories", "taxes"], function(data) {
-			_tariffareas_showArea(TariffArea_default(), data["categories"], data["taxes"]);
+			if (id != null) {
+				storage_get("tariffareas", parseInt(id), function(tariffarea) {
+					_tariffareas_showArea(tariffarea, data["categories"], data["taxes"]);
+					storage_close();
+				});
+			} else {
+				_tariffareas_showArea(TariffArea_default(), data["categories"], data["taxes"]);
+				storage_close();
+			}
 		});
-	}
+	});
 }
+
 function _tariffareas_showArea(area, categories, taxes) {
 	vue.screen.data = {
 		tariffarea: area,
@@ -73,7 +77,6 @@ function tariffareas_delProduct(productId) {
 		let price = area.prices[i];
 		if (price.product == productId) {
 			area.prices.splice(i, 1);
-console.info(area.prices);
 			return;
 		}
 	}
@@ -90,7 +93,7 @@ function tariffareas_saveArea() {
 }
 
 function tariffareas_saveCallback(request, status, response) {
-	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
+	if (srvcall_callbackCatch(request, status, response, tariffareas_saveArea)) {
 		return;
 	}
 	if (status == 400) {
@@ -109,12 +112,8 @@ function tariffareas_saveCallback(request, status, response) {
 		area.id = respArea["id"];
 	}
 	// Update in local database
-	storage_write("tariffareas", area, function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}, function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	});
+	storage_open(function(event) {
+		storage_write("tariffareas", area,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }
-

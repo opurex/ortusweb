@@ -94,39 +94,16 @@ function _salesbyproduct_filterCallback(request, status, response) {
 
 function _salesbyproduct_dataRetreived() {
 	gui_showLoading();
-	let stores = appData.db.transaction(["cashRegisters", "categories", "products"], "readonly");
-	let cashRegisters = [];
-	let categories = [];
-	let products = [];
-	stores.objectStore("categories").openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			categories.push(cursor.value);
-			cursor.continue();
-		} else {
-			stores.objectStore("products").openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					products.push(cursor.value);
-					cursor.continue();
-				} else {
-					if (vue.screen.data.separateCashRegisters) {
-						stores.objectStore("cashRegisters").openCursor().onsuccess = function(event) {
-							let cursor = event.target.result;
-							if (cursor) {
-								cashRegisters.push(cursor.value);
-								cursor.continue();
-							} else {
-								_salesbyproduct_render(cashRegisters, categories, products);
-							}
-						}
-					} else {
-						_salesbyproduct_render(null, categories, products);
-					}
-				}
+	storage_open(function(event) {
+		storage_readStores(["categories", "products", "cashRegisters"], function(data) {
+			if (vue.screen.data.separateCashRegisters) {
+				_salesbyproduct_render(data["cashRegisters"], data["categories"], data["products"]);
+			} else {
+				_salesbyproduct_render(null, data["categories"], data["products"]);
 			}
-		}
-	}
+			storage_close();
+		});
+	});
 }
 
 function _salesbyproduct_render(cashRegisters, categories, products) {

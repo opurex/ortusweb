@@ -1,53 +1,33 @@
 function roles_show() {
 	gui_showLoading();
-	let roleStore = appData.db.transaction(["roles"], "readonly").objectStore("roles");
-	let roles = [];
 	vue.screen.data = {roles: []};
 	vue.screen.component = "vue-role-list"
-	roleStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			roles.push(cursor.value);
-			cursor.continue();
-		} else {
+	storage_open(function(event) {
+		storage_readStore("roles", function(roles) {
 			vue.screen.data.roles = roles;
 			gui_hideLoading();
-		}
-	}
+			storage_close();
+		});
+	});
 }
 
 function roles_showRole(id) {
 	gui_showLoading();
-	let db = appData.db.transaction(["roles", "paymentmodes"], "readonly");
-	let roleStore = db.objectStore("roles");
-	let pmStore = db.objectStore("paymentmodes");
-	let paymentModes = [];
-	if (id != null) {
-		let roleReq = roleStore.get(parseInt(id));
-		roleReq.onsuccess = function(event) {
-			let role = event.target.result;
-			pmStore.openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					paymentModes.push(cursor.value);
-					cursor.continue();
-				} else {
+	storage_open(function(event) {
+		storage_readStore("paymentmodes", function(paymentModes) {
+			if (id != null) {
+				storage_get("roles", parseInt(id), function(role) {
 					_roles_showRole(role, paymentModes);
-				}
-			}
-		}
-	} else {
-		pmStore.openCursor().onsuccess = function(event) {
-			let cursor = event.target.result;
-			if (cursor) {
-				paymentModes.push(cursor.value);
-				cursor.continue();
+					storage_close();
+				});
 			} else {
 				_roles_showRole(Role_default(), paymentModes);
+				storage_close();
 			}
-		}
-	}
+		});
+	});
 }
+
 function _roles_showRole(role, paymentModes) {
 	vue.screen.data = {
 		role: role,
@@ -106,14 +86,8 @@ function role_saveCallback(request, status, response) {
 
 function _role_saveCommit(role) {
 	// Update in local database
-	let roleStore = appData.db.transaction(["roles"], "readwrite").objectStore("roles");
-	let req = roleStore.put(role);
-	req.onsuccess = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
+	storage_open(function(event) {
+		storage_write("roles", role,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }

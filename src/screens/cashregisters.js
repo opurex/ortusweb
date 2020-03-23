@@ -1,30 +1,27 @@
 function cashregisters_show() {
 	gui_showLoading();
-	let crStore = appData.db.transaction(["cashRegisters"], "readonly").objectStore("cashRegisters");
-	let crs = [];
-	vue.screen.data = {cashRegisters: []};
-	vue.screen.component = "vue-cashregister-list"
-	crStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			crs.push(cursor.value);
-			cursor.continue();
-		} else {
-			vue.screen.data.cashRegisters = crs;
+	storage_open(function(event) {
+		let crStore = appData.db.transaction(["cashRegisters"], "readonly").objectStore("cashRegisters");
+		let crs = [];
+		vue.screen.data = {cashRegisters: []};
+		vue.screen.component = "vue-cashregister-list"
+		storage_readStore("cashRegisters", function(cashRegisters) {
+			vue.screen.data.cashRegisters = cashRegisters;
+			storage_close();
 			gui_hideLoading();
-		}
-	}
+		});
+	});
 }
 
 function cashregisters_showCashRegister(id) {
 	gui_showLoading();
-	let crStore = appData.db.transaction(["cashRegisters"], "readonly").objectStore("cashRegisters");
 	if (id != null) {
-		let crReq = crStore.get(parseInt(id));
-		crReq.onsuccess = function(event) {
-			let cashRegister = event.target.result;
-			_cashregisters_showCashRegister(cashRegister);
-		}
+		storage_open(function(event) {
+			storage_get("cashRegisters", parseInt(id), function(cashRegister) {
+				_cashregisters_showCashRegister(cashRegister);
+				storage_close();
+			});
+		});
 	} else {
 		_cashregisters_showCashRegister(CashRegister_default());
 	}
@@ -44,7 +41,7 @@ function cashregister_saveCashRegister() {
 }
 
 function cashregister_saveCallback(request, status, response) {
-	if (srvcall_callbackCatch(request, status, response, category_saveCategory)) {
+	if (srvcall_callbackCatch(request, status, response, cashregister_saveCashRegister)) {
 		return;
 	}
 	if (status == 400) {
@@ -61,15 +58,8 @@ function cashregister_saveCallback(request, status, response) {
 }
 
 function _cashregister_saveCommit(cashRegister) {
-	// Update in local database
-	let crStore = appData.db.transaction(["cashRegisters"], "readwrite").objectStore("cashRegisters");
-	let req = crStore.put(cashRegister);
-	req.onsuccess = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
+	storage_open(function(event) {
+		storage_write("cashRegisters", cashRegister,
+			appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteOpenDbError);
 }

@@ -68,21 +68,21 @@ Vue.component("vue-role-form", {
 				<div class="form-group" v-for="sessPerm in data.permissions.session">
 					<input v-bind:id="'edit-session-' + sessPerm.value" type="checkbox" v-bind:value="sessPerm.value" v-model="data.role.permissions" />
 					<label v-bind:for="'edit-session-' + sessPerm.value">{{sessPerm.name}}</label>
-				</dl>
+				</div>
 			</fieldset>
 			<fieldset class="form-tiny">
 				<legend>Ventes</legend>
 				<div class="form-group" v-for="ticketsPerm in data.permissions.tickets">
 					<input v-bind:id="'edit-ticket-' + ticketsPerm.value" type="checkbox" v-bind:value="ticketsPerm.value" v-model="data.role.permissions" />
 					<label v-bind:for="'edit-ticket-' + ticketsPerm.value">{{ticketsPerm.name}}</label>
-				</dl>
+				</div>
 			</fieldset>
 			<fieldset class="form-tiny">
 				<legend>Modes de paiement</legend>
 				<div class="form-group" v-for="pm in data.paymentModes">
 					<input v-bind:id="'edit-pm-' + pm.code" type="checkbox" v-bind:value="'payment.' + pm.code" v-model="data.role.permissions" />
 					<label v-bind:for="'edit-pm-' + pm.code">{{pm.label}}</label>
-				</dl>
+				</div>
 			</fieldset>
 			<fieldset class="form-tiny">
 				<legend>Divers</legend>

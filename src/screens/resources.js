@@ -94,22 +94,22 @@ function _resource_unsetCustomData(res) {
 
 function resources_show() {
 	gui_showLoading();
-	let resStore = appData.db.transaction(["resources"], "readonly").objectStore("resources");
-	let resources = [];
-	resStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			if (_resources_careAbout(cursor.value)) {
-				_resources_fillCustomData(cursor.value);
-				resources.push(cursor.value);
+	storage_open(function(event) {
+		let res = []
+		storage_readStore("resources", function(resources) {
+			for (let i = 0; i < resources.length; i++) {
+				if (_resources_careAbout(resources[i])) {
+					_resources_fillCustomData(resources[i]);
+					res.push(resources[i]);
+				}
 			}
-			cursor.continue();
-		} else {
-			_resources_fill(resources);
-			_resources_showResources(resources);
-		}
-	}
+			_resources_fill(res);
+			_resources_showResources(res);
+			storage_close();
+		});
+	});
 }
+
 function _resources_showResources(resources) {
 	gui_hideLoading();
 	let sortedRes = resources.sort(tools_sort("dispOrder"));
@@ -121,29 +121,29 @@ function _resources_showResources(resources) {
 
 function resources_showResource(resLabel) {
 	gui_showLoading();
-	let resStore = appData.db.transaction(["resources"], "readonly").objectStore("resources");
-	let resReq = resStore.get(resLabel);
-	resReq.onsuccess = function(event) {
-		let res = event.target.result;
-		if (typeof(res) == "undefined") {
-			res = Resource_default();
-			res.label = resLabel;
-			res.type = _resources_resType(res.label);
-		}
-		_resources_fillCustomData(res);
-		vue.screen.data = {
-			resource: res,
-			deleteImage: false,
-			resTypes: {"Resource_TYPE_TEXT": Resource_TYPE_TEXT}, // Phoque
-			hasImage: res.content != null,
-			hadImage: res.content != null,
-			deleteContentButton: "Supprimer",
-		};
-		if (res.type == Resource_TYPE_IMAGE) {
-		}
-		vue.screen.component = "vue-resource-form";
-		gui_hideLoading();
-	}
+	storage_open(function(event) {
+		storage_get("resources", resLabel, function(res) {
+			if (typeof(res) == "undefined") {
+				res = Resource_default();
+				res.label = resLabel;
+				res.type = _resources_resType(res.label);
+			}
+			_resources_fillCustomData(res);
+			vue.screen.data = {
+				resource: res,
+				deleteImage: false,
+				resTypes: {"Resource_TYPE_TEXT": Resource_TYPE_TEXT}, // Phoque
+				hasImage: res.content != null,
+				hadImage: res.content != null,
+				deleteContentButton: "Supprimer",
+			};
+			if (res.type == Resource_TYPE_IMAGE) {
+			}
+			vue.screen.component = "vue-resource-form";
+			gui_hideLoading();
+			storage_close();
+		});
+	});
 }
 
 function resources_toggleImage() {
@@ -213,20 +213,15 @@ function _resources_saveCommit(res) {
 		res.hasImage = true;
 	}
 	// Update in local database
-	let resStore = appData.db.transaction(["resources"], "readwrite").objectStore("resources");
-	let req;
-	if (res.type == Resource_TYPE_TEXT && res.content == "") {
-		req = resStore.delete(res.label);
-	} else {
-		req = resStore.put(res);
-	}
-	req.onsuccess = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
-	_resources_fillCustomData(res);
+	storage_open(function(event) {
+		if (res.type == Resource_TYPE_TEXT && res.content == "") {
+			storage_delete("resources", res.label,
+				appData.localWriteDbSuccess, appData.localWriteDbError);
+		} else {
+			storage_write("resources", res, function(event) {
+				appData.localWriteDbSuccess(event);
+				_resources_fillCustomData(res);
+			}, appData.localWriteDbError);
+		}
+	}, appData.localWriteDbOpenError);
 }

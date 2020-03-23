@@ -1,17 +1,13 @@
 function floors_show() {
 	gui_showLoading();
-	let floorStore = appData.db.transaction(["floors"], "readonly").objectStore("floors");
-	let floors = [];
-	floorStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			floors.push(cursor.value);
-			cursor.continue();
-		} else {
+	storage_open(function(event) {
+		storage_readStore("floors", function(floors) {
 			_floors_showFloors(floors);
-		}
-	}
+			storage_close();
+		});
+	});
 }
+
 function _floors_showFloors(floors) {
 	var sortedFloors = floors.sort(tools_sort("dispOrder", "label"));
 	vue.screen.data = {floors: floors, selectedFloor: null};
@@ -153,22 +149,16 @@ function floors_saveCallback(request, status, response) {
 
 function _floors_saveCommit(floors) {
 	// Update in local database
-	let transaction = appData.db.transaction(["floors"], "readwrite");
-	transaction.oncomplete = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-		floors_show();
-		// TODO: the selected place is not refreshed, because autoselectfloor is on Vue mount
-	}
-	transaction.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-		floors_show();
-		// TODO: the selected place is not refreshed, because autoselectfloor is on Vue mount
-	}
-	let floorsStore = transaction.objectStore("floors");
-	for (let i = 0; i < floors.length; i++) {
-		floorsStore.put(floors[i]);
-	}
+	storage_open(function(event) {
+		storage_write("floors", floors, function(event) {
+			appData.localWriteDbSuccess(event);
+			floors_show();
+			// TODO: the selected place is not refreshed, because autoselectfloor is on Vue mount
+		}, function(event) {
+			appData.localWriteDbError(event);
+			floors_show();
+			// TODO: the selected place is not refreshed, because autoselectfloor is on Vue mount
+		});
+	}, appData.localWriteDbOpenError);
 }
 

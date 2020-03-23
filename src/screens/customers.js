@@ -1,17 +1,13 @@
 function customers_show() {
 	gui_showLoading();
-	let custStore = appData.db.transaction(["customers"], "readonly").objectStore("customers");
-	let customers = [];
-	custStore.openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			customers.push(cursor.value);
-			cursor.continue();
-		} else {
+	storage_open(function(event) {
+		storage_readStore("customers", function(customers) {
 			_customers_showCustomers(customers);
-		}
-	}
+			storage_close();
+		});
+	});
 }
+
 function _customers_showCustomers(customers) {
 	gui_hideLoading();
 	var sortedCusts = customers.sort(tools_sort("dispName", "card"));
@@ -27,15 +23,18 @@ function _customers_showCustomers(customers) {
 
 function customers_showCustomer(custId) {
 	gui_showLoading();
-	storage_readStores(["taxes", "tariffareas", "discountprofiles"], function(data) {
-		if (custId != null) {
-			let custStore = appData.db.transaction(["customers"], "readonly").objectStore("customers");
-			custStore.get(parseInt(custId)).onsuccess = function(event) {
-				_customers_showCustomer(event.target.result, data["taxes"], data["tariffareas"], data["discountprofiles"]);
+	storage_open(function(event) {
+		storage_readStores(["taxes", "tariffareas", "discountprofiles"], function(data) {
+			if (custId != null) {
+				storage_get("customers", parseInt(custId), function(customer) {
+					_customers_showCustomer(customer, data["taxes"], data["tariffareas"], data["discountprofiles"]);
+					storage_close();
+				});
+			} else {
+				_customers_showCustomer(Customer_default(), data["taxes"], data["tariffareas"], data["discountprofiles"]);
+				storage_close();
 			}
-		} else {
-			_customers_showCustomer(Customer_default(), data["taxes"], data["tariffareas"], data["discountprofiles"]);
-		}
+		});
 	});
 }
 
@@ -143,17 +142,10 @@ function _customers_saveCommit(cust) {
 		cust.hasImage = true;
 	}
 	// Update in local database
-	let custStore = appData.db.transaction(["customers"], "readwrite").objectStore("customers");
-	let req = custStore.put(cust);
-	req.onsuccess = function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-	}
-	req.onerror = function(event) {
-		gui_hideLoading();
-		gui_showError("Les modifications ont été enregistrées mais une erreur est survenue<br />" + event.target.error);
-	}
-
+	storage_open(function(event) {
+		storage_write("customers", cust,
+			appData.localWriteDbSuccess, appData.localWriteDbError)
+	}, appData.localWriteDbOpenError);
 }
 
 function customers_filterHistory() {

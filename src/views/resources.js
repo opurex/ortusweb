@@ -55,13 +55,13 @@ Vue.component("vue-resource-form", {
 		<form id="edit-resource-form" class="form-tiny" onsubmit="javascript:resources_saveResource(); return false;">
 			<div class="form-group">
 				<label for="edit-reference" style="display:none">Valeur</label>
-				<textarea v-if="data.resource.type == data.resTypes.Resource_TYPE_TEXT" style="font-family:monospace" id="edit-textarea" style="width:auto !important" v-bind:cols="data.resource.textWidth" rows="7" v-model="data.resource.content" />
+				<textarea v-if="data.resource.type == data.resTypes.Resource_TYPE_TEXT" style="font-family:monospace width:auto !important" id="edit-textarea" v-bind:cols="data.resource.textWidth" rows="7" v-model="data.resource.content" />
 				<template v-else>
 				<img v-if="data.hasImage" id="resource-image" class="img img-thumbnail" v-bind:src="imageData(data.resource)" />
 				<input id="edit-image" type="file" accept="image/*" />
 				<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:resources_toggleImage();return false;" >{{data.deleteContentButton}}</a>
 				</template>
-			</dl>
+			</div>
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>

@@ -23,44 +23,13 @@ function _ztickets_filterCallback(request, status, response) {
 		return;
 	}
 	let zTickets = JSON.parse(response);
-	let stores = appData.db.transaction(["cashRegisters", "taxes", "categories", "paymentmodes"], "readonly");
-	let cashRegisters = [];
-	let taxes = [];
-	let categories = [];
-	let paymentModes = [];
-	stores.objectStore("paymentmodes").openCursor().onsuccess = function(event) {
-		let cursor = event.target.result;
-		if (cursor) {
-			paymentModes.push(cursor.value);
-			cursor.continue();
-		} else {
-			stores.objectStore("taxes").openCursor().onsuccess = function(event) {
-				let cursor = event.target.result;
-				if (cursor) {
-					taxes.push(cursor.value);
-					cursor.continue();
-				} else {
-					stores.objectStore("categories").openCursor().onsuccess = function(event) {
-						let cursor = event.target.result;
-						if (cursor) {
-							categories.push(cursor.value);
-							cursor.continue();
-						} else {
-							stores.objectStore("cashRegisters").openCursor().onsuccess = function(event) {
-								let cursor = event.target.result;
-								if (cursor) {
-									cashRegisters.push(cursor.value);
-									cursor.continue();
-								} else {
-									_parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	storage_open(function(event) {
+		storage_readStores(["cashRegisters", "taxes", "categories", "paymentmodes"], function(data) {
+			_parseZTickets(data["cashRegisters"], data["paymentmodes"],
+				data["taxes"], data["categories"], zTickets);
+			storage_close();
+		});
+	});
 }
 
 function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets) {

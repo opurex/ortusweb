@@ -21,15 +21,28 @@ var storage_available = function() {
 
 /** Success and error are callback function with only the event as parameter. */
 var storage_open = function(success, error) {
+	if (arguments.length < 2) {
+		error = appData.dbError;
+	}
 	// Version is XYYZZ with X the major version, Y minor and Z local (debug)
 	var request = window.indexedDB.open("pasteque", 80005);
 	request.onerror = error;
-	request.onsuccess = success;
+	request.onsuccess = function(event) {
+		appData.db = event.target.result;
+		success(event);
+	};
 	request.onupgradeneeded = _storage_install;
 }
 
-var storage_drop = function(db, success, error) {
-	db.close();
+var storage_close = function() {
+	if (appData.db != null) {
+		appData.db.close();
+		appData.db = null;
+	}
+}
+
+var storage_drop = function(success, error) {
+	storage_close();
 	var request = window.indexedDB.deleteDatabase("pasteque");
 	request.onerror = error;
 	request.onsuccess = success;
@@ -92,18 +105,37 @@ var _storage_pulverize = function(db) {
 	}
 }
 
-var storage_sync = function(db, syncData, progress, error, complete) {
-	var transaction = db.transaction(SYNC_MODELS, "readwrite");
+var _storage_dbCheck = function(func_name) {
+	if (appData.db == null) {
+		let error = new Error();
+		let event = new EventTarget();
+		if (error.stack) {
+			event.stack += "\n" + error.stack;
+		}
+		console.error("storage_sync: appData.db is null. Is the database opened?");
+		event.error = new DOMException("appData.db is null.", "NullAppDataError");
+		return event;
+	}
+	return null;
+}
+
+var storage_sync = function(syncData, progress, error, complete) {
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		error(dbError);
+		return;
+	}
+	var transaction = appData.db.transaction(SYNC_MODELS, "readwrite");
 	transaction.oncomplete = function(event) {
 		localStorage.setItem("syncDate", Date.now());
 		complete(event);
 	}
 	for (var i = 0; i < SYNC_MODELS.length; i++) {
-		_storage_sync_part(db, transaction, syncData, SYNC_MODELS[i], progress, error);
+		_storage_sync_part(transaction, syncData, SYNC_MODELS[i], progress, error);
 	}
 }
 
-var _storage_sync_part = function(db, transaction, syncData, model, progress, error) {
+var _storage_sync_part = function(transaction, syncData, model, progress, error) {
 	var store = transaction.objectStore(model);
 	var delReq = store.clear();
 	delReq.onsuccess = function(event) {
@@ -134,13 +166,24 @@ var storage_hasData = function() {
 	return (localStorage.getItem("syncDate") != null);
 }
 
-var storage_readStore = function(storeName, callback) {
+var storage_readStore = function(storeName, callback, errorCallback) {
+	if (arguments.length < 3) {
+		errorCallback = appData.readDbError;
+	}
 	storage_readStores([storeName], function(data) {
 		callback(data[storeName]);
-	});
+	}, errorCallback);
 }
 
-var storage_readStores = function(storeNames, callback) {
+var storage_readStores = function(storeNames, callback, errorCallback) {
+	if (arguments.length < 3) {
+		errorCallback = appData.readDbError;
+	}
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		errorCallback(dbError);
+		return;
+	}
 	let data = {};
 	let finished = [];
 	let callbackCalled = false;
@@ -172,18 +215,88 @@ var storage_readStores = function(storeNames, callback) {
 	for (let i = 0; i < storeNames.length; i++) {
 		let storeName = storeNames[i];
 		let store = stores.objectStore(storeName);
-		store.openCursor().onsuccess = successClosure(storeName, i);
+		let cursor = store.openCursor();
+		cursor.onsuccess = successClosure(storeName, i);
+		cursor.onerror = errorCallback;
 	}
 }
 
 var storage_write = function(storeName, record, successCallback, errorCallback) {
-	let store = appData.db.transaction([storeName], "readwrite").objectStore(storeName);
-	let req = store.put(record);
-	req.onsuccess = successCallback;
-	req.onerror = errorCallback;
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		errorCallback(dbError);
+		return;
+	}
+	// Multi write
+	if (Array.isArray(record)) {
+		let size = record.length;
+		let data = [];
+		let callbackCalled = false;
+		let store = appData.db.transaction(storeName, "readwrite").objectStore(storeName);
+		let success = function(event) {
+			data.push(event.target.result);
+			if (data.length == size && callbackCalled == false) {
+				callbackCalled = true;
+				successCallback(data);
+			}
+		}
+		for (let i = 0; i < size; i++) {
+			let request = store.put(record[i]);
+			request.onsuccess = success;
+			request.onerror = errorCallback;
+		}
+	} else {
+		// Single record write
+		let store = appData.db.transaction([storeName], "readwrite").objectStore(storeName);
+		let req = store.put(record);
+		req.onsuccess = successCallback;
+		req.onerror = errorCallback;
+	}
+
 }
 
-var storage_get = function(storeName, id, callback) {
+var storage_delete = function(storeName, id, successCallback, errorCallback) {
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		errorCallback(dbError);
+		return;
+	}
+	// Multi delete
+	if (Array.isArray(id)) {
+		let size = record.length;
+		let data = [];
+		let callbackCalled = false;
+		let store = appData.db.transaction(storeName, "readwrite").objectStore(storeName);
+		let success = function(event) {
+			data.push(event.target.result);
+			if (data.length == size && callbackCalled == false) {
+				callbackCalled = true;
+				successCallback(data);
+			}
+		}
+		for (let i = 0; i < size; i++) {
+			let request = store.delete(id[i]);
+			request.onsuccess = success;
+			request.onerror = errorCallback;
+		}
+	} else {
+		// Single record write
+		let store = appData.db.transaction([storeName], "readwrite").objectStore(storeName);
+		let req = store.delete(id);
+		req.onsuccess = successCallback;
+		req.onerror = errorCallback;
+	}
+}
+
+var storage_get = function(storeName, id, callback, errorCallback) {
+	if (arguments.length < 4) {
+		errorCallback = appData.readDbError;
+	}
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		errorCallback(dbError);
+		return;
+	}
 	// Multi read
 	if (Array.isArray(id)) {
 		let size = id.length;
@@ -198,18 +311,30 @@ var storage_get = function(storeName, id, callback) {
 			}
 		}
 		for (let i = 0; i < size; i++) {
-			store.get(id[i]).onsuccess = success;
+			let request = store.get(id[i]);
+			request.onsuccess = success;
+			request.onerror = errorCallback;
 		}
 	} else {
 		// Single record read
 		let store = appData.db.transaction([storeName], "readonly").objectStore(storeName);
-		store.get(id).onsuccess = function(event) {
+		let request = store.get(id);
+		request.onsuccess = function(event) {
 			callback(event.target.result);
 		}
+		request.onerror = errorCallback;
 	}
 }
 
-var storage_getProductsFromCategory = function(catId, callback, sortFields) {
+var storage_getProductsFromCategory = function(catId, callback, sortFields, errorCallback) {
+	if (arguments.length < 4) {
+		errorCallback = appData.readDbError;
+	}
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		errorCallback(dbError);
+		return;
+	}
 	if (arguments.length < 3) {
 		sortFields = ["dispOrder", "reference"];
 	}
