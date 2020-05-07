@@ -110,6 +110,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 			"cs": z.cs.toLocaleString(),
 			"csPeriod": z.csPeriod.toLocaleString(),
 			"csFYear": z.csFYear.toLocaleString(),
+			"csPerpetual": (z.csPerpetual) ? z.csPerpetual.toLocaleString() : "",
 			"payments": [],
 			"taxes": [],
 			"categories": [],
@@ -266,9 +267,10 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		{label: "Tickets", visible: true},
 		{label: "CA", visible: true, class: "z-oddcol"},
 		{label: "CA mois", visible: false, class: "z-oddcol"},
-		{label: "CA année", visible: false, class: "z-oddcol"}
+		{label: "CA année", visible: false, class: "z-oddcol"},
+		{label: "CA perpétuel", visible: false, class: "z-oddcol"}
 	];
-	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal, total.tickets, total.cs, "", ""];
+	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal, total.tickets, total.cs, "", "", ""];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
 		vue.screen.data.table.columns.push({label: pm.label, visible: true});
@@ -297,7 +299,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	for (let i = 0; i < renderZs.length; i++) {
 		let z = renderZs[i];
 		let line = [z.cashRegister, z.sequence, z.openDate, z.closeDate, z.openCash, z.closeCash, z.expectedCash,
-			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear];
+			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear, z.csPerpetual];
 		for (let j = 0; j < z.payments.length; j++) {
 			line.push(z.payments[j].amount);
 		}
