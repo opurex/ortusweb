@@ -62,7 +62,11 @@ Vue.component("vue-table", {
 				csvData.push([]);
 				for (let j = 0; j < this.table.lines[i].length; j++) {
 					if (this.table.columns[j].visible && this.table.columns[j].export !== false) {
-						csvData[i + 1].push(this.table.lines[i][j]);
+						if (this.table.lines[i][j].type && this.table.lines[i][j].type == "bool") {
+							csvData[i + 1].push(this.table.lines[i][j].value ? "1" : "0");
+						} else {
+							csvData[i + 1].push(this.table.lines[i][j]);
+						}
 					}
 				}
 			}
