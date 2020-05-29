@@ -10,7 +10,8 @@ Vue.component("vue-table", {
 			</li>
 		</ul>
 		<div v-if="table.lines">
-			<a class="btn btn-add" v-on:click="exportCsv">Exporter les résultats</a>
+			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter les résultats</a>
+			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter les résultats (Excel)</a>
 		</div>
 	</div>
 	<h2 v-if="table.title">{{table.title}}</h2>
@@ -47,7 +48,7 @@ Vue.component("vue-table", {
 </div>
 `,
 	methods: {
-		exportCsv: function() {
+		exportCsv: function(withExcelBom) {
 			// Get data, exlude hidden columns
 			let csvData = [];
 			csvData.push([]);
@@ -80,9 +81,18 @@ Vue.component("vue-table", {
 				function toSolidBytes(match, p1) {
 					return String.fromCharCode('0x' + p1);
 				});
+			if (withExcelBom) {
+				encodedData = String.fromCharCode(0xef, 0xbb, 0xbf) + encodedData;
+			}
 			// Set href for download
 			let href = "data:text/csv;base64," + btoa(encodedData);
 			window.open(href, "csvexport");
-	}
+		},
+		exportCsvOther: function() {
+			this.exportCsv(false);
+		},
+		exportCsvExcel: function() {
+			this.exportCsv(true);
+		}
 	}});
 
