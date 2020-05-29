@@ -25,6 +25,7 @@ Vue.component("vue-product-list", {
 					{label: "Remise automatique", visible: false},
 					{label: "Taux de remise", visible: false},
 					{label: "Ordre", visible: false},
+					{label: "En vente", visible: false},
 					{label: "Opération", export: false, visible: true},
 				],
 				lines: []
@@ -128,7 +129,8 @@ Vue.component("vue-product-list", {
 					(prd.priceBuy != null && prd.priceSell != null) ? (prd.priceSell - prd.priceBuy).toLocaleString() : "?",
 					tax, {type: "bool", value: prd.discountEnabled},
 					(prd.discountRate * 100).toLocaleString() + "%",
-					prd.dispOrder, {type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Edit</a></div>"},
+					prd.dispOrder, {type: "bool", value: prd.visible},
+					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Edit</a></div>"},
 				];
 				lines.push(line);
 			}
