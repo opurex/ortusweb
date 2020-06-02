@@ -1,0 +1,28 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="utf-8" />
+	<title>Pastèque - back office</title>
+	<link rel="icon" href="res/img/favicon.png">
+	<link rel="stylesheet" type="text/css" href="res/css/css-x.css" />
+	<script type="text/javascript" src="libs/vue-min.js"></script>
+	<script type="text/javascript" src="libs/csv.min.js"></script>
+	<script type="text/javascript" src="js-x.js"></script>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function() { boot(); });
+	</script>
+</head>
+<body>
+<div id="vue-app">
+<!-- Floating components -->
+<vue-loading v-bind:loading="loading"></vue-loading>
+<vue-message v-bind:message="message"></vue-message>
+<!-- Main components -->
+<vue-login v-bind:login="login" v-show="ready"></vue-login>
+<div id="main" v-if="login.loggedIn && ready">
+	<vue-menu v-bind:menu="menu"></vue-menu>
+	<div v-if="false">As you can see this site doesn't work without javascript.</div>
+	<component id="content" class="container-fluid" v-bind:is="screen.component" v-bind:data="screen.data"></component>
+</div>
+</body>
+</html>
