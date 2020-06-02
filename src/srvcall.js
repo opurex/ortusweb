@@ -100,7 +100,7 @@ function srvcall_multicall(calls, callback) {
 		let singleCall = calls[i];
 		switch (singleCall.method.toUpperCase()) {
 			case "GET":
-				srvcall_get(singleCall.target, callCallback(id, i));
+				srvcall_get(singleCall.target, callCallback(singleCall.id, i));
 				break;
 			case "POST":
 				srvcall_post(singleCall.target, singleCall.data, callCallback(singleCall.id, i));

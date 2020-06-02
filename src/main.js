@@ -79,6 +79,9 @@ function route(screen) {
 	case "productCompo":
 		products_showProduct(_get("id"), _get("category"), true);
 		break;
+	case "productImport":
+		products_showImport();
+		break;
 	case "tariffarea":
 		tariffareas_showArea(_get("id"));
 		break;

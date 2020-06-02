@@ -1,15 +1,15 @@
 Vue.component("vue-table", {
-	props: ["table"],
+	props: ["table", "noexport", "nofilter"],
 	template: `<div class="table">
-	<div class="filters noprint">
-		<p>Afficher/masquer des colonnes</p>
-		<ul class="filter-columns">
+	<div class="filters noprint" v-if="!nofilter && !noexport">
+		<p v-if="!nofilter">Afficher/masquer des colonnes</p>
+		<ul class="filter-columns" v-if="!nofilter">
 			<li v-for="(col, index) in table.columns">
 				<input v-model="col.visible" v-bind:id="'filter-column-' + index" type="checkbox" />
 				<label v-bind:for="'filter-column-' + index">{{col.label}}</label>
 			</li>
 		</ul>
-		<div v-if="table.lines">
+		<div v-if="table.lines && !noexport">
 			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter les résultats</a>
 			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter les résultats (Excel)</a>
 		</div>

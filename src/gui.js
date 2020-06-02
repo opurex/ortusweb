@@ -37,8 +37,12 @@ function gui_closeMessageBox() {
 function gui_showMessage(message) {
 	_gui_showMessage("message-info", message);
 }
+function gui_showWarning(message) {
+	_gui_showMessage("message-warning", message);
+}
 /** Set the vue app data to show an error message. */
 function gui_showError(message, stack) {
 	_gui_showMessage("message-error", message, stack);
 }
 
+Vue.component("vue-blank", {});

@@ -334,6 +334,11 @@ dt {
 	color: #DDD;
 	border: 2px solid #DDD;
 }
+#message-box.message-warning {
+	background-color: #c6c900;
+	color: #000;
+	border: 2px solid #DDD;
+}
 #message-box.message-error {
 	background-color: #4F4C4D;
 	border: 2px solid #333;
