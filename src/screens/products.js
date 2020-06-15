@@ -98,14 +98,18 @@ function _products_showProduct(product, categories, taxes) {
 			}
 		}
 		storage_open(function(event) {
-			storage_get("products", prdIds, function(products) {
-				for (let j = 0; j < products.length; j++) {
-					let cachePrd = products[j];
-					vue.screen.data.precache[cachePrd.id] = cachePrd;
-				}
+			if (prdIds.length == 0) {
 				vue.screen.component = "vue-product-composition-form";
-				storage_close();
-			});
+			} else {
+				storage_get("products", prdIds, function(products) {
+					for (let j = 0; j < products.length; j++) {
+						let cachePrd = products[j];
+						vue.screen.data.precache[cachePrd.id] = cachePrd;
+					}
+					vue.screen.component = "vue-product-composition-form";
+					storage_close();
+				});
+			}
 		});
 	}
 	product_updatePrice();

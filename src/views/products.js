@@ -438,12 +438,12 @@ Vue.component("vue-product-composition-form", {
 					</tbody>
 				</table>
 			</fieldset>
-		<div class="form-group">
-			<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
-		</div>
-	</form>
-</div>
-</div>
+			<div class="form-group">
+				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+			</div>
+		</form>
+	</div>
+</section>
 </div>
 `,
 	methods: {
