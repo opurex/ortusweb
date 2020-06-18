@@ -159,7 +159,7 @@ function boot() {
 				loggedIn: false,
 				server: null,
 				user: null,
-				https: "0",
+				https: true,
 				password: ''
 			},
 			menu: menu_init(),

@@ -31,6 +31,9 @@ var login_getUser = function() {
 }
 
 var login_getHttps = function() {
+	if (!login_getServer()) {
+		return true; // Default
+	}
 	return localStorage.getItem("https") == "1";
 }
 
