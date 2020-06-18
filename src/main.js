@@ -61,6 +61,9 @@ function route(screen) {
 	case "paymentmodes":
 		paymentmodes_show();
 		break;
+	case "sales_tickets":
+		tickets_show();
+		break;
 	case "sales_z":
 		ztickets_show();
 		break;

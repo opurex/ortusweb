@@ -66,6 +66,7 @@ function menu_init() {
 			{"name": "Ventes",
 			"items": [
 				{"target": _menu_getTargetUrl("sales_z"), "name": "Tickets Z", "icon": _menu_getIcon(null)},
+				{"target": _menu_getTargetUrl("sales_tickets"), "name": "Tickets", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesbyproduct"), "name": "Par produit", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesdetails"), "name": "Détail", "icon": _menu_getIcon(null)},
 			]},

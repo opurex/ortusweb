@@ -355,6 +355,15 @@ p.warning strong {
 	color: #DDD;
 }
 
+.ticket {
+	border: 1px solid #000;
+	padding: 1ex;
+	max-width: 34ex;
+	position: sticky;
+	top: 4rem;
+	bottom: 0px;
+}
+
 /* Form */
 
 fieldset legend {
