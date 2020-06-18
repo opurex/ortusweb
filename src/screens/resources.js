@@ -2,20 +2,20 @@ let _resources_caredResources = [
 	"Printer.Ticket.Logo",
 	"Printer.Ticket.Header",
 	"Printer.Ticket.Footer",
-	"MobilePrinter.Ticket.Logo",
-	"MobilePrinter.Ticket.Header",
-	"MobilePrinter.Ticket.Footer"
+	"MobilePrinter.Logo",
+	"MobilePrinter.Header",
+	"MobilePrinter.Footer"
 ];
 
 function _resources_resType(label) {
 	switch (label) {
 		case "Printer.Ticket.Logo":
-		case "MobilePrinter.Ticket.Logo":
+		case "MobilePrinter.Logo":
 			return Resource_TYPE_IMAGE;
 		case "Printer.Ticket.Header":
 		case "Printer.Ticket.Footer":
-		case "MobilePrinter.Ticket.Header":
-		case "MobilePrinter.Ticket.Footer":
+		case "MobilePrinter.Header":
+		case "MobilePrinter.Footer":
 			return Resource_TYPE_TEXT;
 	}
 }
@@ -70,16 +70,16 @@ function _resources_fillCustomData(res) {
 			res.textWidth = 42;
 			res.dispOrder = 2;
 			break;
-		case "MobilePrinter.Ticket.Logo":
+		case "MobilePrinter.Logo":
 			res.dispName = "Logo de ticket (Android)";
 			res.dispOrder = 3;
 			break;
-		case "MobilePrinter.Ticket.Header":
+		case "MobilePrinter.Header":
 			res.dispName = "En-tête de ticket (Android)";
 			res.textWidth = 32;
 			res.dispOrder = 4;
 			break;
-		case "MobilePrinter.Ticket.Footer":
+		case "MobilePrinter.Footer":
 			res.dispName = "Pied de ticket (Android)";
 			res.textWidth = 32;
 			res.dispOrder = 5;
