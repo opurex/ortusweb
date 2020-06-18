@@ -254,44 +254,53 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		total.catTaxTotal[i].amount = total.catTaxTotal[i].amount.toLocaleString();
 	}
 	// Set table
+	let oldColumns = vue.screen.data.table.columns;
+	let oldColumnVisible = function(label, old, default_val) {
+		for (let i = 0; i < old.length; i++) {
+			if (old[i].label == label) {
+				return old[i].visible;
+			}
+		}
+		return default_val;
+	};
 	vue.screen.data.table.title = "Tickets Z du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop);
 	vue.screen.data.table.columns = [
-		{label: "Caisse", visible: true},
-		{label: "N°", visible: false},
-		{label: "Ouverture", visible: true},
-		{label: "Clôture", visible: true},
-		{label: "Fond ouverture", visible: false},
-		{label: "Fond clôture", visible: false},
-		{label: "Fond attendu", visible: false},
-		{label: "Erreur de caisse", visible: true},
-		{label: "Tickets", visible: true},
-		{label: "CA", visible: true, class: "z-oddcol"},
-		{label: "CA mois", visible: false, class: "z-oddcol"},
-		{label: "CA année", visible: false, class: "z-oddcol"},
-		{label: "CA perpétuel", visible: false, class: "z-oddcol"}
+		{label: "Caisse", visible: oldColumnVisible("Caisse", oldColumns, true)},
+		{label: "N°", visible: oldColumnVisible("N°", oldColumns, false)},
+		{label: "Ouverture", visible: oldColumnVisible("Ouverture", oldColumns, true)},
+		{label: "Clôture", visible: oldColumnVisible("Clôture", oldColumns, true)},
+		{label: "Fond ouverture", visible: oldColumnVisible("Fond ouverture", oldColumns, false)},
+		{label: "Fond clôture", visible: oldColumnVisible("Fond clôture", oldColumns, false)},
+		{label: "Fond attendu", visible: oldColumnVisible("Fond attendu", oldColumns, false)},
+		{label: "Erreur de caisse", visible: oldColumnVisible("Erreur de caisse", oldColumns, true)},
+		{label: "Tickets", visible: oldColumnVisible("Tickets", oldColumns, true)},
+		{label: "CA", visible: oldColumnVisible("CA", oldColumns, true), class: "z-oddcol"},
+		{label: "CA mois", visible: oldColumnVisible("CA mois", oldColumns, false), class: "z-oddcol"},
+		{label: "CA année", visible: oldColumnVisible("CA année", oldColumns, false), class: "z-oddcol"},
+		{label: "CA perpétuel", visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol"}
 	];
 	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal, total.tickets, total.cs, "", "", ""];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
-		vue.screen.data.table.columns.push({label: pm.label, visible: true});
+		vue.screen.data.table.columns.push({label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true)});
 		vue.screen.data.table.footer.push(total.paymentModeTotal[i]);
 	}
 	for (let i = 0; i < taxes.length; i++) {
 		let tax = taxes[i];
-		vue.screen.data.table.columns.push({label: tax.label + " base", visible: true, class: "z-oddcol"});
-		vue.screen.data.table.columns.push({label: tax.label + " TVA", visible: true, class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, true), class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: tax.label + " TVA", visible: oldColumnVisible(tax.label + " TVA", oldColumns, true), class: "z-oddcol"});
 		vue.screen.data.table.footer.push(total.taxTotal[i].base);
 		vue.screen.data.table.footer.push(total.taxTotal[i].amount);
 	}
 	for (let i = 0; i < categories.length; i++) {
 		let cat = categories[i];
-		vue.screen.data.table.columns.push({label: cat.label, visible: true});
+		vue.screen.data.table.columns.push({label: cat.label, visible: oldColumnVisible(cat.label, oldColumns, true)});
 		vue.screen.data.table.footer.push(total.categoryTotal[i]);
 	}
 	for (let i = 0; i < catTaxes.length; i++) {
 		let catTax = catTaxes[i];
-		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " base", visible: true, class: "z-oddcol"});
-		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " TVA", visible: false, class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " base", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, true), class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " TVA", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false), class: "z-oddcol"});
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].base);
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].amount);
 	}
