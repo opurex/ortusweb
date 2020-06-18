@@ -424,12 +424,14 @@ function _products_parseCsv(fileContent, callback) {
 			let taxes = data["taxes"];
 			let productByRef = [];
 			let categoryByRef = [];
+			let categoryByLabel = [];
 			let taxByRef = [];
 			for (let i = 0; i < products.length; i++) {
 				productByRef[products[i].reference] = products[i];
 			}
 			for (let i = 0; i < categories.length; i++) {
 				categoryByRef[categories[i].reference] = categories[i];
+				categoryByLabel[categories[i].label] = categories[i];
 			}
 			for (let i = 0; i < taxes.length; i++) {
 				taxByRef[taxes[i].label] = taxes[i];
@@ -498,6 +500,9 @@ function _products_parseCsv(fileContent, callback) {
 				if ("category" in value) {
 					if (value.category in categoryByRef) {
 						categoryId = categoryByRef[value.category].id
+						value.category = categoryId;
+					} else if (value.category in categoryByLabel) {
+						categoryId = categoryByLabel[value.category].id
 						value.category = categoryId;
 					} else {
 						errors.push({line: i + 2, error: "Le champ catégorie n'est pas renseigné ou invalide."});
