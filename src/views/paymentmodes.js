@@ -16,13 +16,16 @@ Vue.component("vue-paymentmode-list", {
 		</nav>
 	</header>
 	<article class="box-body">
+		<p class="warning" v-if="data.cashWarning"><strong>Attention :</strong> Pour que les montants du fond de caisse à l'ouverture et à la clôture puisse fonctionner, le mode de paiements équivalent aux espèces doit avoir la référence <em>cash</em></p>
 		<table>
 			<col />
+			<col style="width:10%; min-width: 5em;" />
 			<col style="width:10%; min-width: 5em;" />
 			<col style="width:10%; min-width: 5em;" />
 			<thead>
 				<tr>
 					<th>Désignation</th>
+					<th>Référence</th>
 					<th>Ordre d'affichage</th>
 					<th>Opération</th>
 				</tr>
@@ -30,6 +33,7 @@ Vue.component("vue-paymentmode-list", {
 			<tbody>
 				<tr v-for="pm in data.paymentModes">
 					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(pm)" />{{pm.label}}</td>
+					<td>{{pm.reference}}</td>
 					<td>{{pm.dispOrder}}</td>
 					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(pm)">Edit</a></nav></td>
 				</tr>

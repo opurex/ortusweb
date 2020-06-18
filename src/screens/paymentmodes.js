@@ -7,6 +7,14 @@ function paymentmodes_show() {
 			vue.screen.data.paymentModes = paymentModes.sort(tools_sort("dispOrder", "reference"));
 			gui_hideLoading();
 			storage_close();
+			let cashWarning = true;
+			for (let i = 0; i < paymentModes.length; i++) {
+				if (paymentModes[i].reference == "cash") {
+					cashWarning = false;
+					break;
+				}
+			}
+			vue.screen.data.cashWarning = cashWarning;
 		});
 	});
 }

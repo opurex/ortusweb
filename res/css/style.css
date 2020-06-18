@@ -339,6 +339,16 @@ dt {
 	color: #000;
 	border: 2px solid #DDD;
 }
+p.warning {
+	background-color: #c6c900;
+	color: #000;
+	border: 2px solid #DDD;
+	border-radius: 1ex;
+	padding: 1ex;
+}
+p.warning strong {
+	color: #e00;
+}
 #message-box.message-error {
 	background-color: #4F4C4D;
 	border: 2px solid #333;
