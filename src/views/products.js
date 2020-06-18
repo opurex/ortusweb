@@ -68,6 +68,11 @@ Vue.component("vue-product-list", {
 					<select id="sort" name="sort" v-model="sorting">
 						<option value="dispOrder">Ordre</option>
 						<option value="label">Désignation</option>
+						<option value="reference">Référence</option>
+						<option value="priceBuy">Prix d'achat</option>
+						<option value="priceSell">Prix de vente hors-taxes</option>
+						<option value="priceSellVat">Prix de vente TTC</option>
+						<option value="margin">Marge</option>
 					</select>
 				</li>
 			</ul>
@@ -147,6 +152,32 @@ Vue.component("vue-product-list", {
 					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("label"));
 					break;
+				case "reference":
+					lines = lines.sort(tools_sort(1));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("reference"));
+					break;
+				case "priceSell":
+					lines = lines.sort(tools_sort(10));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("priceSell"));
+					break;
+				case "priceSellVat":
+					lines = lines.sort(tools_sort(11));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("priceSellVat"));
+					break;
+				case "priceBuy":
+					lines = lines.sort(tools_sort(9));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("priceBuy"));
+					break;
+				case "margin":
+					lines = lines.sort(tools_sort(12));
+					this.productsTable.lines = lines;
+					this.sortedProducts = products.sort(tools_sort("margin"));
+					break;
+
 			}
 		},
 		loadProducts: function() {
