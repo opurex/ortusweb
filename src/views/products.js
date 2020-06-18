@@ -52,6 +52,7 @@ Vue.component("vue-product-list", {
 					<label for="filter-category">Catégorie</label>
 					<select id="filter-category" name="category" v-model="currentCategoryId">
 						<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
+						<option value="">Tout afficher</option>
 					</select>
 				</li>
 				<li>
@@ -150,12 +151,21 @@ Vue.component("vue-product-list", {
 		},
 		loadProducts: function() {
 			let thiss = this;
-			storage_open(function(event) {
-				storage_getProductsFromCategory(thiss.currentCategoryId, function(products) {
-					thiss.sortAndAssign(products);
-					storage_close();
+			if (this.currentCategoryId != "") {
+				storage_open(function(event) {
+					storage_getProductsFromCategory(thiss.currentCategoryId, function(products) {
+						thiss.sortAndAssign(products);
+						storage_close();
+					});
 				});
-			});
+			} else {
+				storage_open(function(event) {
+					storage_readStore("products", function(products) {
+						thiss.sortAndAssign(products);
+						storage_close();
+					});
+				});
+			}
 		},
 	},
 	computed: {
