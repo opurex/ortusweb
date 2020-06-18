@@ -74,8 +74,12 @@ Vue.component("vue-paymentmode-form", {
 			<fieldset>
 				<legend>Mode de paiement</legend>
 				<div class="form-group">
-					<label for="edit-label">Désignation</label>
+					<label for="edit-label">Désignation à l'encaissement</label>
 					<input id="edit-label" type="text" v-model="data.paymentMode.label" required="true" />
+				</div>
+				<div class="form-group">
+					<label for="edit-backlabel">Désignation au rendu</label>
+					<input id="edit-backlabel" type="text" v-model="data.paymentMode.backLabel" required="true" />
 				</div>
 				<div class="form-group">
 					<label for="edit-image">Image</label>
