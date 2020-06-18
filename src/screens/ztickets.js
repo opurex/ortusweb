@@ -279,7 +279,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		{label: "CA HT année", visible: oldColumnVisible("CA année", oldColumns, false), class: "z-oddcol"},
 		{label: "CA HT perpétuel", visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol"}
 	];
-	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal, total.tickets, total.cs, "", "", ""];
+	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", ""];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
 		vue.screen.data.table.columns.push({label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true)});
