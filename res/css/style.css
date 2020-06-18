@@ -355,6 +355,20 @@ p.warning strong {
 	color: #DDD;
 }
 
+table thead {
+	position: sticky;
+	top: 4rem;
+}
+table tfoot {
+	position: sticky;
+	bottom: 1rem;
+}
+table thead tr,
+table thead tr .z-oddcol,
+table tfoot tr,
+table tfoot tr .z-oddcol {
+	background-color: #ddd;
+}
 .ticket {
 	border: 1px solid #000;
 	padding: 1ex;
