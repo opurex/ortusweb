@@ -116,14 +116,14 @@ function _salesdetails_render(cashRegisters, tickets) {
 				tools_dateTimeToString(date),
 				tktLine.productLabel,
 				(tktLine.taxRate * 100).toLocaleString(),
-				(taxedRef) ? "~" + unitPrice.toLocaleString() : unitPrice.toLocaleString(),
-				(taxedRef) ? taxedUnitPrice.toLocaleString() : "~" + taxedUnitPrice.toLocaleString(),
+				unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
+				taxedUnitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 				tktLine.quantity.toLocaleString(),
-				(taxedRef) ? "~" + price.toLocaleString() : price.toLocaleString(),
-				(taxedRef) ? taxedPrice.toLocaleString() : "~" + taxedPrice.toLocaleString(),
+				price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
+				taxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 				(tktLine.discountRate * 100).toLocaleString(),
-				(taxedRef) ? "~" + finalPrice.toLocaleString() : finalPrice.toLocaleString(),
-				(taxedRef) ? finalTaxedPrice.toLocaleString() : "~" + finalTaxedPrice.toLocaleString()]);
+				finalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
+				finalTaxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 } )]);
 		}
 	}
 	vue.screen.data.table.title = "Détail des ventes du "
