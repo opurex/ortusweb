@@ -4,29 +4,54 @@ var _salesdetails_data = {};
 function salesdetails_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
-	vue.screen.data = {
-		"start": start,
-		"stop": stop,
-		"table": {
-			"title": null,
-			"columns": [
-				{label: "Caisse", visible: false},
-				{label: "Ticket", visible: false},
-				{label: "Date", visible: false},
-				{label: "Désignation", visible: true},
-				{label: "TVA", visible: true},
-				{label: "Prix unitaire HT", visible: false},
-				{label: "Prix unitaire TTC", visible: false},
-				{label: "Quantité", visible: true},
-				{label: "Sous-total HT", visible: false},
-				{label: "Sous-total TTC", visible: false},
-				{label: "Remise", visible: true},
-				{label: "Total HT", visible: true},
-				{label: "Total TTC", visible: true}
-			],
-		},
-	}
-	vue.screen.component = "vue-salesdetails";
+	storage_open(function(event) {
+		storage_readStores(["cashRegisters", "products", "categories"], function(data) {
+			let catById = {};
+			let prdById = {};
+			let crById = {};
+			for (let i = 0; i < data["cashRegisters"].length; i++) {
+				let cr = data["cashRegisters"][i];
+				crById[cr.id] = cr
+			}
+			for (let i = 0; i < data["products"].length; i++) {
+				let prd = data["products"][i];
+				prdById[prd.id] = prd;
+			}
+			for (let i = 0; i < data["categories"].length; i++) {
+				let cat = data["categories"][i];
+				catById[cat.id] = cat;
+			}
+			vue.screen.data = {
+				"start": start,
+				"stop": stop,
+				"crById": crById,
+				"prdById": prdById,
+				"catById": catById,
+				"table": {
+					"title": null,
+					"columns": [
+						{label: "Caisse", visible: false},
+						{label: "Ticket", visible: false},
+						{label: "Date", visible: false},
+						{label: "Catégorie", visible: true},
+						{label: "Référence", visible: true},
+						{label: "Désignation", visible: true},
+						{label: "TVA", visible: true},
+						{label: "Prix unitaire HT", visible: false},
+						{label: "Prix unitaire TTC", visible: false},
+						{label: "Quantité", visible: true},
+						{label: "Sous-total HT", visible: false},
+						{label: "Sous-total TTC", visible: false},
+						{label: "Remise", visible: true},
+						{label: "Total HT", visible: true},
+						{label: "Total TTC", visible: true}
+					],
+				},
+			}
+			vue.screen.component = "vue-salesdetails";
+		});
+	});
+
 }
 
 function salesdetails_filter() {
@@ -74,20 +99,10 @@ function _salesdetails_filterCallback(request, status, response) {
 
 function _salesdetails_dataRetreived() {
 	gui_showLoading();
-	storage_open(function(event) {
-		storage_readStore("cashRegisters", function(cashRegisters) {
-			_salesdetails_render(cashRegisters, _salesdetails_data.tickets);
-			storage_close();
-		});
-	});
+	_salesdetails_render(_salesdetails_data.tickets);
 }
 
-function _salesdetails_render(cashRegisters, tickets) {
-	let crById = [];
-	let prdById = [];
-	for (let i = 0; i < cashRegisters.length; i++) {
-		crById[cashRegisters[i].id] = cashRegisters[i];
-	}
+function _salesdetails_render(tickets) {
 	// Prepare rendering
 	let lines = [];
 	for (let i = 0; i < tickets.length; i++) {
@@ -95,6 +110,8 @@ function _salesdetails_render(cashRegisters, tickets) {
 		for (let j = 0; j < ticket.lines.length; j++) {
 			let tktLine = ticket.lines[j];
 			let date = new Date(ticket.date * 1000);
+			let category = "";
+			let reference = "";
 			let taxedRef = tktLine.finalTaxedPrice != null;
 			let unitPrice = tktLine.unitPrice;
 			let taxedUnitPrice = tktLine.taxedUnitPrice;
@@ -102,6 +119,11 @@ function _salesdetails_render(cashRegisters, tickets) {
 			let taxedPrice = tktLine.taxedPrice;
 			let finalPrice = tktLine.finalPrice;
 			let finalTaxedPrice = tktLine.finalTaxedPrice;
+			if (tktLine.product != null) {
+				let prd = vue.screen.data.prdById[tktLine.product];
+				category = vue.screen.data.catById[prd.category].label;
+				reference = prd.reference;
+			}
 			if (taxedRef) {
 				unitPrice = taxedUnitPrice / (1.0 + tktLine.taxRate);
 				price = taxedPrice / (1.0 + tktLine.taxRate);
@@ -111,9 +133,11 @@ function _salesdetails_render(cashRegisters, tickets) {
 				taxedPrice = price * (1.0 + tktLine.taxRate);
 				finalTaxedPrice = finalPrice * (1.0 + tktLine.taxRate);
 			}
-			lines.push([crById[ticket.cashRegister].label,
+			lines.push([vue.screen.data.crById[ticket.cashRegister].label,
 				ticket.number,
 				tools_dateTimeToString(date),
+				category,
+				reference,
 				tktLine.productLabel,
 				(tktLine.taxRate * 100).toLocaleString(),
 				unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
