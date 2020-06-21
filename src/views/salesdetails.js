@@ -26,6 +26,7 @@ Vue.component("vue-salesdetails", {
 		</nav>
 	</header>
 	<article class="box-body" id="report-content">
+		<p class="notice"><strong>Note :</strong> Le prix d'achat et la catégorie correspondent aux informations actuellement renseignées sur la fiche produit et non à celles au moment de la vente.</p>
 		<vue-table v-bind:table="data.table"></vue-table>
 	</article>
 </section>

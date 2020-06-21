@@ -37,6 +37,7 @@ function salesdetails_show() {
 						{label: "Référence", visible: true},
 						{label: "Désignation", visible: true},
 						{label: "TVA", visible: true},
+						{label: "Prix d'achat HT", visible: false},
 						{label: "Prix unitaire HT", visible: false},
 						{label: "Prix unitaire TTC", visible: false},
 						{label: "Quantité", visible: true},
@@ -44,7 +45,8 @@ function salesdetails_show() {
 						{label: "Sous-total TTC", visible: false},
 						{label: "Remise", visible: true},
 						{label: "Total HT", visible: true},
-						{label: "Total TTC", visible: true}
+						{label: "Total TTC", visible: true},
+						{label: "Marge HT", visible: false},
 					],
 				},
 			}
@@ -115,14 +117,17 @@ function _salesdetails_render(tickets) {
 			let taxedRef = tktLine.finalTaxedPrice != null;
 			let unitPrice = tktLine.unitPrice;
 			let taxedUnitPrice = tktLine.taxedUnitPrice;
+			let priceBuy = "";
 			let price = tktLine.price;
 			let taxedPrice = tktLine.taxedPrice;
 			let finalPrice = tktLine.finalPrice;
 			let finalTaxedPrice = tktLine.finalTaxedPrice;
+			let margin = "";
 			if (tktLine.product != null) {
 				let prd = vue.screen.data.prdById[tktLine.product];
 				category = vue.screen.data.catById[prd.category].label;
 				reference = prd.reference;
+				priceBuy = prd.priceBuy.toLocaleString();
 			}
 			if (taxedRef) {
 				unitPrice = taxedUnitPrice / (1.0 + tktLine.taxRate);
@@ -133,6 +138,10 @@ function _salesdetails_render(tickets) {
 				taxedPrice = price * (1.0 + tktLine.taxRate);
 				finalTaxedPrice = finalPrice * (1.0 + tktLine.taxRate);
 			}
+			if (priceBuy != "") {
+				let prd = vue.screen.data.prdById[tktLine.product];
+				margin = (finalPrice - (tktLine.quantity * prd.priceBuy)).toLocaleString();
+			}
 			lines.push([vue.screen.data.crById[ticket.cashRegister].label,
 				ticket.number,
 				tools_dateTimeToString(date),
@@ -140,6 +149,7 @@ function _salesdetails_render(tickets) {
 				reference,
 				tktLine.productLabel,
 				(tktLine.taxRate * 100).toLocaleString(),
+				priceBuy,
 				unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
 				taxedUnitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 				tktLine.quantity.toLocaleString(),
@@ -147,7 +157,8 @@ function _salesdetails_render(tickets) {
 				taxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 				(tktLine.discountRate * 100).toLocaleString(),
 				finalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
-				finalTaxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 } )]);
+				finalTaxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 } ),
+				margin]);
 		}
 	}
 	vue.screen.data.table.title = "Détail des ventes du "
