@@ -4,6 +4,7 @@ function ztickets_show() {
 	vue.screen.data = {
 		"start": start,
 		"stop": stop,
+		"addZeros": false,
 		"table": {columns: []}
 	}
 	vue.screen.component = "vue-zticket-list";
@@ -132,7 +133,11 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 				}
 			}
 			if (!found) {
-				renderZ.payments.push({"amount": ""});
+				if (vue.screen.data.addZeros) {
+					renderZ.payments.push({"amount": "0"});
+				} else {
+					renderZ.payments.push({"amount": ""});
+				}
 			}
 		}
 		for (let j = 0; j < taxes.length; j++) {
@@ -150,7 +155,11 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 				}
 			}
 			if (!found) {
-				renderZ.taxes.push({"base": "", "amount": ""});
+				if (vue.screen.data.addZeros) {
+					renderZ.taxes.push({"base": "0", "amount": "0"});
+				} else {
+					renderZ.taxes.push({"base": "", "amount": ""});
+				}
 			}
 		}
 		for (let j = 0; j < categories.length; j++) {
@@ -166,7 +175,11 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 				}
 			}
 			if (!found) {
-				renderZ.categories.push({"amount": ""});
+				if (vue.screen.data.addZeros) {
+					renderZ.categories.push({"amount": "0"});
+				} else {
+					renderZ.categories.push({"amount": ""});
+				}
 			}
 		}
 		for (let j = 0; j < categories.length; j++) {
@@ -186,7 +199,11 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 					}
 				}
 				if (!found) {
-					renderZ.catTaxes.push({"base": "", "amount": ""});
+					if (vue.screen.data.addZeros) {
+						renderZ.catTaxes.push({"base": "0", "amount": "0"});
+					} else {
+						renderZ.catTaxes.push({"base": "", "amount": ""});
+					}
 				}
 			}
 		}

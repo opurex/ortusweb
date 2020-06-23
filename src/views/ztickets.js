@@ -19,6 +19,10 @@ Vue.component("vue-zticket-list", {
 					<label for="stop">au</label>
 					<vue-inputdate id="stop" v-model="data.stop" />
 				</div>
+				<div class="form-group">
+					<input id="add-zeros" type="checkbox" v-model="data.addZeros" />
+					<label for="add-zeros">Afficher les montants à 0</label>
+				</div>
 				<div class="form-control">
 					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 				</div>
