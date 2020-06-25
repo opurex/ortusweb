@@ -100,6 +100,12 @@ function paymentmodes_removeReturn(index) {
 function paymentmodes_savePaymentMode() {
 	let pm = vue.screen.data.paymentMode;
 	gui_showLoading();
+	for (let i = 0; i < pm.returns.length; i++) {
+		delete pm.returns[i]['id'];
+	}
+	for (let i = 0; i < pm.values.length; i++) {
+		delete pm.values[i]['id'];
+	}
 	if ("id" in pm) {
 		srvcall_post("api/paymentmode", pm, paymentmodes_saveCallback);
 	} else {
