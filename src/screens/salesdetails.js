@@ -33,6 +33,8 @@ function salesdetails_show() {
 						{label: "Caisse", visible: false},
 						{label: "Ticket", visible: false},
 						{label: "Date", visible: false},
+						{label: "Ligne", visible: false},
+						{label: "Ligne-article", visible: false},
 						{label: "Catégorie", visible: true},
 						{label: "Référence", visible: true},
 						{label: "Désignation", visible: true},
@@ -109,6 +111,8 @@ function _salesdetails_render(tickets) {
 	let lines = [];
 	for (let i = 0; i < tickets.length; i++) {
 		let ticket = tickets[i];
+		let inCompo = false;
+		let articleLine = 0;
 		for (let j = 0; j < ticket.lines.length; j++) {
 			let tktLine = ticket.lines[j];
 			let date = new Date(ticket.date * 1000);
@@ -123,11 +127,21 @@ function _salesdetails_render(tickets) {
 			let finalPrice = tktLine.finalPrice;
 			let finalTaxedPrice = tktLine.finalTaxedPrice;
 			let margin = "";
+			let line = tktLine.dispOrder + 1;
+			if (inCompo && (tktLine.price == 0.0 || tktLine.taxedPrice == 0.0)) {
+				// Keep article line to match the composition line
+			} else {
+				articleLine++;
+				inCompo = false;
+			}
 			if (tktLine.product != null) {
 				let prd = vue.screen.data.prdById[tktLine.product];
 				category = vue.screen.data.catById[prd.category].label;
 				reference = prd.reference;
 				priceBuy = prd.priceBuy.toLocaleString();
+				if (prd.composition) {
+					inCompo = true;
+				}
 			}
 			if (taxedRef) {
 				unitPrice = taxedUnitPrice / (1.0 + tktLine.taxRate);
@@ -145,6 +159,8 @@ function _salesdetails_render(tickets) {
 			lines.push([vue.screen.data.crById[ticket.cashRegister].label,
 				ticket.number,
 				tools_dateTimeToString(date),
+				line,
+				articleLine,
 				category,
 				reference,
 				tktLine.productLabel,
