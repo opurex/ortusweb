@@ -210,6 +210,13 @@ dt {
 	margin-right: 0.5em;
 }
 
+.filters ul li p.help {
+	font-size: small;
+	font-style: italic;
+	margin-left: 3ex;
+	margin-top: 0px;
+}
+
 /* Login form */
 
 #login-logo {

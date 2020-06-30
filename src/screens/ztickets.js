@@ -282,42 +282,42 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	};
 	vue.screen.data.table.title = "Tickets Z du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop);
 	vue.screen.data.table.columns = [
-		{label: "Caisse", visible: oldColumnVisible("Caisse", oldColumns, true)},
-		{label: "N°", visible: oldColumnVisible("N°", oldColumns, true)},
-		{label: "Ouverture", visible: oldColumnVisible("Ouverture", oldColumns, true)},
-		{label: "Clôture", visible: oldColumnVisible("Clôture", oldColumns, true)},
-		{label: "Fond ouverture", visible: oldColumnVisible("Fond ouverture", oldColumns, true)},
-		{label: "Fond clôture", visible: oldColumnVisible("Fond clôture", oldColumns, true)},
-		{label: "Fond attendu", visible: oldColumnVisible("Fond attendu", oldColumns, true)},
-		{label: "Erreur de caisse", visible: oldColumnVisible("Erreur de caisse", oldColumns, true)},
-		{label: "Tickets", visible: oldColumnVisible("Tickets", oldColumns, false)},
-		{label: "CA HT", visible: oldColumnVisible("CA", oldColumns, true), class: "z-oddcol"},
-		{label: "CA HT mois", visible: oldColumnVisible("CA mois", oldColumns, false), class: "z-oddcol"},
-		{label: "CA HT année", visible: oldColumnVisible("CA année", oldColumns, false), class: "z-oddcol"},
-		{label: "CA HT perpétuel", visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol"}
+		{label: "Caisse", visible: oldColumnVisible("Caisse", oldColumns, true), help: "Le nom de la caisse."},
+		{label: "N°", visible: oldColumnVisible("N°", oldColumns, true), help: "Le numéro de séquence de la session de caisse."},
+		{label: "Ouverture", visible: oldColumnVisible("Ouverture", oldColumns, true), help: "La date et heure d'ouverture de la session de caisse."},
+		{label: "Clôture", visible: oldColumnVisible("Clôture", oldColumns, true), help: "La date et heure de clôture de la session de caisse."},
+		{label: "Fond ouverture", visible: oldColumnVisible("Fond ouverture", oldColumns, true), help: "Le montant du fond de caisse compté à l'ouverture."},
+		{label: "Fond clôture", visible: oldColumnVisible("Fond clôture", oldColumns, true), help: "Le montant du fond de caisse compté à la clôture."},
+		{label: "Fond attendu", visible: oldColumnVisible("Fond attendu", oldColumns, true), help: "Le montant du fond de caisse attendu à la clôture, calculé à partir du fond de caisse à l'ouverture et des encaissements."},
+		{label: "Erreur de caisse", visible: oldColumnVisible("Erreur de caisse", oldColumns, true), help: "L'écart entre le fond de caisse à la clôture et le fond de caisse attendu. Lorsqu'il est positif, il y avait trop de monnaie, lorsque négatif, il en manquait."},
+		{label: "Tickets", visible: oldColumnVisible("Tickets", oldColumns, false), help: "Le nombre de tickets réalisés sur la session de caisse."},
+		{label: "CA HT", visible: oldColumnVisible("CA", oldColumns, true), class: "z-oddcol", help: "Le montant total du chiffre d'affaire hors taxes réalisé pendant la session."},
+		{label: "CA HT mois", visible: oldColumnVisible("CA mois", oldColumns, false), class: "z-oddcol", help: "Le cumul du chiffre d'affaire réalisé sur la période. Ce cumul est remis à zéro lorsque la clôture mensuelle est choisie au moment de clôturer la caisse."},
+		{label: "CA HT année", visible: oldColumnVisible("CA année", oldColumns, false), class: "z-oddcol", help: "Le cumul du chiffre d'affaire réalisé sur l'année ou exercice fiscal. Ce cumul est remis à zéro lorsque la clôture annuelle est choisie au moment de clôturer la caisse."},
+		{label: "CA HT perpétuel", visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol", help: "Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."}
 	];
 	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", ""];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
-		vue.screen.data.table.columns.push({label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true)});
+		vue.screen.data.table.columns.push({label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true), help: "Le montant des encaissements réalisés avec ce moyen de paiement sur la session."});
 		vue.screen.data.table.footer.push(total.paymentModeTotal[i]);
 	}
 	for (let i = 0; i < taxes.length; i++) {
 		let tax = taxes[i];
-		vue.screen.data.table.columns.push({label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, false), class: "z-oddcol"});
-		vue.screen.data.table.columns.push({label: tax.label + " TVA", visible: oldColumnVisible(tax.label + " TVA", oldColumns, false), class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe associé au taux de TVA."});
+		vue.screen.data.table.columns.push({label: tax.label + " TVA", visible: oldColumnVisible(tax.label + " TVA", oldColumns, false), class: "z-oddcol", help: "Le montant de TVA collectée associé au taux de TVA."});
 		vue.screen.data.table.footer.push(total.taxTotal[i].base);
 		vue.screen.data.table.footer.push(total.taxTotal[i].amount);
 	}
 	for (let i = 0; i < categories.length; i++) {
 		let cat = categories[i];
-		vue.screen.data.table.columns.push({label: cat.label, visible: oldColumnVisible(cat.label, oldColumns, false)});
+		vue.screen.data.table.columns.push({label: cat.label, visible: oldColumnVisible(cat.label, oldColumns, false), help: "Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."});
 		vue.screen.data.table.footer.push(total.categoryTotal[i]);
 	}
 	for (let i = 0; i < catTaxes.length; i++) {
 		let catTax = catTaxes[i];
-		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " base", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false), class: "z-oddcol"});
-		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " TVA", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false), class: "z-oddcol"});
+		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " base", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."});
+		vue.screen.data.table.columns.push({label: catTax.cat + " " + catTax.label + " TVA", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false), class: "z-oddcol", help: "Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."});
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].base);
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].amount);
 	}

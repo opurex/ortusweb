@@ -1,12 +1,16 @@
 Vue.component("vue-table", {
 	props: ["table", "noexport", "nofilter"],
+	data: function() {
+		return {showHelp: false};
+	},
 	template: `<div class="table">
 	<div class="filters noprint" v-if="!nofilter && !noexport">
-		<p v-if="!nofilter">Afficher/masquer des colonnes</p>
-		<ul class="filter-columns" v-if="!nofilter">
+		<p v-if="!nofilter">Afficher/masquer des colonnes <button type="button" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button></p>
+		<ul class="filter-columns" v-if="!nofilter" v-bind:class="{'expand-help': showHelp}">
 			<li v-for="(col, index) in table.columns">
 				<input v-model="col.visible" v-bind:id="'filter-column-' + index" type="checkbox" />
 				<label v-bind:for="'filter-column-' + index">{{col.label}}</label>
+				<p class="help" v-if="showHelp">{{col.help}}</p>
 			</li>
 		</ul>
 		<div v-if="table.lines && !noexport">
@@ -97,6 +101,9 @@ Vue.component("vue-table", {
 		},
 		exportCsvExcel: function() {
 			this.exportCsv(true);
+		},
+		toggleHelp: function() {
+			this.showHelp = !this.showHelp;
 		}
 	}});
 

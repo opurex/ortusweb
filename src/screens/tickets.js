@@ -27,14 +27,14 @@ function tickets_show() {
 				"table": {
 					"title": null,
 					"columns": [
-						{label: "Caisse", visible: false},
-						{label: "Séquence", visible: false},
-						{label: "Numéro", visible: true},
-						{label: "Date", visible: true},
-						{label: "Encaissement", visible: true},
-						{label: "Montant", visible: true},
-						{label: "Opérateur", visible: false},
-						{label: "Opération", visible: true, export: false},
+						{label: "Caisse", visible: false, help: "Le nom de la caisse."},
+						{label: "Séquence", visible: false, help: "Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."},
+						{label: "Numéro", visible: true, help: "Le numéro du ticket de la caisse."},
+						{label: "Date", visible: true, help: "La date de réalisation de la vente."},
+						{label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
+						{label: "Montant", visible: true, help: "Le montant TTC du ticket."},
+						{label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
+						{label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
 					],
 				},
 			}
