@@ -141,7 +141,7 @@ function _tickets_dataRetreived() {
 
 _tickets_selectTicket = function(ticket) {
 	if (ticket == null) {
-		vue.screen.data.selectedTicket = null;
+		Vue.set(vue.screen.data, "selectedTicket", null);
 		return;
 	}
 	let cr = "";
