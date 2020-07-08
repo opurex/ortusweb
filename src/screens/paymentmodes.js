@@ -109,7 +109,7 @@ function paymentmodes_savePaymentMode() {
 	if ("id" in pm) {
 		srvcall_post("api/paymentmode", pm, paymentmodes_saveCallback);
 	} else {
-		srvcall_put("api/paymentmode/" + pm["reference"], pm, paymentmodes_saveCallback);
+		srvcall_put("api/paymentmode/" + encodeURIComponent(pm["reference"]), pm, paymentmodes_saveCallback);
 	}
 }
 
@@ -137,18 +137,18 @@ function paymentmodes_saveCallback(request, status, response) {
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {
 		pm.hasImage = false;
-		calls.push({id: "pmImg", method: "DELETE", target: "api/image/paymentmode/" + pm.id});
+		calls.push({id: "pmImg", method: "DELETE", target: "api/image/paymentmode/" + encodeURIComponent(pm.id)});
 	} else if (imgTag.files.length != 0) {
 		pm.hasImage = true;
 		if (vue.screen.data.hadImage) {
 			calls.push({id: "pmImg",
 					method: "PATCH",
-					target: "api/image/paymentmode/" + pm.id, data: imgTag.files[0]
+					target: "api/image/paymentmode/" + encodeURIComponent(pm.id), data: imgTag.files[0]
 			});
 		} else {
 			calls.push({id: "pmImg",
 					method: "PUT",
-					target: "api/image/paymentmode/" + pm.id,
+					target: "api/image/paymentmode/" + encodeURIComponent(pm.id),
 					data: imgTag.files[0]
 			});
 		}
@@ -160,20 +160,20 @@ function paymentmodes_saveCallback(request, status, response) {
 			pmValue.hasImage = false;
 			calls.push({id: "pmValueImg-" + pmValue.value,
 					method: "DELETE",
-					target: "api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value
+					target: "api/image/paymentmodevalue/" + encodeURIComponent(pm.id) + "-" + encodeURIComponent(pmValue.value)
 			});
 		} else if (imgValueTag.files.length != 0) {
 			pmValue.hasImage = true;
 			if (pmValue.value in vue.screen.data.hadValueImage && vue.screen.data.hadValueImage[pmValue.value]) {
 				calls.push({id: "pmValueImg-" + pmValue.value,
 						method: "PATCH",
-						target: "api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value,
+						target: "api/image/paymentmodevalue/" + encodeURIComponent(pm.id) + "-" + encodeURIComponent(pmValue.value),
 						data: imgValueTag.files[0]
 				});
 			} else {
 				calls.push({id: "pmValueImg-" + pmValue.value,
 						method: "PUT",
-						target: "api/image/paymentmodevalue/" + pm.id + "-" + pmValue.value,
+						target: "api/image/paymentmodevalue/" + encodeURIComponent(pm.id) + "-" + encodeURIComponent(pmValue.value),
 						data: imgValueTag.files[0]
 				});
 			}

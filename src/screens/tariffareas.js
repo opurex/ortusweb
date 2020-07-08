@@ -126,7 +126,7 @@ function tariffareas_saveArea() {
 	if ("id" in area) {
 		srvcall_post("api/tariffarea", area, tariffareas_saveCallback);
 	} else {
-		srvcall_put("api/tariffarea/" + area["reference"], area, tariffareas_saveCallback);
+		srvcall_put("api/tariffarea/" + encodeURIComponent(area["reference"]), area, tariffareas_saveCallback);
 	}
 }
 

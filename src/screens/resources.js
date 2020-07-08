@@ -165,13 +165,13 @@ function resources_saveResource() {
 	gui_showLoading();
 	if (res.type == Resource_TYPE_TEXT) {
 		if (res.content == "") {
-			srvcall_delete("api/resource/" + res.label, _resources_saveCallback);
+			srvcall_delete("api/resource/" + encodeURIComponent(res.label), _resources_saveCallback);
 		} else {
 			srvcall_post("api/resource", res, _resources_saveCallback);
 		}
 	} else {
 		if (vue.screen.data.deleteImage) {
-			srvcall_delete("api/resource/" + res.label, _resources_saveCallback);
+			srvcall_delete("api/resource/" + encodeURIComponent(res.label), _resources_saveCallback);
 		} else {
 			let imgTag = document.getElementById("edit-image");
 			if (imgTag.files.length != 0) {

@@ -61,7 +61,7 @@ function category_saveCategory() {
 	if ("id" in cat) {
 		srvcall_post("api/category", cat, category_saveCallback);
 	} else {
-		srvcall_put("api/category/" + cat["reference"], cat, category_saveCallback);
+		srvcall_put("api/category/" + encodeURIComponent(cat["reference"]), cat, category_saveCallback);
 	}
 }
 
@@ -90,17 +90,17 @@ function category_saveCallback(request, status, response) {
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {
 		cat.hasImage = false;
-		srvcall_delete("api/image/category/" + cat.id, function(request, status, response) {
+		srvcall_delete("api/image/category/" + encodeURIComponent(cat.id), function(request, status, response) {
 			_category_saveCommit(cat);
 		});
 	} else if (imgTag.files.length != 0) {
 		cat.hasImage = true;
 		if (vue.screen.data.hadImage) {
-			srvcall_patch("api/image/category/" + cat.id, imgTag.files[0], function(request, status, response) {
+			srvcall_patch("api/image/category/" + encodeURIComponent(cat.id), imgTag.files[0], function(request, status, response) {
 				_category_saveCommit(cat);
 			});
 		} else {
-			srvcall_put("api/image/category/" + cat.id, imgTag.files[0], function(request, status, response) {
+			srvcall_put("api/image/category/" + encodeURIComponent(cat.id), imgTag.files[0], function(request, status, response) {
 				_category_saveCommit(cat);
 			});
 		}

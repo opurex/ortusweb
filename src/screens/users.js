@@ -81,7 +81,7 @@ function users_updatePassword() {
 	let user = vue.screen.data.user;
 	let password = document.getElementById("edit-reset-password").value;
 	gui_showLoading();
-	srvcall_post("api/user/" + user.id + "/password", {"oldPassword": user.password, "newPassword": password}, user_updPwdCallback);
+	srvcall_post("api/user/" + encodeURIComponent(user.id) + "/password", {"oldPassword": user.password, "newPassword": password}, user_updPwdCallback);
 }
 
 function user_updPwdCallback(request, status, response) {

@@ -47,7 +47,7 @@ function currency_saveCurrency() {
 	if ("id" in curr) {
 		srvcall_post("api/currency", curr, currency_saveCallback);
 	} else {
-		srvcall_put("api/currency/" + curr["reference"], curr, currency_saveCallback);
+		srvcall_put("api/currency/" + encodeURIComponent(curr["reference"]), curr, currency_saveCallback);
 	}
 }
 

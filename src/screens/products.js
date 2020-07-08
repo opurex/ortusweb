@@ -199,7 +199,7 @@ function products_saveProduct() {
 		srvcall_post("api/product", prd, products_saveCallback);
 	} else {
 		// This is a create
-		srvcall_put("api/product/" + prd.reference, prd, products_saveCallback);
+		srvcall_put("api/product/" + encodeURIComponent(prd.reference), prd, products_saveCallback);
 	}
 }
 
@@ -216,7 +216,7 @@ function products_saveProducts() {
 			if (key != "id")
 				copy[key] = prd[key];
 		}
-		calls.push({id: "edit-" + i, method: "PATCH", target: "api/product/" + prd.reference, data: copy});
+		calls.push({id: "edit-" + i, method: "PATCH", target: "api/product/" + encodeURIComponent(prd.reference), data: copy});
 	}
 	gui_showLoading();
 	srvcall_multicall(calls, products_saveMultipleCallback);
@@ -244,17 +244,17 @@ function products_saveCallback(request, status, response) {
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {
 		prd.hasImage = false;
-		srvcall_delete("api/image/product/" + prd.id, function(request, status, response) {
+		srvcall_delete("api/image/product/" + encodeURIComponent(prd.id), function(request, status, response) {
 			_products_saveCommit(prd);
 		});
 	} else if (imgTag.files.length != 0) {
 		prd.hasImage = true;
 		if (vue.screen.data.hadImage) {
-			srvcall_patch("api/image/product/" + prd.id, imgTag.files[0], function(request, status, response) {
+			srvcall_patch("api/image/product/" + encodeURIComponent(prd.id), imgTag.files[0], function(request, status, response) {
 				_products_saveCommit(prd);
 			});
 		} else {
-			srvcall_put("api/image/product/" + prd.id, imgTag.files[0], function(request, status, response) {
+			srvcall_put("api/image/product/" + encodeURIComponent(prd.id), imgTag.files[0], function(request, status, response) {
 				_products_saveCommit(prd);
 			});
 		}
@@ -387,7 +387,7 @@ function _products_parseCsv(fileContent, callback) {
 		scalevalue: "scaleValue",
 		"contenance": "scaleValue",
 		pricebuy: "priceBuy",
-		"prix d'achat HT": "priceBuy",
+		"prix d'achat ht": "priceBuy",
 		taxedprice: "taxedPrice",
 		pricesellvat: "taxedPrice",
 		"prix de vente ttc": "taxedPrice",

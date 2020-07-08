@@ -53,7 +53,7 @@ function tickets_search() {
 		"pages": 0,
 		"currentPage": 0,
 		"tickets": []};
-	srvcall_get("api/ticket/search?count=1&cashRegister=" + crId + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_countCallback);
+	srvcall_get("api/ticket/search?count=1&cashRegister=" + encodeURIComponent(crId) + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_countCallback);
 	gui_showLoading();
 }
 
@@ -68,7 +68,7 @@ function _tickets_countCallback(request, status, response) {
 	}
 	_tickets_data.pages = pages;
 	gui_showProgress(0, pages);
-	srvcall_get("api/ticket/search?limit=100&cashRegister=" + _tickets_data.crId + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_filterCallback); 
+	srvcall_get("api/ticket/search?limit=100&cashRegister=" + encodeURIComponent(_tickets_data.crId) + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_filterCallback);
 }
 
 function _tickets_filterCallback(request, status, response) {
@@ -82,7 +82,7 @@ function _tickets_filterCallback(request, status, response) {
 	_tickets_data.currentPage++;
 	if (_tickets_data.currentPage < _tickets_data.pages) {
 		gui_showProgress(_tickets_data.currentPage, _tickets_data.pages);
-		srvcall_get("api/ticket/search?limit=100&offset=" + (100 * _tickets_data.currentPage) + "&cashRegister=" + _tickets_data.crId + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_filterCallback); 
+		srvcall_get("api/ticket/search?limit=100&offset=" + (100 * _tickets_data.currentPage) + "&cashRegister=" + encodeURIComponent(_tickets_data.crId) + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_filterCallback);
 	} else {
 		_tickets_dataRetreived();
 	}

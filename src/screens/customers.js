@@ -92,7 +92,7 @@ function customers_saveBalance() {
 	let custId = vue.screen.data.customer.id;
 	let balance = vue.screen.data.customer.balance;
 	gui_showLoading();
-	srvcall_patch("api/customer/" + custId + "/balance/" + balance, null, _customers_saveCallbackClosure(customers_saveBalance));
+	srvcall_patch("api/customer/" + encodeURIComponent(custId) + "/balance/" + encodeURIComponent(balance), null, _customers_saveCallbackClosure(customers_saveBalance));
 }
 
 function _customers_saveCallbackClosure(originalFunc) {
@@ -116,17 +116,17 @@ function _customers_saveCallback(request, status, response) {
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {
 		cust.hasImage = false;
-		srvcall_delete("api/image/customer/" + cust.id, function(request, status, response) {
+		srvcall_delete("api/image/customer/" + encodeURIComponent(cust.id), function(request, status, response) {
 			_customers_saveCommit(cust);
 		});
 	} else if (imgTag.files.length != 0) {
 		cust.hasImage = true;
 		if (vue.screen.data.hadImage) {
-			srvcall_patch("api/image/customer/" + cust.id, imgTag.files[0], function(request, status, response) {
+			srvcall_patch("api/image/customer/" + encodeURIComponent(cust.id), imgTag.files[0], function(request, status, response) {
 				_customers_saveCommit(cust);
 			});
 		} else {
-			srvcall_put("api/image/customer/" + cust.id, imgTag.files[0], function(request, status, response) {
+			srvcall_put("api/image/customer/" + encodeURIComponent(cust.id), imgTag.files[0], function(request, status, response) {
 				_customers_saveCommit(cust);
 			});
 		}
