@@ -112,6 +112,7 @@ Vue.component("vue-tariffarea-form", {
 					<tr>
 						<th>Désignation</th>
 						<th>Prix de vente original</th>
+						<th>Prix de vente HT</th>
 						<th>Prix de vente TTC</th>
 						<th>TVA</th>
 						<th>Opération</th>
@@ -121,8 +122,9 @@ Vue.component("vue-tariffarea-form", {
 					<tr v-for="price in data.tariffarea.prices">
 						<td><img class="thumbnail thumbnail-text"  v-bind:src="imageSrc(price.product)" />{{label(price.product)}}</td>
 						<td>{{priceSell(price.product)}}</td>
-						<td><input type="number" v-model.number="price.price" step="0.01" /></td>
-						<td><select v-model="price.tax">
+						<td><input type="number" v-model.number="price.price" disabled="true" /></td>
+						<td><input type="number" v-model.number="price.priceSellVat" step="0.01" v-on:change="updatePrice(price)" /></td>
+						<td><select v-model="price.tax" v-on:change="updatePrice(price)">
 							<option v-bind:value="null">Inchangée</option>
 							<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 						</select></td>
@@ -173,6 +175,9 @@ Vue.component("vue-tariffarea-form", {
 		deletePrice: function(productId) {
 			tariffareas_delProduct(productId);
 		},
+		updatePrice: function(price) {
+			tariffareas_updatePrice(price);
+		}
 	},
 });
 

@@ -49,6 +49,18 @@ function _tariffareas_showArea(area, categories, taxes) {
 		prdStore.get(price.product).onsuccess = function(event) {
 			let product = event.target.result;
 			vue.screen.data.productCache[product.id] = product;
+			let taxId = price.tax;
+			let tax = null;
+			if (taxId == null) {
+				taxId = product.tax;
+			}
+			for (let j = 0; j < vue.screen.data.taxes.length; j++) {
+				if (vue.screen.data.taxes[j].id == taxId) {
+					tax = vue.screen.data.taxes[j];
+					break;
+				}
+			}
+			price.priceSellVat = Number(price.price * (1.0 + tax.rate)).toFixed(2)
 			loaded++;
 			if (loaded == area.prices.length) {
 				vue.screen.component = "vue-tariffarea-form";
@@ -80,6 +92,32 @@ function tariffareas_delProduct(productId) {
 			return;
 		}
 	}
+}
+
+function tariffareas_updatePrice(price) {
+	let sellVat = price.priceSellVat;
+	let prd = vue.screen.data.productCache[price.product];
+	let newTaxId = price.tax;
+	let tax = null;
+	if (newTaxId != null) {
+		for (let j = 0; j < vue.screen.data.taxes.length; j++) {
+			let jTax = vue.screen.data.taxes[j];
+			if (jTax.id == newTaxId) {
+				tax = jTax;
+				break;
+			}
+		}
+	} else {
+		for (let j = 0; j < vue.screen.data.taxes.length; j++) {
+			let jTax = vue.screen.data.taxes[j];
+			if (jTax.id == prd.tax) {
+				tax = jTax;
+				break;
+			}
+		}
+	}
+	let taxRate = tax.rate;
+	price.price = Number(sellVat / (1.0 + taxRate)).toFixed(5);
 }
 
 function tariffareas_saveArea() {
