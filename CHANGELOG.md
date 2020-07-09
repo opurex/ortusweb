@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.4] - 2020-07-09
+
+### Added
+- Line-article in sales details to group composition and components with the same identifier.
+- Optional column description on table filters.
+- Progression feedback when importing products.
+
+### Changed
+- Returning to the product list from the edition form reselects the original category of the product.
+
+### Fixed
+- Tariff area uses price and price with taxes instead of price only.
+- Escape url parameters to allow slashes in references.
+- The balance of the customer in customer list is localized.
+- The ticket shows itself when searching again after a empty result set.
+
+
 ## [8.3] - 2020-06-25
 
 ### Added
