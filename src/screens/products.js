@@ -203,6 +203,11 @@ function products_saveProduct() {
 	}
 }
 
+function _products_progress() {
+	vue.screen.data.progress++;
+	gui_showProgress(vue.screen.data.progress, vue.screen.data.progressTotal);
+}
+
 function products_saveProducts() {
 	let calls = [];
 	for (let i = 0; i < vue.screen.data.newProducts.length; i++) {
@@ -218,8 +223,10 @@ function products_saveProducts() {
 		}
 		calls.push({id: "edit-" + i, method: "PATCH", target: "api/product/" + encodeURIComponent(prd.reference), data: copy});
 	}
-	gui_showLoading();
-	srvcall_multicall(calls, products_saveMultipleCallback);
+	vue.screen.data.progress = 0;
+	vue.screen.data.progressTotal = calls.length;
+	gui_showProgress(vue.screen.data.progress, vue.screen.data.progressTotal);
+	srvcall_multicall(calls, products_saveMultipleCallback, _products_progress);
 }
 
 function products_saveCallback(request, status, response) {

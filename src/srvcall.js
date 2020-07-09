@@ -70,7 +70,10 @@ function srvcall_delete(target, callback) {
 	_srvcall_send(target, "DELETE", null, callback);
 }
 
-function srvcall_multicall(calls, callback) {
+function srvcall_multicall(calls, callback, progressCallback) {
+	if (arguments.length < 3) {
+		progressCallback = null;
+	}
 	let results = {};
 	let finished = [];
 	let callbackCalled = false;
@@ -80,6 +83,9 @@ function srvcall_multicall(calls, callback) {
 	}
 	let callCallback = function(id, index) {
 		return function(request, status, response) {
+				if (progressCallback != null) {
+					progressCallback();
+				}
 				let result = results[id];
 				result.request = request;
 				result.status = status;
