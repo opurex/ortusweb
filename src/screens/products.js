@@ -1,6 +1,13 @@
 function products_show(catId) {
 	if (arguments.length < 1) {
 		catId = null;
+	} else {
+		if (typeof catId == "string") {
+			catId = Number.parseInt(catId);
+			if (catId == Number.NaN) {
+				catId = null;
+			}
+		}
 	}
 	gui_showLoading();
 	storage_open(function(event) {

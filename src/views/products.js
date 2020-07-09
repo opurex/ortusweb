@@ -225,13 +225,18 @@ Vue.component("vue-product-list", {
 
 Vue.component("vue-product-form", {
 	props: ["data"],
+	data: function() {
+		return {
+			"backUrl": "?p=products",
+		};
+	},
 	template: `<div class="product-form">
 <section class="box box-large">
 	<header>
 		<nav class="browser">
 			<ul>
 				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=products">Liste des produits</a></li>
+				<li><a v-bind:href="backUrl">Liste des produits</a></li>
 				<li><h1>Édition d'un produit</h1></li>
 			</ul>
 		</nav>
@@ -345,19 +350,28 @@ Vue.component("vue-product-form", {
 		imageSrc: function(prd) {
 			return srvcall_imageUrl("product", prd);
 		}
+	},
+	mounted: function() {
+		this.backUrl = "?p=products&category=" + encodeURIComponent(this.data.product.category);
 	}
 });
 
 Vue.component("vue-product-composition-form", {
 	props: ["data"],
-	data: function() { return {"selectedGroupIndex": 0, "productCache": []} },
+	data: function() {
+		return {
+			"selectedGroupIndex": 0,
+			"productCache": [],
+			"backUrl": "?p=products"
+		}
+	},
 	template: `<div class="composition-form">
 <section class="box box-large">
 	<header>
 		<nav class="browser">
 			<ul>
 				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=products">Liste des produits</a></li>
+				<li><a v-bind:href="backUrl">Liste des produits</a></li>
 				<li><h1>Édition d'un produit</h1></li>
 			</ul>
 		</nav>
@@ -544,6 +558,9 @@ Vue.component("vue-product-composition-form", {
 			this.productCache[id] = prd;
 		}
 	},
+	mounted: function() {
+		this.backUrl = "?p=products&category=" + encodeURIComponent(this.data.product.category);
+	}
 });
 
 Vue.component("vue-product-import", {

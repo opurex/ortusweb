@@ -50,7 +50,7 @@ function route(screen) {
 		categories_show();
 		break;
 	case "products":
-		products_show();
+		products_show(_get("category"));
 		break;
 	case "tariffareas":
 		tariffareas_show();
