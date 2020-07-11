@@ -1,5 +1,20 @@
 Vue.component("vue-category-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			categoriesTable: {
+				columns: [
+					{label: "Image", export: false, visible: true, help: "L'image du bouton de la catégorie. Ce champ ne peut être exporté."},
+					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque catégorie. Elle permet la modification lors de l'import des catégories."},
+					{label: "Désignation", visible: true, help: "Le nom de la catégorie tel qu'affiché sur les boutons de la caisse."},
+					{label: "Parent", visible: false, help: "La catégorie dans laquelle se trouve cette catégorie. Vide si elle n'est pas une sous-catégorie."},
+					{label: "Ordre", visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
+					{label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div class="category-list">
 <section class="box box-medium">
 	<header>
@@ -24,27 +39,9 @@ Vue.component("vue-category-list", {
 			</ul>
 		</nav>
 	</header>
-	<article class="box-body">
-		<table>
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th>Ordre d'affichage</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="category in data.categories">
-					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(category)" />{{category.label}}</td>
-					<td>{{category.dispOrder}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(category)">Edit</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
-	</article>
+	<div class="box-body">
+		<vue-table v-bind:table="categoriesTable"></vue-table>
+	</div>
 </section>
 </div>`,
 	methods: {
@@ -57,15 +54,34 @@ Vue.component("vue-category-list", {
 		sort: function(event) {
 			switch (this.data.sort) {
 				case "dispOrder":
-					this.data.categories = this.data.categories.sort(tools_sort("dispOrder", "reference"));
+					Vue.set(this.categoriesTable, "lines", this.categoriesTable.lines.sort(tools_sort(4, 1)));
 					break;
 				case "label":
-					this.data.categories = this.data.categories.sort(tools_sort("label"));
+					Vue.set(this.categoriesTable, "lines", this.categoriesTable.lines.sort(tools_sort(2)));
 			break;
 			}
 		},
 	},
 	mounted: function() {
+		let catById = {};
+		for (let i = 0; i < this.data.categories.length; i++) {
+			let cat = this.data.categories[i];
+			catById[cat.id] = cat;
+		}
+		for (let i = 0; i < this.data.categories.length; i++) {
+			let cat = this.data.categories[i];
+			let parentLabel = "";
+			if (cat.parent != null) {
+				parentLabel = catById[cat.parent].label;
+			}
+			let line = [
+				{type: "thumbnail", src: this.imageSrc(cat)},
+				cat.reference, cat.label, parentLabel,
+				cat.dispOrder,
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Edit</a></div>"},
+			];
+			this.categoriesTable.lines.push(line);
+		}
 		this.sort();
 	}
 });
