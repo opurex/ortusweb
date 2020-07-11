@@ -23,6 +23,7 @@ Vue.component("vue-tickets-list", {
 					<label for="cashregister">Caisse</label>
 					<select id="filter-cashregister" name="cashregister" v-model="data.cashRegisterId">
 						<option v-for="cr in data.cashRegisters" v-bind:value="cr.id">{{cr.label}}</option>
+						<option value="">Toutes les caisses</option>
 					</select>
 				</div>
 
