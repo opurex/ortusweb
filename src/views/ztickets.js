@@ -23,6 +23,18 @@ Vue.component("vue-zticket-list", {
 					<input id="add-zeros" type="checkbox" v-model="data.addZeros" />
 					<label for="add-zeros">Afficher les montants à 0</label>
 				</div>
+				<div class="form-group">
+					<input id="include-unused-payments" type="checkbox" v-model="data.includeUnusedPayments" />
+					<label for="include-unused-payments">Inclure les modes de paiements non utilisés</label>
+				</div>
+				<div class="form-group">
+					<input id="include-unused-taxes" type="checkbox" v-model="data.includeUnusedTaxes" />
+					<label for="include-unused-taxes">Inclure les taxes non utilisées</label>
+				</div>
+				<div class="form-group">
+					<input id="include-unused-categories" type="checkbox" v-model="data.includeUnusedCategories" />
+					<label for="include-unused-categories">Inclure les catégories non utilisées</label>
+				</div>
 				<div class="form-control">
 					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 				</div>

@@ -5,6 +5,9 @@ function ztickets_show() {
 		"start": start,
 		"stop": stop,
 		"addZeros": false,
+		"includeUnusedPayments": false,
+		"includeUnusedTaxes": false,
+		"includeUnusedCategories": false,
 		"table": {columns: []}
 	}
 	vue.screen.component = "vue-zticket-list";
@@ -211,36 +214,42 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	}
 	// Remove the empty columns
 	let spliced = 0;
-	for (let i = 0; i < keptPayments.length; i++) {
-		if (!keptPayments[i]) {
-			for (let j = 0; j < renderZs.length; j++) {
-				renderZs[j]["payments"].splice(i - spliced, 1);
+	if (!vue.screen.data.includeUnusedPayments) {
+		for (let i = 0; i < keptPayments.length; i++) {
+			if (!keptPayments[i]) {
+				for (let j = 0; j < renderZs.length; j++) {
+					renderZs[j]["payments"].splice(i - spliced, 1);
+				}
+				paymentModes.splice(i - spliced, 1);
+				total.paymentModeTotal.splice(i - spliced, 1);
+				spliced++;
 			}
-			paymentModes.splice(i - spliced, 1);
-			total.paymentModeTotal.splice(i - spliced, 1);
-			spliced++;
 		}
 	}
 	spliced = 0;
-	for (let i = 0; i < keptTaxes.length; i++) {
-		if (!keptTaxes[i]) {
-			for (let j = 0; j < renderZs.length; j++) {
-				renderZs[j]["taxes"].splice(i - spliced, 1);
+	if (!vue.screen.data.includeUnusedTaxes) {
+		for (let i = 0; i < keptTaxes.length; i++) {
+			if (!keptTaxes[i]) {
+				for (let j = 0; j < renderZs.length; j++) {
+					renderZs[j]["taxes"].splice(i - spliced, 1);
+				}
+				taxes.splice(i - spliced, 1);
+				total.taxTotal.splice(i - spliced, 1);
+				spliced++;
 			}
-			taxes.splice(i - spliced, 1);
-			total.taxTotal.splice(i - spliced, 1);
-			spliced++;
 		}
 	}
 	spliced = 0;
-	for (let i = 0; i < keptCategories.length; i++) {
-		if (!keptCategories[i]) {
-			for (let j = 0; j < renderZs.length; j++) {
-				renderZs[j]["categories"].splice(i - spliced, 1);
+	if (!vue.screen.data.includeUnusedCategories) {
+		for (let i = 0; i < keptCategories.length; i++) {
+			if (!keptCategories[i]) {
+				for (let j = 0; j < renderZs.length; j++) {
+					renderZs[j]["categories"].splice(i - spliced, 1);
+				}
+				categories.splice(i - spliced, 1);
+				total.categoryTotal.splice(i - spliced, 1);
+				spliced++;
 			}
-			categories.splice(i - spliced, 1);
-			total.categoryTotal.splice(i - spliced, 1);
-			spliced++;
 		}
 	}
 	spliced = 0;
