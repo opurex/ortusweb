@@ -62,6 +62,7 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("tariffareas"), "name": "Zones tarifaires", "icon": _menu_getIcon("menu_tariffarea.png")},
 				{"target": _menu_getTargetUrl("customers"), "name": "Clients", "icon": _menu_getIcon("menu_customer.png")},
 				{"target": _menu_getTargetUrl("discountprofiles"), "name": "Profils de remise", "icon": _menu_getIcon("menu_discountprofile.png")},
+				{"target": _menu_getTargetUrl("producttags"), "name": "Étiquettes", "icon": _menu_getIcon("menu_producttags.png")},
 			]},
 			{"name": "Ventes",
 			"items": [

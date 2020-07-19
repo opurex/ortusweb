@@ -52,6 +52,9 @@ function route(screen) {
 	case "products":
 		products_show(_get("category"));
 		break;
+	case "producttags":
+		producttags_show();
+		break;
 	case "tariffareas":
 		tariffareas_show();
 		break;

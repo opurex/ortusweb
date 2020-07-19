@@ -351,3 +351,4 @@ var storage_getProductsFromCategory = function(catId, callback, sortFields, erro
 		}
 	}
 }
+
