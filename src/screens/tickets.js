@@ -9,6 +9,11 @@ function tickets_show() {
 	storage_open(function(event) {
 		storage_readStores(["cashRegisters", "products", "taxes", "paymentmodes", "users"], function(data) {
 			let cashRegisters = data["cashRegisters"];
+			let crById = {};
+			for (let i = 0; i < cashRegisters.length; i++) {
+				let cr = cashRegisters[i];
+				crById[cr.id] = cr;
+			}
 			let products = data["products"];
 			let taxes = data["taxes"];	
 			let crId = null;
@@ -19,6 +24,7 @@ function tickets_show() {
 				"start": start,
 				"stop": stop,
 				"cashRegisters": cashRegisters,
+				"crById": crById,
 				"products": products,
 				"taxes": taxes,
 				"paymentModes": data["paymentmodes"],
@@ -91,7 +97,7 @@ function _tickets_filterCallback(request, status, response) {
 	_tickets_data.currentPage++;
 	if (_tickets_data.currentPage < _tickets_data.pages) {
 		gui_showProgress(_tickets_data.currentPage, _tickets_data.pages);
-		if (_ticket_data.crId != "") {
+		if (_tickets_data.crId != "") {
 			srvcall_get("api/ticket/search?limit=100&offset=" + (100 * _tickets_data.currentPage) + "&cashRegister=" + encodeURIComponent(_tickets_data.crId) + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_filterCallback);
 		} else {
 			srvcall_get("api/ticket/search?limit=100&offset=" + (100 * _tickets_data.currentPage) + "&dateStart=" + _tickets_data.start + "&dateStop=" + _tickets_data.stop, _tickets_filterCallback);
@@ -105,16 +111,12 @@ function _tickets_dataRetreived() {
 	gui_hideLoading();
 	vue.screen.data.tickets = _tickets_data.tickets;
 	let lines = [];
-	let cr = "";
-	for (let i = 0; i < vue.screen.data.cashRegisters.length; i++) {
-		let cashRegister = vue.screen.data.cashRegisters[i];
-		if (vue.screen.data.cashRegisterId == cashRegister.id) {
-			cr = cashRegister.label;
-			break;
-		}
-	}
 	for (let i = 0; i < _tickets_data.tickets.length; i++) {
 		let tkt = _tickets_data.tickets[i];
+		let cr = "Inconnue";
+		if (tkt.cashRegister in vue.screen.data.crById) {
+			cr = vue.screen.data.crById[tkt.cashRegister].label;
+		}
 		let date = new Date(tkt.date * 1000);
 		let pmModes = {};
 		for (let j = 0; j < tkt.payments.length; j++) {
