@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.5] - 2020-07-21
+
+### Added
+- Select fields to show for the list of categories, export to spreadsheet.
+- List tickets from all cash registers.
+- Option to include unused payment modes, taxes and/or categories in the list of Z tickets.
+- Button to show all/hide all/toggle fields of tables.
+- Generate label sheets, ported from previous versions of the back-office.
+
+
 ## [8.4] - 2020-07-09
 
 ### Added
