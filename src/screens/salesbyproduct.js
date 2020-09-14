@@ -169,7 +169,7 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
 			}
 			if (!separateByCR) {
-				let qty = _salesbyproduct_data.productsQty[prd.id];
+				let qty = _salesbyproduct_data.productsQty[prd.id].toLocaleString();
 				let line = [img, "", cat, prd.reference, prd.label, qty];
 				line.push((prd.priceSell * qty).toLocaleString());
 				if (prd.priceBuy > 0) {
