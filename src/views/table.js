@@ -77,7 +77,7 @@ Vue.component("vue-table", {
 			if ("footer" in this.table) {
 				let line = [];
 				for (let i = 0; i < this.table.footer.length; i++) {
-					if (this.table.columns[i].visible) {
+					if (this.table.columns[i].visible && this.table.columns[i].export !== false) {
 						line.push(this.table.footer[i]);
 					}
 				}
