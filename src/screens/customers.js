@@ -16,7 +16,7 @@ function _customers_showCustomers(customers) {
 		cust.balance = cust.balance.toLocaleString();
 	}
 	vue.screen.data = {
-		"customers": sortedCusts
+		"customers": sortedCusts,
 	}
 	vue.screen.component = "vue-customer-list";
 }
@@ -57,7 +57,20 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles)
 		"hadImage": customer.hasImage, // Save for later check
 		"start": start,
 		"stop": stop,
-		"customerHistory": null
+		"customerHistory": {
+			columns: [
+				{label: "Image", export: false, visible: true, help: "L'image du produit. Ce champ ne peut être exporté."},
+				{label: "Date", visible: true, help: "La date d'achat." },
+				{label: "Reference", visible: false, help: "La référence du produit."},
+				{label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
+				{label: "PU HT", visible: false, help: "Le prix unitaire hors taxes avant remise."},
+				{label: "PU TTC", visible: false, help: "Le prix unitaire TTC avant remise."},
+				{label: "Quantité", visible: true, help: "La quantité de produit."},
+				{label: "Remise", visible: false, help: "Le taux de remise accordé, inclus dans les champs HT et TTC."},
+				{label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé."},
+				{label: "TTC", visible: false, help: "Le prix de vente TTC."},
+			],
+		},
 	}
 	vue.screen.component = "vue-customer-form";
 }
@@ -161,26 +174,78 @@ function _customers_historyCallback(request, status, response) {
 		return;
 	}
 	let tickets = JSON.parse(response);
-	let table = {
-		title: "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
-		columns: [
-			{	label: "Date", visible: true },
-			{ label: "Produit", visible: true },
-			{ label: "Quantité", visible: true},
-		],
-		lines: [],
+	storage_open(function(event) {
+		storage_readStore("products", function(data) {
+			_customers_showHistory(tickets, data);
+			storage_close();
+		});
+	});
+}
+
+function _customers_showHistory(tickets, products) {
+	let prdById = {};
+	for (let i = 0; i < products.length; i++) {
+		let prd = products[i];
+		prdById[prd.id] = prd;
 	}
+	let total = 0.0;
+	let taxedTotal = 0.0;
+	let lines = [];
 	for (let i = 0; i < tickets.length; i++) {
 		let tkt = tickets[i];
 		let date = new Date(tkt.date * 1000);
 		for (let j = 0; j < tkt.lines.length; j++) {
-			table.lines.push([
+			let line = tkt.lines[j];
+			// Set product data if any
+			let prd = null;
+			if (line.product != null && (line.product in prdById)) {
+				prd = prdById[line.product];
+			}
+			let img;
+			let ref = "";
+			if (prd != null) {
+				if (prd.hasImage) {
+					img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken()};
+				} else {
+					img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
+				}
+				ref = prd.reference;
+			} else {
+				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
+			}
+			// Compute prices
+			let finalTaxedPrice = line.finalTaxedPrice;
+			let finalPrice = line.finalPrice;
+			let price;
+			let taxedPrice;
+			if (line.finalTaxedPrice != null) {
+				finalPrice = finalTaxedPrice / (1.0 + line.taxRate);
+				taxedPrice = Math.round(line.taxedPrice / line.quantity * 100) / 100.0;
+				price = taxedPrice / (1.0 + line.taxRate);
+			} else {
+				finalTaxedPrice = finalPrice * (1.0 + line.taxRate);
+				price = line.price / line.quantity;
+				taxedPrice = price * (1.0 + line.taxRate);
+			}
+			total += Math.round(finalPrice * 100) / 100.0;
+			taxedTotal += Math.round(finalTaxedPrice * 100) / 100.0;
+			// Render
+			lines.push([
+				img,
 				tools_dateTimeToString(date),
-				tkt.lines[j].productLabel,
-				tkt.lines[j].quantity
+				ref,
+				line.productLabel,
+				price.toLocaleString(undefined, {maximumFractionDigits: 2}),
+				taxedPrice.toLocaleString(undefined, {maximumFractionDigits: 2}),
+				line.quantity.toLocaleString(),
+				(line.discountRate * 100).toLocaleString() + "%",
+				finalPrice.toLocaleString(undefined, {maximumFractionDigits: 2}),
+				finalTaxedPrice.toLocaleString(undefined, {maximumFractionDigits: 2})
 			]);
 		}
 	}
-	vue.screen.data.customerHistory = table;
+	vue.screen.data.customerHistory.title = "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
+	Vue.set(vue.screen.data.customerHistory, "lines", lines);
+	Vue.set(vue.screen.data.customerHistory, "footer", ["", "", "", "", "", "", "", "Totaux", total.toLocaleString(), taxedTotal.toLocaleString()]);
 	gui_hideLoading();
 }
