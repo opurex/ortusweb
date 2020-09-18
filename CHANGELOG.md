@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.6] - 2020-09-18
+
+### Added
+- Prices in the customers' history.
+- Notice for legal informations to put in ticket header or footer.
+
+### Fixed
+- Quantity not being localized in sales by products
+
+
 ## [8.5] - 2020-07-21
 
 ### Added
