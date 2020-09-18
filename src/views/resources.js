@@ -28,6 +28,12 @@ Vue.component("vue-resources-list", {
 				</tr>
 			</tbody>
 		</table>
+		<p>Pour que vos tickets puissent faire office de facture, les mentions suivantes doivent être ajoutées dans l'en-tête ou le pied de ticket : (cf <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F31808" target="_blank">service-public.fr</a>)</p>
+		<ul>
+			<li>La raison sociale et Siren ou Siret, le numéro de RCS ou RM (si disponible), la forme juridique et le montant du capital,</li>
+			<li>L'adresse du siège social et le nom de l'établissement,</li>
+			<li>Pensez également à assigner un compte client pour l'identification ;</li>
+		</ul>
 	</article>
 </section>
 </div>`,
