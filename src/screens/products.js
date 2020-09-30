@@ -82,7 +82,7 @@ function _products_showProduct(product, categories, taxes) {
 		hadImage: product.hasImage // Save for later check
 	}
 	if (product.tax == null) {
-		product.tax = taxes[0].id;
+		product.tax = "";
 	}
 	if (!product.composition) {
 		vue.screen.component = "vue-product-form";

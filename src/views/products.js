@@ -282,7 +282,8 @@ Vue.component("vue-product-form", {
 				</div>
 				<div class="form-group">
 					<label for="edit-tax">TVA</label>
-					<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice">
+					<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice" required>
+						<option disabled value="">Sélectionnez une TVA</option>
 						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 					</select>
 				</div>
