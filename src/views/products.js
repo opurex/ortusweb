@@ -240,6 +240,11 @@ Vue.component("vue-product-form", {
 				<li><h1>Édition d'un produit</h1></li>
 			</ul>
 		</nav>
+		<nav class="navbar" v-if="data.product.id">
+			<ul>
+				<li><a class="btn btn-add" v-bind:href="duplicateUrl">Dupliquer le produit</a></li>
+			</ul>
+		</nav>
 	</header>
 	<div class="box-body">
 		<form class="form-large" id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
@@ -344,6 +349,11 @@ Vue.component("vue-product-form", {
 </section>
 </div>
 `,
+	computed: {
+		duplicateUrl: function() {
+			return "?p=productDuplicate&id=" + this.data.product.id;
+		},
+	},
 	methods: {
 		updatePrice: function() {
 			product_updatePrice();
@@ -374,6 +384,11 @@ Vue.component("vue-product-composition-form", {
 				<li><a href="?p=home">Accueil</a></li>
 				<li><a v-bind:href="backUrl">Liste des produits</a></li>
 				<li><h1>Édition d'un produit</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar" v-if="data.product.id">
+			<ul>
+				<li><a class="btn btn-add" v-bind:href="duplicateUrl">Dupliquer le produit</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -411,10 +426,11 @@ Vue.component("vue-product-composition-form", {
 				<div class="form-group">
 					<label for="edit-priceSell">Prix de vente HT</label>
 					<input type="number" id="edit-priceSell" name="priceSell" v-model="data.product.priceSell" step="0.01" disabled="true">
-					<label for="edit-tax">TVA</label>
 				</div>
 				<div class="form-group">
-					<select id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice">
+					<label for="edit-tax">TVA</label>
+					<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice" required>
+						<option disabled value="">Sélectionnez une TVA</option>
 						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 					</select>
 				</div>
@@ -551,7 +567,10 @@ Vue.component("vue-product-composition-form", {
 	computed: {
 		groupProducts: function() {
 			return this.data.product.compositionGroups[selectedGroupIndex].compositionProducts;
-		}
+		},
+		duplicateUrl: function() {
+			return "?p=productDuplicate&id=" + this.data.product.id;
+		},
 	},
 	created: function() {
 		for (let id in this.data.precache) {
@@ -689,6 +708,7 @@ Vue.component("vue-product-import-table", {
 			<th>Remise automatique</th>
 			<th>Taux de remise</th>
 			<th>Ordre</th>
+			<th>En vente</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -708,6 +728,7 @@ Vue.component("vue-product-import-table", {
 			<td v-bind:style="hasChanged(index, 'discountEnabled')">{{boolVal(product.discountEnabled)}}</td>
 			<td v-bind:style="hasChanged(index, 'discountRate')">{{percentVal(product.discountRate)}}</td>
 			<td v-bind:style="hasChanged(index, 'dispOrder')">{{product.dispOrder}}</td>
+			<td v-bind:style="hasChanged(index, 'visible')"><input type="checkbox" disabled="1" v-bind:checked="product.visible" /></td>
 		</tr>
 	</tbody>
 </table>

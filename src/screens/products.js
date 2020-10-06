@@ -71,6 +71,24 @@ function products_showProduct(prdId, catId, isCompo) {
 	});
 }
 
+function products_showDuplicateProduct(prdId, isCompo) {
+	if (arguments.length < 3) {
+		isCompo = false;
+	}
+	gui_showLoading();
+	storage_open(function(event) {
+		storage_readStores(["categories", "taxes"], function(data) {
+			let categories = data["categories"];
+			let taxes = data["taxes"];
+			storage_get("products", parseInt(prdId), function(product) {
+				delete product.id;
+				_products_showProduct(product, categories, taxes);
+				storage_close();
+			});
+		});
+	});
+}
+
 function _products_showProduct(product, categories, taxes) {
 	gui_hideLoading();
 	vue.screen.data = {

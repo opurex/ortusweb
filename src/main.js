@@ -82,8 +82,14 @@ function route(screen) {
 	case "product":
 		products_showProduct(_get("id"), _get("category"));
 		break;
+	case "productDuplicate":
+		products_showDuplicateProduct(_get("id"));
+		break;
 	case "productCompo":
 		products_showProduct(_get("id"), _get("category"), true);
+		break;
+	case "productCompoDuplicate":
+		products_showDuplicateProduct(_get("id"), true);
 		break;
 	case "productImport":
 		products_showImport();
