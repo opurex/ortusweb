@@ -7,7 +7,7 @@ function tickets_show() {
 	start.setMinutes(0);
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	storage_open(function(event) {
-		storage_readStores(["cashRegisters", "products", "taxes", "paymentmodes", "users"], function(data) {
+		storage_readStores(["cashRegisters", "products", "taxes", "paymentmodes", "users", "customers"], function(data) {
 			let cashRegisters = data["cashRegisters"];
 			let crById = {};
 			for (let i = 0; i < cashRegisters.length; i++) {
@@ -15,7 +15,7 @@ function tickets_show() {
 				crById[cr.id] = cr;
 			}
 			let products = data["products"];
-			let taxes = data["taxes"];	
+			let taxes = data["taxes"];
 			let crId = null;
 			if (cashRegisters.length > 0) {
 				cr = cashRegisters[0].id;
@@ -29,6 +29,7 @@ function tickets_show() {
 				"taxes": taxes,
 				"paymentModes": data["paymentmodes"],
 				"users": data["users"],
+				"customers": data["customers"],
 				"cashRegisterId": cr,
 				"table": {
 					"title": null,
@@ -37,6 +38,7 @@ function tickets_show() {
 						{label: "Séquence", visible: false, help: "Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."},
 						{label: "Numéro", visible: true, help: "Le numéro du ticket de la caisse."},
 						{label: "Date", visible: true, help: "La date de réalisation de la vente."},
+						{label: "Client", visible: false, help: "Le compte client associé au ticket."},
 						{label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
 						{label: "Montant", visible: true, help: "Le montant TTC du ticket."},
 						{label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
@@ -118,6 +120,15 @@ function _tickets_dataRetreived() {
 			cr = vue.screen.data.crById[tkt.cashRegister].label;
 		}
 		let date = new Date(tkt.date * 1000);
+		let customer = "";
+		if (tkt.customer != null) {
+			for (let j = 0; j < vue.screen.data.customers.length; j++) {
+				if (vue.screen.data.customers[j].id == tkt.customer) {
+					customer = vue.screen.data.customers[j].dispName;
+					break;
+				}
+			}
+		}
 		let pmModes = {};
 		for (let j = 0; j < tkt.payments.length; j++) {
 			let payment = tkt.payments[j];
@@ -142,7 +153,7 @@ function _tickets_dataRetreived() {
 				break;
 			}
 		}
-		lines.push([cr, tkt.sequence, tkt.number, tools_dateTimeToString(date), pmModesStr,
+		lines.push([cr, tkt.sequence, tkt.number, tools_dateTimeToString(date), customer, pmModesStr,
 			tkt.finalTaxedPrice.toLocaleString(), user,
 			{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"}]);
 	}
@@ -174,11 +185,21 @@ _tickets_selectTicket = function(ticket) {
 			break;
 		}
 	}
+	let customer = null;
+	if (ticket.customer != null) {
+		for (let i = 0; i < vue.screen.data.customers.length; i++) {
+			if (vue.screen.data.customers[i].id == ticket.customer) {
+				customer = vue.screen.data.customers[i].dispName;
+				break;
+			}
+		}
+	}
 	let tkt = {
 		cashRegister: cr,
 		number: ticket.number,
 		date: tools_dateTimeToString(new Date(ticket.date * 1000)),
 		user: user,
+		customer: customer,
 		lines: [],
 		payments: [],
 		taxes: [],

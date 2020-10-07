@@ -48,6 +48,7 @@ Vue.component("vue-tickets-content", {
 Ticket :    {{ticket.cashRegister}} - {{ticket.number}}
 Date :      {{ticket.date}}
 Servi par : {{ticket.user}}
+<template v-if="ticket.customer">Client :    {{ticket.customer}}</template>
 
 
 Article      Prix          Total
