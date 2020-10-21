@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.7] - 2020-10-21
+
+### Added
+- Customer's balances in Z tickets.
+- Customer in the ticket list.
+- Duplicate a product.
+
+### Changed
+- The tax rate must be explicitely set when creating a new product.
+
+
 ## [8.6] - 2020-09-18
 
 ### Added
