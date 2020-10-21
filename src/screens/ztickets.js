@@ -28,25 +28,27 @@ function _ztickets_filterCallback(request, status, response) {
 	}
 	let zTickets = JSON.parse(response);
 	storage_open(function(event) {
-		storage_readStores(["cashRegisters", "taxes", "categories", "paymentmodes"], function(data) {
+		storage_readStores(["cashRegisters", "taxes", "categories", "paymentmodes", "customers"], function(data) {
 			_parseZTickets(data["cashRegisters"], data["paymentmodes"],
-				data["taxes"], data["categories"], zTickets);
+				data["taxes"], data["categories"], data["customers"], zTickets);
 			storage_close();
 		});
 	});
 }
 
-function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets) {
+function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customers, zTickets) {
 	// Collect the listed taxes, payment modes and cat taxes
 	let catTaxes = [];
 	let total = {
 		"tickets": 0,
 		"cs": 0.0,
 		"errorTotal": 0.0,
+		"custBalance": 0.0,
 		"paymentModeTotal": [],
 		"taxTotal": [],
 		"categoryTotal": [],
-		"catTaxTotal": []
+		"catTaxTotal": [],
+		"custBalanceTotal": [],
 	};
 	for (let i = 0; i < categories.length; i++) {
 		total.categoryTotal.push(0.0);
@@ -64,6 +66,9 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 			total.catTaxTotal.push({"base": 0.0, "amount": 0.0});
 		}
 	}
+	for (let i = 0; i < customers.length; i++) {
+		total.custBalanceTotal.push(0.0);
+	}
 	let cashRegistersById = [];
 	for (let i = 0; i < cashRegisters.length; i++) {
 		let cr = cashRegisters[i];
@@ -74,6 +79,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	let keptTaxes = [];
 	let keptCategories = [];
 	let keptCatTaxes = [];
+	let keptCustBalances = [];
 	for (let i = 0; i < paymentModes.length; i++) {
 		keptPayments[i] = false;
 	}
@@ -87,6 +93,9 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		for (let j = 0; j < taxes.length; j++) {
 			keptCatTaxes[i * taxes.length + j] = false;
 		}
+	}
+	for (let i = 0; i < customers.length; i++) {
+		keptCustBalances[i] = false;
 	}
 	// Build the full data
 	for (let i = 0; i < zTickets.length; i++) {
@@ -115,10 +124,12 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 			"csPeriod": z.csPeriod.toLocaleString(),
 			"csFYear": z.csFYear.toLocaleString(),
 			"csPerpetual": (z.csPerpetual) ? z.csPerpetual.toLocaleString() : "",
+			"custBalance": 0.0,
 			"payments": [],
 			"taxes": [],
 			"categories": [],
 			"catTaxes": [],
+			"custBalances": [],
 		}
 		total.tickets += z.ticketCount;
 		total.cs += z.cs;
@@ -210,6 +221,29 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 				}
 			}
 		}
+		for (let j = 0; j < customers.length; j++) {
+			let customer = customers[j];
+			let found = false;
+			for (let k = 0; k < z.custBalances.length; k++) {
+				if (z.custBalances[k].id.customer == customer.id) {
+					renderZ.custBalances.push({"amount": z.custBalances[k].balance.toLocaleString()});
+					renderZ.custBalance += z.custBalances[k].balance;
+					total.custBalance += z.custBalances[k].balance;
+					total.custBalanceTotal[j] += z.custBalances[k].balance;
+					found = true;
+					keptCustBalances[j] = true;
+					break;
+				}
+			}
+			if (!found) {
+				if (vue.screen.data.addZeros) {
+					renderZ.custBalances.push({"amount": "0"});
+				} else {
+					renderZ.custBalances.push({"amount": ""});
+				}
+			}
+		}
+		renderZ.custBalance = renderZ.custBalance.toLocaleString();
 		renderZs.push(renderZ);
 	}
 	// Remove the empty columns
@@ -263,6 +297,17 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 			spliced++;
 		}
 	}
+	spliced = 0;
+	for (let i = 0; i < keptCustBalances.length; i++) {
+		if (!keptCustBalances[i]) {
+			for (let j = 0; j < renderZs.length; j++) {
+				renderZs[j]["custBalances"].splice(i - spliced, 1);
+			}
+			customers.splice(i - spliced, 1);
+			total.custBalanceTotal.splice(i - spliced, 1);
+			spliced++;
+		}
+	}
 	// Render
 	total.cs = total.cs.toLocaleString();
 	for (let i = 0; i < total.paymentModeTotal.length; i++) {
@@ -278,6 +323,9 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 	for (let i = 0; i < total.catTaxTotal.length; i++) {
 		total.catTaxTotal[i].base = total.catTaxTotal[i].base.toLocaleString();
 		total.catTaxTotal[i].amount = total.catTaxTotal[i].amount.toLocaleString();
+	}
+	for (let i = 0; i < total.custBalanceTotal.length; i++) {
+		total.custBalanceTotal[i] = total.custBalanceTotal[i].toLocaleString();
 	}
 	// Set table
 	let oldColumns = vue.screen.data.table.columns;
@@ -303,9 +351,10 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		{label: "CA HT", visible: oldColumnVisible("CA", oldColumns, true), class: "z-oddcol", help: "Le montant total du chiffre d'affaire hors taxes réalisé pendant la session."},
 		{label: "CA HT mois", visible: oldColumnVisible("CA mois", oldColumns, false), class: "z-oddcol", help: "Le cumul du chiffre d'affaire réalisé sur la période. Ce cumul est remis à zéro lorsque la clôture mensuelle est choisie au moment de clôturer la caisse."},
 		{label: "CA HT année", visible: oldColumnVisible("CA année", oldColumns, false), class: "z-oddcol", help: "Le cumul du chiffre d'affaire réalisé sur l'année ou exercice fiscal. Ce cumul est remis à zéro lorsque la clôture annuelle est choisie au moment de clôturer la caisse."},
-		{label: "CA HT perpétuel", visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol", help: "Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."}
+		{label: "CA HT perpétuel", visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol", help: "Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."},
+		{label: "Balance client", visible: oldColumnVisible("Balance client", oldColumns, false), class: "z-oddcol", help: "La variation totale des soldes des comptes clients. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."},
 	];
-	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", ""];
+	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", "", total.custBalance.toLocaleString()];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
 		vue.screen.data.table.columns.push({label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true), help: "Le montant des encaissements réalisés avec ce moyen de paiement sur la session."});
@@ -330,11 +379,16 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].base);
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].amount);
 	}
+	for (let i = 0; i < customers.length; i++) {
+		let customer = customers[i];
+		vue.screen.data.table.columns.push({label: customer.dispName, visible: oldColumnVisible(customer.dispName, oldColumns, false), help: "La variation du solde client"});
+		vue.screen.data.table.footer.push(total.custBalanceTotal[i]);
+	}
 	vue.screen.data.table.lines = [];
 	for (let i = 0; i < renderZs.length; i++) {
 		let z = renderZs[i];
 		let line = [z.cashRegister, z.sequence, z.openDate, z.closeDate, z.openCash, z.closeCash, z.expectedCash,
-			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear, z.csPerpetual];
+			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear, z.csPerpetual, z.custBalance];
 		for (let j = 0; j < z.payments.length; j++) {
 			line.push(z.payments[j].amount);
 		}
@@ -348,6 +402,9 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, zTickets
 		for (let j = 0; j < z.catTaxes.length; j++) {
 			line.push(z.catTaxes[j].base);
 			line.push(z.catTaxes[j].amount);
+		}
+		for (let j = 0; j < z.custBalances.length; j++) {
+			line.push(z.custBalances[j].amount);
 		}
 		vue.screen.data.table.lines.push(line);
 	}
