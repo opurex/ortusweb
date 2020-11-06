@@ -15,7 +15,7 @@ Vue.component("vue-product-list", {
 					{label: "Code barre", visible: false, help: "Le code barre faculcatif du produit. Le code barre peut être une série de caractères arbitraires pour une saisie manuelle."},
 					{label: "Recharge pré-payement", visible: false, help: "L'achat de se produit augmente le solde client du même montant. Les produits pré-payés ne rentrent pas dans le chiffre d'affaire et permettent également dee rembourser des dettes client."},
 					{label: "Vente au poids", visible: false, help: "Si actif, la quantité peut être non unitaire et sera demandée lors de l'ajout à une commande."},
-					{label: "Poids/Volume", visible: false, help: "Indique si le produit est vendu au poids ou au volume."},
+					{label: "Poids/Volume", visible: false, help: "Indique l'unité pour la contenance."},
 					{label: "Contenance", visible: false, help: "Indique la contenance dans le produit. Pour un bocal de 200g par exemple, la contenance sera 0,2. Ce champ permet de calculer le prix au litre ou au kilogramme."},
 					{label: "Prix d'achat HT", visible: false, help: "Le prix d'achat hors taxes. Ce champ facultatif permet de calculer la marge. Il n'est pas historisé."},
 					{label: "Prix de vente HT", visible: false, help: "Le prix de vente unitaire hors taxes du produit."},
@@ -119,10 +119,10 @@ Vue.component("vue-product-list", {
 				let scaleType = "-";
 				switch (prd.scaleType) {
 					case 1:
-						scaleType = "Poids";
+						scaleType = "Kilogramme";
 						break;
 					case 2:
-						scaleType = "Volume";
+						scaleType = "Litre";
 						break;
 				}
 				let line = [
@@ -320,11 +320,11 @@ Vue.component("vue-product-form", {
 					<input id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" />
 				</div>
 				<div class="form-group">
-					<label for="edit-scaleType">Volume</label>
+					<label for="edit-scaleType">Poids/Volume</label>
 					<select id="edit-scaleType" v-model="data.product.scaleType">
-						<option value="0">Pas de volumétrie</option>
-						<option value="1">Poids</option>
-						<option value="2">Litre</option>
+						<option v-bind:value="0">Pas de volumétrie</option>
+						<option v-bind:value="1">Kilogramme</option>
+						<option v-bind:value="2">Litre</option>
 					</select>
 				</div>
 				<div class="form-group">
