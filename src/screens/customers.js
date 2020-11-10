@@ -24,10 +24,10 @@ function _customers_showCustomers(customers) {
 function customers_showCustomer(custId) {
 	gui_showLoading();
 	storage_open(function(event) {
-		storage_readStores(["taxes", "tariffareas", "discountprofiles"], function(data) {
+		storage_readStores(["taxes", "tariffareas", "discountprofiles", "cashRegisters", "paymentmodes"], function(data) {
 			if (custId != null) {
 				storage_get("customers", parseInt(custId), function(customer) {
-					_customers_showCustomer(customer, data["taxes"], data["tariffareas"], data["discountprofiles"]);
+					_customers_showCustomer(customer, data["taxes"], data["tariffareas"], data["discountprofiles"], data["cashRegisters"], data["paymentmodes"]);
 					storage_close();
 				});
 			} else {
@@ -38,7 +38,7 @@ function customers_showCustomer(custId) {
 	});
 }
 
-function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles) {
+function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles, cashRegisters, paymentModes) {
 	gui_hideLoading();
 	if (customer != null) {
 		if (customer.expireDate != null) {
@@ -52,6 +52,8 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles)
 		"taxes": taxes,
 		"tariffAreas": tariffAreas,
 		"discountProfiles": discountProfiles,
+		"cashRegisters": cashRegisters,
+		"paymentModes": paymentModes,
 		"deleteImage": false,
 		"deleteImageButton": "Supprimer",
 		"hadImage": customer.hasImage, // Save for later check
@@ -61,10 +63,13 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles)
 			columns: [
 				{label: "Image", export: false, visible: true, help: "L'image du produit. Ce champ ne peut être exporté."},
 				{label: "Date", visible: true, help: "La date d'achat." },
+				{label: "Ticket", visible: false, help: "Le numéro du ticket correspondant." },
+				{label: "Paiement", visible: false, help: "Le mode de paiement associé au ticket. Il est commun à toutes les lignes d'un même ticket."},
 				{label: "Reference", visible: false, help: "La référence du produit."},
 				{label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
 				{label: "PU HT", visible: false, help: "Le prix unitaire hors taxes avant remise."},
 				{label: "PU TTC", visible: false, help: "Le prix unitaire TTC avant remise."},
+				{label: "TVA", visible: false, help: "Le taux de TVA appliqué."},
 				{label: "Quantité", visible: true, help: "La quantité de produit."},
 				{label: "Remise", visible: false, help: "Le taux de remise accordé, inclus dans les champs HT et TTC."},
 				{label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé."},
@@ -184,9 +189,19 @@ function _customers_historyCallback(request, status, response) {
 
 function _customers_showHistory(tickets, products) {
 	let prdById = {};
+	let crById = {};
+	let pmById = {};
 	for (let i = 0; i < products.length; i++) {
 		let prd = products[i];
 		prdById[prd.id] = prd;
+	}
+	for (let i = 0; i < vue.screen.data.cashRegisters.length; i++) {
+		let cr = vue.screen.data.cashRegisters[i];
+		crById[cr.id] = cr;
+	}
+	for (let i = 0; i < vue.screen.data.paymentModes.length; i++) {
+		let pm = vue.screen.data.paymentModes[i];
+		pmById[pm.id] = pm;
 	}
 	let total = 0.0;
 	let taxedTotal = 0.0;
@@ -194,6 +209,21 @@ function _customers_showHistory(tickets, products) {
 	for (let i = 0; i < tickets.length; i++) {
 		let tkt = tickets[i];
 		let date = new Date(tkt.date * 1000);
+		let cr = crById[tkt.cashRegister];
+		let number = cr.label + "-" + tkt.number;
+		let pmIds = {};
+		let pms = [];
+		for (let j = 0; j < tkt.payments.length; j++) {
+			let payment = tkt.payments[j];
+			let pm = pmById[payment.paymentMode];
+			if (!(pm.id in pmIds)) {
+				pmIds[pm.id] = pm.label;
+			}
+		}
+		for (let key in pmIds) {
+			pms.push(pmIds[key]);
+		}
+		let payments = pms.join(", ");
 		for (let j = 0; j < tkt.lines.length; j++) {
 			let line = tkt.lines[j];
 			// Set product data if any
@@ -233,10 +263,13 @@ function _customers_showHistory(tickets, products) {
 			lines.push([
 				img,
 				tools_dateTimeToString(date),
+				number,
+				payments,
 				ref,
 				line.productLabel,
 				price.toLocaleString(undefined, {maximumFractionDigits: 2}),
 				taxedPrice.toLocaleString(undefined, {maximumFractionDigits: 2}),
+				(line.taxRate * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%",
 				line.quantity.toLocaleString(),
 				(line.discountRate * 100).toLocaleString() + "%",
 				finalPrice.toLocaleString(undefined, {maximumFractionDigits: 2}),
