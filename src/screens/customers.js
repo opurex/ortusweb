@@ -64,7 +64,8 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 				{label: "Image", export: false, visible: true, help: "L'image du produit. Ce champ ne peut être exporté."},
 				{label: "Date", visible: true, help: "La date d'achat." },
 				{label: "Ticket", visible: false, help: "Le numéro du ticket correspondant." },
-				{label: "Paiement", visible: false, help: "Le mode de paiement associé au ticket. Il est commun à toutes les lignes d'un même ticket."},
+				{label: "Paiement", visible: false, help: "Le mode de paiement associé au ticket. Il est commun à toutes les lignes d'un même ticket et ne correspond pas au paiement de la ligne."},
+				{label: "Remise du ticket", visible: false, help: "Le taux de remise appliqué à tout le ticket. La remise n'est pas prise en compte dans les champs HT et TTC."},
 				{label: "Reference", visible: false, help: "La référence du produit."},
 				{label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
 				{label: "PU HT", visible: false, help: "Le prix unitaire hors taxes avant remise."},
@@ -72,8 +73,8 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 				{label: "TVA", visible: false, help: "Le taux de TVA appliqué."},
 				{label: "Quantité", visible: true, help: "La quantité de produit."},
 				{label: "Remise", visible: false, help: "Le taux de remise accordé, inclus dans les champs HT et TTC."},
-				{label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé."},
-				{label: "TTC", visible: false, help: "Le prix de vente TTC."},
+				{label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."},
+				{label: "TTC", visible: false, help: "Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket."},
 			],
 		},
 	}
@@ -265,6 +266,7 @@ function _customers_showHistory(tickets, products) {
 				tools_dateTimeToString(date),
 				number,
 				payments,
+				(tkt.discountRate * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%",
 				ref,
 				line.productLabel,
 				price.toLocaleString(undefined, {maximumFractionDigits: 2}),
@@ -279,6 +281,6 @@ function _customers_showHistory(tickets, products) {
 	}
 	vue.screen.data.customerHistory.title = "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
 	Vue.set(vue.screen.data.customerHistory, "lines", lines);
-	Vue.set(vue.screen.data.customerHistory, "footer", ["", "", "", "", "", "", "", "Totaux", total.toLocaleString(), taxedTotal.toLocaleString()]);
+	Vue.set(vue.screen.data.customerHistory, "footer", ["", "", "", "", "", "", "", "", "", "", "", "Totaux", total.toLocaleString(), taxedTotal.toLocaleString()]);
 	gui_hideLoading();
 }
