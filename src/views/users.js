@@ -34,7 +34,7 @@ Vue.component("vue-user-list", {
 					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(user)" />{{user.name}}</td>
 					<td>{{data.roles[user.role].name}}</td>
 					<td>{{user.card}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(user)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(user)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>

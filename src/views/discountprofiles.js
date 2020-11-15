@@ -31,7 +31,7 @@ Vue.component("vue-discountprofile-list", {
 				<tr v-for="profile in data.discountProfiles">
 					<td>{{profile.label}}</td>
 					<td>{{percent(profile.rate)}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(profile)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(profile)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>

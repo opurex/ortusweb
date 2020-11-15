@@ -40,7 +40,7 @@ Vue.component("vue-tariffarea-list", {
 				<tr v-for="tariffarea in data.tariffareas">
 					<td>{{tariffarea.label}}</td>
 					<td>{{tariffarea.dispOrder}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(tariffarea)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(tariffarea)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
