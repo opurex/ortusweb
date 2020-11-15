@@ -274,6 +274,7 @@ dt {
 }
 .box .navbar ul li {
 	margin-right: 1em;
+	margin-block: auto;
 }
 
 #menu .navbar-brand,
