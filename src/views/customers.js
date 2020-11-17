@@ -30,7 +30,7 @@ Vue.component("vue-customer-list", {
 						<img class="thumbnail thumbnail-text" v-bind:src="imageSrc(customer)" />{{customer.dispName}}
 					</td>
 					<td>{{customer.balance.toLocaleString()}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(customer)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(customer)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>

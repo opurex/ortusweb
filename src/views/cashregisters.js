@@ -31,7 +31,7 @@ Vue.component("vue-cashregister-list", {
 				<tr v-for="cashRegister in data.cashRegisters">
 					<td>{{cashRegister.reference}}</td>
 					<td>{{cashRegister.label}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(cashRegister)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(cashRegister)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>

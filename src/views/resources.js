@@ -24,7 +24,7 @@ Vue.component("vue-resources-list", {
 			<tbody>
 				<tr v-for="resource in data.resources">
 					<td>{{resource.dispName}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(resource)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(resource)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>

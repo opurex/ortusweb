@@ -78,7 +78,7 @@ Vue.component("vue-category-list", {
 				{type: "thumbnail", src: this.imageSrc(cat)},
 				cat.reference, cat.label, parentLabel,
 				cat.dispOrder,
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Edit</a></div>"},
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Modifier</a></div>"},
 			];
 			this.categoriesTable.lines.push(line);
 		}

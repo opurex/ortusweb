@@ -31,7 +31,7 @@ Vue.component("vue-currency-list", {
 				<tr v-for="currency in data.currencies">
 					<td>{{currency.label}}</td>
 					<td>{{currency.rate.toLocaleString()}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(currency)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(currency)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>

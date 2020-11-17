@@ -35,7 +35,7 @@ Vue.component("vue-paymentmode-list", {
 					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(pm)" />{{pm.label}}</td>
 					<td>{{pm.reference}}</td>
 					<td>{{pm.dispOrder}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(pm)">Edit</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(pm)">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
