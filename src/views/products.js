@@ -137,7 +137,7 @@ Vue.component("vue-product-list", {
 					tax, {type: "bool", value: prd.discountEnabled},
 					(prd.discountRate * 100).toLocaleString() + "%",
 					prd.dispOrder, {type: "bool", value: prd.visible},
-					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Edit</a></div>"},
+					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Modifier</a></div>"},
 				];
 				lines.push(line);
 			}
