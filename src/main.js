@@ -142,6 +142,12 @@ function route(screen) {
 	case "currency":
 		currencies_showCurrency(_get("id"));
 		break;
+	case "taxes":
+		taxes_show();
+		break;
+	case "tax":
+		taxes_showTax(_get("id"));
+		break;
 	case "home":
 	default:
 		home_show();

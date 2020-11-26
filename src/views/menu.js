@@ -77,6 +77,7 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("cashregisters"), "name": "Caisses", "icon": _menu_getIcon("menu_cashregister.png")},
 				{"target": _menu_getTargetUrl("paymentmodes"), "name": "Modes de paiement", "icon": _menu_getIcon("menu_paymentmode.png")},
 				{"target": _menu_getTargetUrl("currencies"), "name": "Devises", "icon": _menu_getIcon("menu_currencies.png")},
+				{"target": _menu_getTargetUrl("taxes"), "name": "TVA", "icon": _menu_getIcon("menu_tax.png")},
 				{"target": _menu_getTargetUrl("users"), "name": "Utilisateurs", "icon": _menu_getIcon("menu_user.png")},
 				{"target": _menu_getTargetUrl("roles"), "name": "Permissions", "icon": _menu_getIcon("menu_role.png")},
 				{"target": _menu_getTargetUrl("resources"), "name": "Personnalisation", "icon": _menu_getIcon("menu_resources.png")},
