@@ -15,8 +15,22 @@ var SYNC_MODELS = [
 	"resources"
 ];
 
-var storage_available = function() {
-	return window.indexedDB;
+var storage_available = function(success, error) {
+	// General browser check
+	if (!window.indexedDB) {
+		error(false);
+		return;
+	}
+	// DB acces (private navigation mode)
+	var request = window.indexedDB.open("pasteque-check", 1);
+	request.onerror = error;
+	request.onsuccess = function(event) {
+		var db = event.target.result;
+		db.close();
+		var delRequest = window.indexedDB.deleteDatabase("pasteque-check");
+		delRequest.onsuccess = success;
+		delRequest.onerror = error;
+	}
 }
 
 /** Success and error are callback function with only the event as parameter. */

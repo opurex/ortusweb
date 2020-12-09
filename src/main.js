@@ -3,8 +3,9 @@ var vue = null;
 var appData = {
 	db: null,
 	generalDbError: function(event) {
-		gui_showError(["Impossible d'accéder aux stockage des données locales (aussi appelé données de site).",
-			"Ce problème provient la plupart du temps du mode de navigation privée. Si vous l'utilisez, essayez avec le mode de navigation normal et utilisez le bouton \"déconnexion\" de l'écran d'accueil pour vider les données en partant."]);
+		gui_showError(["Impossible d'accéder aux stockage des données locales (aussi appelé données de site). Ce problème provient la plupart du temps du mode de navigation privée. Le bouton \"déconnexion\" une fois connecté·e permet de vider les données de l'interface de gestion.",
+			"Si vous l'utilisez le mode de navigation privée, essayez avec le mode de navigation normal.",
+			"Si vous ne l'utilisez pas, vérifiez les paramètres de conservation de l'historique dans les préférences du navigateur. Pour Firefox, dans l'onglet \"Vie privée et sécurité\", section \"Historique\", sélectionnez \"Conserver l'historique\" ou \"Utiliser les paramètres personnalisés pour l'historique\" en cochant au moins \"Conserver l'historique de navigation et des téléchargements\"."]);
 		return;
 	},
 	readDbError: function(event) {
@@ -184,11 +185,15 @@ function boot() {
 			}
 		}
 	});
-	if (!storage_available) {
-		gui_showError("Stockage des données non disponible. Votre navigateur est peut être obsolète.");
-		return;
-	}
-	start();
+	storage_available(function(event) {
+		start();
+	}, function(event) {
+		if (event === false) {
+			gui_showError("Stockage des données non disponible. Votre navigateur est peut être obsolète.");
+		} else {
+			appData.generalDbError(event);
+		}
+	});
 }
 
 function start() {
