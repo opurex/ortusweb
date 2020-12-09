@@ -146,7 +146,7 @@ function srvcall_callbackCatch(request, status, response, pendingOperation) {
 	case 403:
 		login_setPendingOperation(pendingOperation);
 		login_show();
-		gui_showMessage("La session a expiré");
+		gui_showMessage("La session a expiré. Veuillez renvoyer vos identifiants pour confirmer l'opération en cours.");
 		return true;
 	default:
 		login_show();
