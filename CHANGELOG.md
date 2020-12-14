@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.8] - 2020-12-14
+
+### Added
+- Tax edition/creation.
+- Tax rate, ticket number, payment mode, ticket discount in the customer's history.
+
+### Changed
+- Wording: Edit -> Modifier, Session has expired + note about current task.
+
+### Fixed
+- Product scaleType is updated correctly after edition.
+- Vertical alignment for navigation buttons in lists.
+- Url to framagit.
+
+
 ## [8.7] - 2020-10-21
 
 ### Added
