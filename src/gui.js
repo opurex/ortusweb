@@ -45,4 +45,22 @@ function gui_showError(message, stack) {
 	_gui_showMessage("message-error", message, stack);
 }
 
+function gui_setDyslexicMode(mode) {
+	if (mode) {
+		document.body.classList.add("dyslexic-friendly");
+	} else {
+		document.body.classList.remove("dyslexic-friendly");
+	}
+}
+
+function gui_updateDyslexicMode() {
+	if (vue.sessionParams.dyslexicMode != null) {
+		gui_setDyslexicMode(vue.sessionParams.dyslexicMode);
+	} else if (storage_getOption("preferDyslexicMode") == "1") {
+		gui_setDyslexicMode(true);
+	} else {
+		gui_setDyslexicMode(false);
+	}
+}
+
 Vue.component("vue-blank", {});

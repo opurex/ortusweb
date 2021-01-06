@@ -14,6 +14,9 @@ var SYNC_MODELS = [
 	"discountprofiles",
 	"resources"
 ];
+var LOCAL_OPTIONS = [
+	"preferDyslexicMode",
+];
 
 var storage_available = function(success, error) {
 	// General browser check
@@ -60,6 +63,9 @@ var storage_drop = function(success, error) {
 	var request = window.indexedDB.deleteDatabase("pasteque");
 	request.onerror = error;
 	request.onsuccess = success;
+	for (let i = 0; i < LOCAL_OPTIONS.length; i++) {
+		storage_setOption(LOCAL_OPTIONS[i], null);
+	}
 }
 
 /** The initializing function called on opening before onsuccess when
@@ -142,6 +148,12 @@ var storage_sync = function(syncData, progress, error, complete) {
 	var transaction = appData.db.transaction(SYNC_MODELS, "readwrite");
 	transaction.oncomplete = function(event) {
 		localStorage.setItem("syncDate", Date.now());
+		for (let i = 0; i < syncData.options.length; i++) {
+			let opt = syncData.options[i];
+			if (opt.name == Option_prefName("preferDyslexicMode")) {
+				storage_setOption("preferDyslexicMode", opt.content);
+			}
+		}
 		complete(event);
 	}
 	for (var i = 0; i < SYNC_MODELS.length; i++) {
@@ -366,3 +378,33 @@ var storage_getProductsFromCategory = function(catId, callback, sortFields, erro
 	}
 }
 
+var storage_getOption = function(option, defaultValue) {
+	if (arguments.length < 2) {
+		defaultValue = null;
+	}
+	let val = localStorage.getItem(option);
+	if (val == null && defaultValue != null) {
+		return defaultValue
+	}
+	return val;
+}
+
+var storage_setOption = function(name, value) {
+	if (value == null) {
+		localStorage.removeItem(name);
+	} else {
+		localStorage.setItem(name, value);
+	}
+}
+
+var storage_getSessionOption = function(option) {
+	return sessionStorage.getItem(option);
+}
+
+var storage_setSessionOption = function(name, value) {
+	if (value == null) {
+		sessionStorage.removeItem(name);
+	} else {
+		sessionStorage.setItem(name, value);
+	}
+}

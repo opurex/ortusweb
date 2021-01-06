@@ -26,6 +26,7 @@ js = [
 	"src/models/currency.js",
 	"src/models/producttagformats.js",
 	"src/models/tax.js",
+	"src/models/option.js",
 	"src/srvcall.js",
 	"src/login.js",
 	"src/storage.js",
@@ -50,6 +51,7 @@ js = [
 	"src/screens/currencies.js",
 	"src/screens/producttags.js",
 	"src/screens/taxes.js",
+	"src/screens/preferences.js",
 	"src/views/loading.js",
 	"src/views/home.js",
 	"src/views/login.js",
@@ -76,6 +78,7 @@ js = [
 	"src/views/currencies.js",
 	"src/views/producttags.js",
 	"src/views/taxes.js",
+	"src/views/preferences.js",
 ]
 
 css_packed = ""

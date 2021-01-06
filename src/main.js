@@ -149,6 +149,9 @@ function route(screen) {
 	case "tax":
 		taxes_showTax(_get("id"));
 		break;
+	case "preferences":
+		preferences_show();
+		break;
 	case "home":
 	default:
 		home_show();
@@ -205,6 +208,14 @@ function start() {
 		https: login_getHttps(),
 		password: ''
 	}
+	let dyslexicMode = storage_getSessionOption("dyslexicMode");
+	if (dyslexicMode != null) {
+		dyslexicMode = (dyslexicMode == "1");
+	}
+	vue.sessionParams = {
+		dyslexicMode: dyslexicMode,
+	}
+	gui_updateDyslexicMode();
 	vue.menu.visible = true;
 	// Initialize the database if required
 	if (appData.db == null) {

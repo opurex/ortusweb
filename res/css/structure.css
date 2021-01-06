@@ -240,11 +240,13 @@ nav button,
 	margin: 3em auto;
 	position: relative;
 }
-#login-logo {
+#login > aside {
 	position: absolute;
 	text-align: center;
 	float: left;
 	left: -15rem;
+	min-width: auto;
+	max-width: 15rem;
 }
 .login-box .login-box-body {
 	padding: 2em;
@@ -257,11 +259,13 @@ nav button,
 }
 
 @media (max-width: 60rem) and (min-height: 35rem) {
-	#login-logo {
+	#login > aside {
 		position: relative;
 		float: none;
 		left: 0;
-		margin-bottom: 0;
+		margin-bottom: 1rem;
+		margin-left: auto;
+		margin-right: auto;
 	}
 	#login nav {
 		margin-top: 0;
@@ -269,6 +273,14 @@ nav button,
 }
 
 @media (max-height: 35rem) and (max-width: 60rem) {
+	#login > aside {
+		position: relative;
+		float: none;
+		left: 0;
+		margin-bottom: 0;
+		margin-left: auto;
+		margin-right: auto;
+	}
 	#login-logo {
 		display: none;
 	}
@@ -295,13 +307,22 @@ nav.navbar {
 	width: 100%;
 }
 
+#user-menu {
+	justify-content: end;
+	flex-grow: 1;
+}
+
 #menu .navbar-brand {
 	display: block;
 }
 
-#main-menu .dropdown-menu {
+#main-menu .dropdown-menu,
+#user-menu .dropdown-menu {
 	position: absolute;
 	flex-direction: column;
+}
+#user-menu .dropdown-menu {
+	right: 0px;
 }
 
 #menu-collapser {
@@ -324,16 +345,23 @@ nav.navbar {
 	#menu .navbar-brand {
 		float: left;
 	}
-	#menu-collapser:not(:checked) ~ #main-menu {
+	#menu-collapser:not(:checked) ~ #main-menu,
+	#menu-collapser:not(:checked) ~ #user-menu {
 		display: none;
 	}
-	#main-menu {
+	#main-menu,
+	#user-menu {
 		flex-direction: column;
 		width: 100%;
 	}
 	#main-menu li button,
-	#main-menu .dropdown-menu {
+	#user-menu li button,
+	#main-menu .dropdown-menu,
+	#user-menu .dropdown-menu {
 		width: 100%;
+	}
+	#user-menu .dropdown-menu {
+		right: auto;
 	}
 }
 

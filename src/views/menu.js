@@ -1,5 +1,5 @@
 Vue.component("vue-menu", {
-	props: ["menu"],
+	props: ["menu", "user"],
 	data: function() {
 		return {
 			openedMenu: null,
@@ -15,7 +15,15 @@ Vue.component("vue-menu", {
 		<li class="dropdown" v-bind:class="{expanded: (openedMenu == index)}" v-for="section, index in menu.sections">
 			<button  v-on:click="expandMenu(index)" aria-haspopup="true" v-bind:aria-expanded="isExpanded(index)">{{section.name}}</button>
 			<ul class="dropdown-menu" v-if="openedMenu == index">
-				<li v-for="item in section.items"><a v-bind:style="item.icon" v-bind:href="item.target">{{item.name}}</a></li>
+				<li v-for="item in section.items"><template v-if="item.target"><a v-bind:style="item.icon" v-bind:href="item.target">{{item.name}}</a></template><template v-else><a v-bind:style="item.icon" v-on:click="item.action();return false;" href="#">{{item.name}}</a></template></li>
+			</ul>
+		</li>
+	</ul>
+	<ul id="user-menu">
+		<li class="dropdown" v-bind:class="{expanded: (openedMenu == menu.sections.length)}">
+			<button  v-on:click="expandMenu(menu.sections.length)" aria-haspopup="true" v-bind:aria-expanded="isExpanded(menu.sections.length)">{{user}}</button>
+			<ul class="dropdown-menu" v-if="openedMenu == menu.sections.length">
+				<li v-for="item in menu.user"><template v-if="item.target"><a v-bind:style="item.icon" v-bind:href="item.target">{{item.name}}</a></template><template v-else><a v-bind:style="item.icon" v-on:click="item.action();return false;" href="#">{{item.name}}</a></template></li>
 			</ul>
 		</li>
 	</ul>
@@ -82,6 +90,10 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("roles"), "name": "Permissions", "icon": _menu_getIcon("menu_role.png")},
 				{"target": _menu_getTargetUrl("resources"), "name": "Personnalisation", "icon": _menu_getIcon("menu_resources.png")},
 			]},
+		],
+		"user": [
+			{"target": _menu_getTargetUrl("preferences"), "name": "Préférences", "icon": _menu_getIcon("menu_preferences.png")},
+			{"action": login_logout, "name": "Déconnexion", "icon": _menu_getIcon("menu_logout.png")},
 		],
 		"visible": true,
 	}

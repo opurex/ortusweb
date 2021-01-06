@@ -16,10 +16,6 @@ function home_show() {
 	vue.screen.component = "vue-home";
 }
 
-function home_logout() {
-	login_logout();
-}
-
 function home_sendSync() {
 	gui_showLoading();
 	srvcall_get("api/sync", home_syncCallback);
@@ -64,6 +60,8 @@ function home_syncComplete() {
 	gui_hideLoading();
 	storage_close();
 	home_show();
+	gui_updateDyslexicMode();
+	gui_hideLoading();
 }
 
 function home_checkProgress() {

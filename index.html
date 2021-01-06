@@ -26,6 +26,7 @@
 	<script type="text/javascript" src="src/models/currency.js"></script>
 	<script type="text/javascript" src="src/models/producttagformats.js"></script>
 	<script type="text/javascript" src="src/models/tax.js"></script>
+	<script type="text/javascript" src="src/models/option.js"></script>
 	<script type="text/javascript" src="src/srvcall.js"></script>
 	<script type="text/javascript" src="src/login.js"></script>
 	<script type="text/javascript" src="src/storage.js"></script>
@@ -50,6 +51,7 @@
 	<script type="text/javascript" src="src/screens/currencies.js"></script>
 	<script type="text/javascript" src="src/screens/producttags.js"></script>
 	<script type="text/javascript" src="src/screens/taxes.js"></script>
+	<script type="text/javascript" src="src/screens/preferences.js"></script>
 	<script type="text/javascript" src="src/views/loading.js"></script>
 	<script type="text/javascript" src="src/views/home.js"></script>
 	<script type="text/javascript" src="src/views/login.js"></script>
@@ -76,6 +78,7 @@
 	<script type="text/javascript" src="src/views/currencies.js"></script>
 	<script type="text/javascript" src="src/views/producttags.js"></script>
 	<script type="text/javascript" src="src/views/taxes.js"></script>
+	<script type="text/javascript" src="src/views/preferences.js"></script>
 
 	<script type="text/javascript">
 		document.addEventListener('DOMContentLoaded', function() { boot(); });
@@ -89,7 +92,7 @@
 <!-- Main components -->
 <vue-login v-bind:login="login" v-show="ready"></vue-login>
 <div id="main" v-if="login.loggedIn && ready">
-	<vue-menu v-bind:menu="menu"></vue-menu>
+	<vue-menu v-bind:menu="menu" v-bind:user="login.user"></vue-menu>
 	<div v-if="false">As you can see this site doesn't work without javascript.</div>
 	<component ref="screenComponent" id="content" class="container-fluid" v-bind:is="screen.component" v-bind:data="screen.data"></component>
 </div>

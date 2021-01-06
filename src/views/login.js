@@ -1,9 +1,20 @@
 
 Vue.component("vue-login", {
 	props: ["login"],
+	data: function() {
+		return {
+			"dyslexicMode": false
+		};
+	},
 	template: `<div id="login" class="login-box" v-if="login.loggedIn == false">
-	<aside class="box box-body" id="login-logo">
-		<img src="res/img/pasteque_logo.png" alt="Pasteque-Admin" />
+	<aside class="box box-body">
+		<div id="login-logo">
+			<img src="res/img/pasteque_logo.png" alt="Pasteque-Admin" />
+		</div>
+		<div class="form-group">
+			<input type="checkbox" name="dyslexic_friendly" id="dyslexic-friendly" v-model="dyslexicMode">
+			<label for="dyslexic-friendly" class="dyslexic-friendly">Mode dyslexique</label>
+		</div>
 	</aside>
 	<nav class="box box-body login-box-body ">
 		<h1>Connexion à votre serveur Pastèque</h1>
@@ -35,6 +46,20 @@ Vue.component("vue-login", {
 	mounted: function() {
 		if (login_getUser()) {
 			document.getElementById("user_pass").focus();
+		}
+		let dysParam = storage_getSessionOption("dyslexicMode");
+		if (dysParam != null) {
+			this.dyslexicMode = (dysParam == "1");
+		}
+	},
+	watch: {
+		dyslexicMode: function(val) {
+			gui_setDyslexicMode(val);
+			if (val) {
+				storage_setSessionOption("dyslexicMode", "1");
+			} else {
+				storage_setSessionOption("dyslexicMode", "0");
+			}
 		}
 	}
 });

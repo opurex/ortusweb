@@ -23,7 +23,7 @@
 <!-- Main components -->
 <vue-login v-bind:login="login" v-show="ready"></vue-login>
 <div id="main" v-if="login.loggedIn && ready">
-	<vue-menu v-bind:menu="menu"></vue-menu>
+	<vue-menu v-bind:menu="menu" v-bind:user="login.user"></vue-menu>
 	<div v-if="false">As you can see this site doesn't work without javascript.</div>
 	<component id="content" class="container-fluid" v-bind:is="screen.component" v-bind:data="screen.data"></component>
 </div>

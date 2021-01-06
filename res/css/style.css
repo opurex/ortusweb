@@ -7,18 +7,35 @@
 @font-face{
 	font-family:'PT Sans';font-style:normal;
 	font-weight:400;
-	src:url(../fonts/PT_Sans-normal-400.woff) format("woff");
+	src: url(../fonts/PT_Sans-normal-400.woff) format("woff");
 	unicode-range:U+0-10FFFF;
 }
 @font-face {
-	font-family: "Titillium";
-	src: url("../fonts/Titillium-Regular.otf");
+	font-family:'OpenDyslexic';
+	font-style: normal;
+	font-weight: normal;
+	src: local("OpenDyslexic"), url(../fonts/OpenDyslexic-Regular.otf) format("opentype");
+}
+@font-face {
+	font-family:'OpenDyslexic';
+	font-style: italic;
+	font-weight: normal;
+	src: local("OpenDyslexic-Italic"), url(../fonts/OpenDyslexic-Italic.otf) format("opentype");
+}
+@font-face {
+	font-family:'OpenDyslexic';
+	font-style: normal;
+	font-weight: bold;
+	src: local("OpenDyslexic-Bold"), url(../fonts/OpenDyslexic-Bold.otf) format("opentype");
+}
+@font-face {
+	font-family:'OpenDyslexic';
+	font-style: italic;
+	font-weight: bold;
+	src: local("OpenDyslexic-BoldItalic"), url(../fonts/OpenDyslexic-BoldItalic.otf) format("opentype");
 }
 
-@font-face {
-	font-family: "Amble";
-	src: url("../fonts/Amble-Regular.ttf");
-}
+
 
 /* Containers */
 
@@ -26,6 +43,17 @@ body {
 	background: #999 url(../img/fond.png) repeat center fixed;
 	font-family:"PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 	color: #555;
+}
+
+.dyslexic-friendly,
+.dyslexic-friendly button,
+.dyslexic-friendly input[type=text] {
+	font-family: OpenDyslexic, "Comic Sans MS", sans-serif !important;
+}
+
+.hi-contrast {
+	color: #000;
+	background: #fff;
 }
 
 #content {
@@ -191,7 +219,6 @@ small {
 
 h1, h2, h3, h4, h5, h6 {
 	color: #A3351E;
-	font-family: Titillium;
 }
 
 dt {
