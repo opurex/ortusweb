@@ -155,3 +155,129 @@ function tariffareas_saveCallback(request, status, response) {
 			appData.localWriteDbSuccess, appData.localWriteDbError);
 	}, appData.localWriteDbOpenError);
 }
+
+function _tariffareas_parseCsv(fileContent) {
+	let csv = new CSV(fileContent, {header: true, cast: false});
+	let rawPrices = csv.parse();
+	if (rawPrices.length == 0) {
+		Vue.set(vue.screen.data.tariffarea, "prices", []);
+	}
+	gui_showLoading();
+	let columnMappingDef = {
+		reference: "reference",
+		"référence": "reference",
+		priceSellVat: "priceSellVat",
+		"prix de vente ttc": "priceSellVat",
+		tax: "tax",
+		"tva": "tax"
+		
+	};
+	columnMapping = {};
+	unknownColumns = [];
+	for (let key in rawPrices[0]) {
+		if (key.toLowerCase() in columnMappingDef) {
+			columnMapping[key] = columnMappingDef[key.toLowerCase()];
+		} else {
+			unknownColumns.push(key);
+		}
+	}
+	let taxByRef = [];
+	let taxByLabel = [];
+	let prdRefs = [];
+	let readPrices = [];
+	for (let i = 0; i < vue.screen.data.taxes.length; i++) {
+		let tax = vue.screen.data.taxes[i];
+		taxByRef[tax.reference] = tax;
+		taxByLabel[tax.label] = tax;
+	}
+	for (let i = 0; i < rawPrices.length; i++) {
+		// Convert the incoming csv lines to prices data
+		// Except product ID which is looked for after
+		function mapValues(line, mapping) {
+			let ret = {};
+			for (key in line) {
+				if (key in mapping) {
+					ret[mapping[key]] = line[key];
+				}
+			}
+			return ret;
+		}
+		function convertNum(value) {
+			let v = value.replace(",", ".");
+			v = v.replace(" ", "");
+			return parseFloat(v);
+		}
+		function convertTax(value) {
+			if (value == "") {
+				return null;
+			} else {
+				if (value in taxByRef) {
+					return taxByRef[value].id;
+				}
+				if (value in taxByLabel) {
+					return taxByLabel[value].id;
+				}
+				return null;
+			}
+		}
+		function convertValues(value) {
+			if ("priceSellVat" in value) {
+				value.priceSellVat = convertNum(value.priceSellVat);
+			} else {
+				value.priceSellVat = null;
+			}
+			if ("tax" in value) {
+				value.tax = convertTax(value.tax);
+			} else {
+				value.tax = null;
+			}
+			return value;
+		}
+		let value = mapValues(rawPrices[i], columnMapping);
+		value = convertValues(value);
+		rawPrices[i] = value;
+		prdRefs.push(value.reference);
+	}
+	let prices = [];
+	let errors = [];
+	storage_open(function() {
+		let prds = storage_getIndex("products", "reference", prdRefs, function(data) {
+			for (let i = 0; i < data.length; i++) {
+				let product = data[i];
+				let rawPrice = rawPrices[i];
+				if (product != null) {
+					let price = TariffArea_price(product);
+					price.priceSellVat = rawPrice.priceSellVat;
+					price.tax = rawPrice.tax;
+					let taxId = price.tax;
+					let tax = null;
+					if (taxId == null) {
+						taxId = product.tax;
+					}
+					for (let j = 0; j < vue.screen.data.taxes.length; j++) {
+						if (vue.screen.data.taxes[j].id == taxId) {
+							tax = vue.screen.data.taxes[j];
+							break;
+						}
+					}
+					price.price = Number(price.priceSellVat / (1.0 + tax.rate)).toFixed(2)
+					prices.push(price);
+					vue.screen.data.productCache[product.id] = product;
+				} else {
+					errors.push("- " + prdRefs[i]);
+				}
+			}
+			Vue.set(vue.screen.data.tariffarea, "prices", prices);
+			gui_hideLoading();
+			if (errors.length > 0) {
+				let message = ["La liste des tarifs a été modifiée, mais les références suivantes n'ont pas été trouvées :"];
+				for (let i = 0; i < errors.length; i++) {
+					message.push(errors[i]);
+				}
+				gui_showWarning(message);
+			} else {
+				gui_showMessage("La liste des tarifs a été remplacée. N'oubliez pas d'enregistrer.")
+			}
+		});
+	});
+}

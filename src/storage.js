@@ -352,6 +352,50 @@ var storage_get = function(storeName, id, callback, errorCallback) {
 	}
 }
 
+var storage_getIndex = function(storeName, index, val, callback, errorCallback) {
+	let dbError = _storage_dbCheck();
+	if (dbError != null) {
+		errorCallback(dbError);
+		return;
+	}
+	// Multi read
+	if (Array.isArray(val)) {
+		let size = val.length;
+		let data = [];
+		let callbackCalled = false;
+		let store = appData.db.transaction(storeName, "readonly").objectStore(storeName);
+		let success = function(event) {
+			let cursor = event.target.result;
+			if (cursor) {
+				data.push(cursor.value);
+				if (data.length == size && callbackCalled == false) {
+					callbackCalled = true;
+					callback(data);
+				}
+			}
+		}
+		for (let i = 0; i < size; i++) {
+			let request = store.index(index);
+			request = request.openCursor(IDBKeyRange.only(val[i]));
+			request.onsuccess = success;
+			request.onerror = errorCallback;
+		}
+	} else {
+		// Single record read
+		let store = appData.db.transaction([storeName], "readonly").objectStore(storeName);
+		let request = store.index(index).openCursor(IDBKeyRange.only(val));
+		request.onsuccess = function(event) {
+			let cursor = event.target.result;
+			if (cursor) {
+				callback(cursor.value);
+			} else {
+				callback(null);
+			}
+		}
+		request.onerror = errorCallback;
+	}
+}
+
 var storage_getProductsFromCategory = function(catId, callback, sortFields, errorCallback) {
 	if (arguments.length < 4) {
 		errorCallback = appData.readDbError;

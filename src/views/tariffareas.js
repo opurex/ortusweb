@@ -88,6 +88,20 @@ Vue.component("vue-tariffarea-form", {
 				<li><h1>Édition d'une zone tarifaire</h1></li>
 			</ul>
 		</nav>
+		<nav class="navbar">
+			<ul>
+				<li>
+					<button class="btn btn-add" v-on:click="exportCsv(false)">Exporter la zone</button>
+				</li>
+				<li>
+					<button class="btn btn-add" v-on:click="exportCsv(true)">Exporter la zone (Excel)</button>
+				</li>
+				<li>
+					<label for="csv-file">Remplacer par un fichier</label>
+					<input ref="csvRef" type="file" accept="text/csv" id="csv-file" name="csv" v-on:change="readCsv" />
+				</li>
+			</ul>
+		</nav>
 	</header>
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:tariffareas_saveArea(); return false;">
@@ -174,6 +188,13 @@ Vue.component("vue-tariffarea-form", {
 			let product = this.data.productCache[prdId];
 			return product.label;
 		},
+		reference: function(prdId) {
+			if (!(prdId in this.data.productCache)) {
+				return "???";
+			}
+			let product = this.data.productCache[prdId];
+			return product.reference;
+		},
 		pickProduct: function(product) {
 			tariffareas_addProduct(product);
 		},
@@ -182,6 +203,57 @@ Vue.component("vue-tariffarea-form", {
 		},
 		updatePrice: function(price) {
 			tariffareas_updatePrice(price);
+		},
+		tax: function(taxId) {
+			for (let i = 0; i < this.data.taxes.length; i++) {
+				let tax = this.data.taxes[i];
+				if (tax.id == taxId) {
+					return tax;
+				}
+			}
+		},
+		readCsv: function (event) {
+			let fileName = event.target.files[0].name;
+			let thiss = this;
+			let reader = new FileReader();
+			let callback = function(data) {
+				thiss.newCategories = data.newCategories;
+				thiss.editedCategories = data.editedCategories;
+				thiss.editedValues = data.editedValues;
+				thiss.unchangedCategories  = data.unchangedCategories;
+				thiss.unknownColumns = data.unknownColumns;
+				thiss.errors = data.errors;
+			}
+			reader.onload = function(readerEvent) {
+				let fileContent = readerEvent.target.result;
+				let data = _tariffareas_parseCsv(fileContent, callback);
+			};
+			reader.readAsText(event.target.files[0]);
+		},
+		exportCsv: function(withExcelBom) {
+			let csvData = [];
+			csvData.push(["Référence", "Prix de vente TTC", "TVA"]);
+			for (let i = 0; i < this.data.tariffarea.prices.length; i++) {
+				let price = this.data.tariffarea.prices[i];
+				let priceSellVat = price.priceSellVat.toLocaleString();
+				let tax = "";
+				if (price.tax != null) {
+					tax = this.tax(price.tax).reference;
+				}
+				csvData.push([this.reference(price.product), priceSellVat, tax]);
+			}
+			// Generate csv (with some utf-8 tweak)
+			let encodedData = new CSV(csvData).encode();
+			encodedData = encodeURIComponent(encodedData).replace(/%([0-9A-F]{2})/g,
+				function toSolidBytes(match, p1) {
+					return String.fromCharCode('0x' + p1);
+				});
+			if (withExcelBom) {
+				encodedData = String.fromCharCode(0xef, 0xbb, 0xbf) + encodedData;
+			}
+			// Set href for download
+			let href = "data:text/csv;base64," + btoa(encodedData);
+			window.open(href, "csvexport");
 		}
 	},
 });
