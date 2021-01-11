@@ -50,6 +50,12 @@ function route(screen) {
 	case "categories":
 		categories_show();
 		break;
+	case "category":
+		categories_showCategory(_get("id"));
+		break;
+	case "categoryImport":
+		categories_showImport();
+		break;
 	case "products":
 		products_show(_get("category"));
 		break;
@@ -76,9 +82,6 @@ function route(screen) {
 		break;
 	case "salesdetails":
 		salesdetails_show();
-		break;
-	case "category":
-		categories_showCategory(_get("id"));
 		break;
 	case "product":
 		products_showProduct(_get("id"), _get("category"));
