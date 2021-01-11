@@ -1,5 +1,19 @@
 Vue.component("vue-tariffarea-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			areasTable: {
+				columns: [
+					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque zone. Elle permet la modification lors de l'import."},
+					{label: "Désignation", visible: true, help: "Le nom de la zone tel qu'affiché sur les boutons de la caisse."},
+					{label: "Ordre", visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
+					{label: "Tarifs", visible: false, help: "Le nombre de tarifs définis dans cette zone."},
+					{label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div class="tariffarea-list">
 <section class="box box-medium">
 	<header>
@@ -25,25 +39,7 @@ Vue.component("vue-tariffarea-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th>Ordre d'affichage</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="tariffarea in data.tariffareas">
-					<td>{{tariffarea.label}}</td>
-					<td>{{tariffarea.dispOrder}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(tariffarea)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="areasTable"></vue-table>
 	</article>
 </section>
 </div>
@@ -55,15 +51,24 @@ Vue.component("vue-tariffarea-list", {
 		sort: function(event) {
 			switch (this.data.sort) {
 				case "dispOrder":
-					this.data.tariffareas = this.data.tariffareas.sort(tools_sort("dispOrder", "reference"));
+					Vue.set(this.areasTable, "lines", this.areasTable.lines.sort(tools_sort(2, 0)));
 					break;
 				case "label":
-					this.data.tariffareas = this.data.tariffareas.sort(tools_sort("label"));
-			break;
+					Vue.set(this.areasTable, "lines", this.areasTable.lines.sort(tools_sort(1)));
+					break;
 			}
 		},
 	},
 	mounted: function() {
+		for (let i = 0; i < this.data.tariffareas.length; i++) {
+			let area = this.data.tariffareas[i];
+			let line = [
+				area.reference, area.label, area.dispOrder,
+				area.prices.length,
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(area) + "\">Modifier</a></div>"},
+			];
+			this.areasTable.lines.push(line);
+		}
 		this.sort();
 	}
 });
