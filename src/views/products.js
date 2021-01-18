@@ -322,7 +322,7 @@ Vue.component("vue-product-form", {
 				<div class="form-group">
 					<label for="edit-scaleType">Poids/Volume</label>
 					<select id="edit-scaleType" v-model="data.product.scaleType">
-						<option v-bind:value="0">Pas de volumétrie</option>
+						<option v-bind:value="0">À la pièce</option>
 						<option v-bind:value="1">Kilogramme</option>
 						<option v-bind:value="2">Litre</option>
 					</select>
@@ -330,6 +330,10 @@ Vue.component("vue-product-form", {
 				<div class="form-group">
 					<label for="edit-scaleValue">Contenance</label>
 					<input id="edit-scaleValue" type="number" step="any" v-model="data.product.scaleValue" />
+				</div>
+				<div class="form-group">
+					<label for="edit-refPrice">Prix de référence TTC</label>
+					<input id="edit-refPrice" v-model="refPrice" disabled="true" />
 				</div>
 				<div class="form-group">
 					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
@@ -353,6 +357,25 @@ Vue.component("vue-product-form", {
 		duplicateUrl: function() {
 			return "?p=productDuplicate&id=" + this.data.product.id;
 		},
+		refPrice: function() {
+			let price = this.data.product.taxedPrice;
+			if (!this.data.product.scaled) {
+				price = price / this.data.product.scaleValue;
+			}
+			price = price.toFixed(2).toLocaleString() + "€ ";
+			switch (this.data.product.scaleType) {
+				case 0:
+					price += "pièce";
+					break;
+				case 1:
+					price += "le kilogramme";
+					break;
+				case 2:
+					price += "le litre";
+					break;
+			}
+			return price;
+		}
 	},
 	methods: {
 		updatePrice: function() {
