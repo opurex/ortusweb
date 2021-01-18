@@ -3,13 +3,12 @@ Vue.component("vue-home", {
 	template: `<div class="home">
 <section class="box box-medium">
 	<article class="box-body">
+		<p v-if="data.syncDate" style="text-align:center">Les données ont été chargées le {{data.syncDate.date}} à {{data.syncDate.time}}.<br>Cliquez sur le bouton ci-dessous pour actualiser vos données, en particulier si vous accédez à cette interface depuis plusieurs ordinateurs.</p>
+		<p v-else style="text-align:center"><strong>Aucune donnée n'a été chargée</strong>. Cliquez sur le bouton ci-dessous pour charger vos données et accéder au menu.</p>
+		<p style="text-align:center"><button class="btn btn-primary" onclick="javascript:home_sendSync();">Recharger les données</button></p>
 		<h1>Pasteque-jsadmin <small>Interface d'administration</small></h1>
 		<p>Bonjour {{data.user}}. Vous êtes connectés sur {{data.server}}.</p>
 		<p>Vous êtes dans votre interface d'administration où vous pouvez créer vos produits, catégories, accéder à vos statistiques de ventes etc.</p>
-		<h2>Vos données</h2>
-		<p v-if="data.syncDate">Les données ont été chargées le {{data.syncDate.date}} à {{data.syncDate.time}}. Cliquez sur le bouton ci-dessous pour actualiser vos données, en particulier si vous accédez à cette interface depuis plusieurs ordinateurs.</p>
-		<p v-else><strong>Aucune donnée n'a été chargée</strong>. Cliquez sur le bouton ci-dessous pour charger vos données et accéder au menu.</p>
-		<p><button class="btn btn-primary" onclick="javascript:home_sendSync();">Recharger les données</button></p>
 		<h2>Documentation</h2>
 		<p>Il y a plusieurs sources de documentation :</p>
 		<ul>
