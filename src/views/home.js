@@ -13,9 +13,8 @@ Vue.component("vue-home", {
 		<h2>Documentation</h2>
 		<p>Il y a plusieurs sources de documentation :</p>
 		<ul>
-			<li><a href="https://fr.wikibooks.org/wiki/Logiciel_Past%C3%A8que">Manuel d’installation, de configuration et d’utilisation sur wikibooks</a></li>
-			<li><a href="https://ask.pasteque.org/">Les forums communautaires</a></li>
-			<li><a href="https://framagit.org/groups/pasteque">Le bug tracker</a></li>
+			<li><a href="https://fr.wikibooks.org/wiki/Logiciel_Past%C3%A8que" target="_blank" >Manuel d’installation, de configuration et d’utilisation sur wikibooks</a></li>
+			<li><a href="https://framateam.org/pasteque" target="_blank">Les salons de clavardage de l'association Pastèque</a></li>
 		</ul>
 	</article>
 </section>
