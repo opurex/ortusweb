@@ -1,5 +1,24 @@
 Vue.component("vue-currency-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			currenciesTable: {
+				columns: [
+					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque devise. Elle permet la modification lors de l'import."},
+					{label: "Désignation", visible: true, help: "Le nom de la devise tel qu'affiché sur les boutons de la caisse."},
+					{label: "Principale", visible: false, help: "Si cette devise est la devise par défaut, devise de référence pour les montants."},
+					{label: "Taux", visible: true, help: "Taux de change vers la devise principale."},
+					{label: "Symbole", visible: false, help: "Le symbole monétaire de la devise."},
+					{label: "Sep. décimales", visible: false, help: "Le séparateur entre les entiers et les décimales (souvent , ou .)"},
+					{label: "Sep. milliers", visible: false, help: "Le séparateur entre les milliers (souvent vide ou espace)."},
+					{label: "Format", visible: false, help: "Le format d'affichage des valeurs."},
+					{label: "Active", visible: true, help: "Si la devise est utilisable ou non."},
+					{label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div class="currency-list">
 <section class="box box-medium">
 	<header>
@@ -16,25 +35,7 @@ Vue.component("vue-currency-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th>Taux de change</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="currency in data.currencies">
-					<td>{{currency.label}}</td>
-					<td>{{currency.rate.toLocaleString()}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(currency)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="currenciesTable"></vue-table>
 	</article>
 </section>
 </div>`,
@@ -43,10 +44,26 @@ Vue.component("vue-currency-list", {
 			return "?p=currency&id=" + curr.id;
 		},
 	},
+	mounted: function() {
+		for (let i = 0; i < this.data.currencies.length; i++) {
+			let curr = this.data.currencies[i];
+			let line = [
+				curr.reference, curr.label,
+				{type: "bool", value: curr.main}, curr.rate.toLocaleString(),
+				curr.symbol, curr.decimalSeparator, curr.thousandsSeparator,
+				curr.format, {type: "bool", value: curr.visible},
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(curr) + "\">Modifier</a></div>"},
+			];
+			this.currenciesTable.lines.push(line);
+		}
+	}
 });
 
 Vue.component("vue-currency-form", {
 	props: ["data"],
+	data: function() {
+		return {mainCurrencyLbl: "", sample: ""};
+	},
 	template: `<div class="currency-form">
 <section class="box box-medium">
 	<header>
@@ -72,7 +89,9 @@ Vue.component("vue-currency-form", {
 				</div>
 				<div class="form-group">
 					<label for="edit-dispOrder">Taux de change</label>
+					<span>1 {{data.currency.label}} = </span>
 					<input id="edit-dispOrder" type="number" v-model.number="data.currency.rate" min="0.00" step="0.01">
+					<span> {{mainCurrencyLbl}}</span>
 				</div>
 				<div class="form-group">
 					<input id="edit-main" type="checkbox" name="main" v-model="data.currency.main" v-bind:disabled="data.wasMain" />
@@ -101,6 +120,8 @@ Vue.component("vue-currency-form", {
 					<label for="edit-format">Format</label>
 					<input id="edit-format" type="text" v-model="data.currency.format" />
 				</div>
+				<div>Le format est un champ technique. Le format courant est #,##0.00$ (2 décimales, symbole monétaire en fin, chiffres regroupés par 3).
+				</div>
 			</fieldset>
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
@@ -115,6 +136,14 @@ Vue.component("vue-currency-form", {
 				return login_getHostUrl() + "/api/image/category/" + cat.id + "?Token=" + login_getToken();
 			} else {
 				return login_getHostUrl() + "/api/image/category/default?Token=" + login_getToken();
+			}
+		}
+	},
+	mounted: function() {
+		for (let i = 0; i < this.data.currencies.length; i++) {
+			if (this.data.currencies[i].main) {
+				this.mainCurrencyLbl = this.data.currencies[i].label;
+				break;
 			}
 		}
 	}
