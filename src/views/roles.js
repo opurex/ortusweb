@@ -27,7 +27,7 @@ Vue.component("vue-role-list", {
 			<tbody>
 				<tr v-for="role in data.roles">
 					<td>{{role.name}}</td>
-					<td><nav><a class="btn btn-Modifier" v-bind:href="ModifierUrl(role)">Modifier</a></nav></td>
+					<td><a class="btn btn-edit" v-bind:href="editUrl(role)">Modifier</a></td>
 				</tr>
 			</tbody>
 		</table>
