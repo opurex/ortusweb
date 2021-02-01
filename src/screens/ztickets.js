@@ -137,13 +137,19 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		for (let j = 0; j < paymentModes.length; j++) {
 			let pm = paymentModes[j];
 			let found = false;
+			let renderZIndex = 0;
 			for (let k = 0; k < z.payments.length; k++) {
-				if (z.payments[k].paymentMode == pm.id) {
-					renderZ.payments.push({"amount": z.payments[k].currencyAmount.toLocaleString()});
-					total.paymentModeTotal[j] += z.payments[k].currencyAmount;
+				let pmt = z.payments[k];
+				if (pmt.paymentMode == pm.id) {
+					if (found) {
+						renderZ.payments[renderZIndex].amount += pmt.amount;
+					} else {
+						renderZIndex = renderZ.payments.length;
+						renderZ.payments.push({"amount": pmt.amount});
+					}
+					total.paymentModeTotal[j] += pmt.amount;
 					found = true;
 					keptPayments[j] = true;
-					break;
 				}
 			}
 			if (!found) {
@@ -152,6 +158,8 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				} else {
 					renderZ.payments.push({"amount": ""});
 				}
+			} else {
+				renderZ.payments[renderZIndex].amount = renderZ.payments[renderZIndex].amount.toLocaleString();
 			}
 		}
 		for (let j = 0; j < taxes.length; j++) {
