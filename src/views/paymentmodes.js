@@ -1,5 +1,21 @@
 Vue.component("vue-paymentmode-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			paymentModesTable: {
+				columns: [
+					{label: "Image", export: false, visible: true, help: "L'image du bouton du mode de paiement. Ce champ ne peut être exporté."},
+					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque mode de paiement."},
+					{label: "Désignation", visible: true, help: "Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."},
+
+					{label: "Actif", visible: true, help: "Si le mode de paiement peut être encaissé ou non."},
+					{label: "Ordre", visible: false, help: "L'ordre d'affichage."},
+					{label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div class="paymentmode-list">
 <section class="box box-medium">
 	<header>
@@ -17,28 +33,7 @@ Vue.component("vue-paymentmode-list", {
 	</header>
 	<article class="box-body">
 		<p class="warning" v-if="data.cashWarning"><strong>Attention :</strong> Pour que les montants du fond de caisse à l'ouverture et à la clôture puisse fonctionner, le mode de paiements équivalent aux espèces doit avoir la référence <em>cash</em></p>
-		<table>
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th>Référence</th>
-					<th>Ordre d'affichage</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="pm in data.paymentModes">
-					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(pm)" />{{pm.label}}</td>
-					<td>{{pm.reference}}</td>
-					<td>{{pm.dispOrder}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(pm)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="paymentModesTable"></vue-table>
 	</article>
 </section>
 </div>`,
@@ -53,7 +48,25 @@ Vue.component("vue-paymentmode-list", {
 		editUrl: function(pm) {
 			return "?p=paymentmode&id=" + pm.id;
 		},
-	}
+	},
+	mounted: function() {
+		let thiss = this;
+		storage_open(function(event) {
+			storage_readStore("paymentmodes", function(pms) {
+				for (let i = 0; i < pms.length; i++) {
+					let pm = pms[i];
+					let line = [
+						{type: "thumbnail", src: thiss.imageSrc(pm)},
+						pm.reference, pm.label,
+						{type: "bool", value: pm.visible}, pm.dispOrder,
+						{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(pm) + "\">Modifier</a></div>"},
+					];
+					thiss.paymentModesTable.lines.push(line);
+				}
+				storage_close();
+			});
+		});
+	},
 });
 
 Vue.component("vue-paymentmode-form", {
@@ -103,6 +116,10 @@ Vue.component("vue-paymentmode-form", {
 						<option value="3">Enregistre une dette client</option>
 						<option value="5">Utilise le solde pré-payé</option>
 					</select>
+				</div>
+				<div class="form-group">
+					<input id="edit-visible" type="checkbox" name="visible" v-model="data.paymentMode.visible">
+					<label for="edit-visible">Actif</label>
 				</div>
 			</fieldset>
 			<fieldset>
