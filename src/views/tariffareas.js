@@ -39,7 +39,7 @@ Vue.component("vue-tariffarea-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<vue-table v-bind:table="areasTable"></vue-table>
+		<vue-table v-bind:table="areasTable" v-bind:noexport="true"></vue-table>
 	</article>
 </section>
 </div>

@@ -4,7 +4,7 @@ Vue.component("vue-table", {
 		return {showHelp: false};
 	},
 	template: `<div class="table">
-	<div class="filters noprint" v-if="!nofilter && !noexport">
+	<div class="filters noprint" v-if="!nofilter || !noexport">
 		<p v-if="!nofilter">Afficher/masquer des colonnes <button type="button" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button> <button type="button" v-on:click="checkAllColumns">Afficher toutes les colonnes</button> <button type="button" v-on:click="uncheckAllColumns">Masquer toutes les colonnes</button> <button type="button" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></p>
 		<ul class="filter-columns" v-if="!nofilter" v-bind:class="{'expand-help': showHelp}">
 			<li v-for="(col, index) in table.columns">
@@ -14,8 +14,8 @@ Vue.component("vue-table", {
 			</li>
 		</ul>
 		<div v-if="table.lines && !noexport">
-			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter les résultats</a>
-			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter les résultats (Excel)</a>
+			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter le tableau</a>
+			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter le tableau (Excel)</a>
 		</div>
 	</div>
 	<h2 v-if="table.title">{{table.title}}</h2>
