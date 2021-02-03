@@ -136,6 +136,7 @@ Vue.component("vue-paymentmode-form", {
 								<a v-if="data.hadValueImage[value.value]" class="btn btn-del" v-on:click="toggleValueImage(value);return false;" >{{data.deleteValueImageButton[value.value]}}</a>
 							</td>
 							<td><input type="number" v-model="value.value" step="0.01" /></td>
+							<td><button type="button" class="btn btn-delete" v-on:click="deleteValue(index)">X</button></td>
 						</tr>
 					</tbody>
 				</table>
