@@ -297,16 +297,12 @@ Vue.component("vue-product-form", {
 					<input type="number" id="edit-taxedPrice" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
-					<label for="edit-priceBuy">Prix d'achat</label>
+					<label for="edit-priceBuy">Prix d'achat HT</label>
 					<input type="number" id="edit-priceBuy" name="priceBuy" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
 					<label for="edit-margin">Marge</label>
 					<input type="text" id="edit-margin" name="margin" v-model="data.product.margin" disabled="true" />
-				</div>
-				<div class="form-group">
-					<input id="edit-scaled" type="checkbox" name="scaled" v-model="data.product.scaled"></dd>
-					<label for="edit-scaled">Vente au poids</label>
 				</div>
 				<div class="form-group">
 					<label for="edit-discountRate">Remise automatique</label>
@@ -327,17 +323,21 @@ Vue.component("vue-product-form", {
 					<label for="edit-barcode">Code barre</label>
 					<input id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" />
 				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Volumétrie et contenance</legend>
 				<div class="form-group">
-					<label for="edit-scaleType">Poids/Volume</label>
-					<select id="edit-scaleType" v-model="data.product.scaleType">
-						<option v-bind:value="0">À la pièce</option>
-						<option v-bind:value="1">Kilogramme</option>
-						<option v-bind:value="2">Litre</option>
-					</select>
+					<input id="edit-scaled" type="checkbox" name="scaled" v-model="data.product.scaled"></dd>
+					<label for="edit-scaled">Vente en vrac</label>
 				</div>
 				<div class="form-group">
 					<label for="edit-scaleValue">Contenance</label>
-					<input id="edit-scaleValue" type="number" step="any" v-model="data.product.scaleValue" />
+					<input id="edit-scaleValue" type="number" step="0.01" v-model="data.product.scaleValue" v-if="data.product.scaled == false" />
+					<select id="edit-scaleType" v-model="data.product.scaleType">
+						<option v-bind:value="0" v-bind:disabled="data.product.scaled == true">pièce</option>
+						<option v-bind:value="1">Kilogramme</option>
+						<option v-bind:value="2">Litre</option>
+					</select>
 				</div>
 				<div class="form-group">
 					<label for="edit-refPrice">Prix de référence TTC</label>
