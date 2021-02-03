@@ -72,7 +72,7 @@ Vue.component("vue-tax-form", {
 
 			<div class="form-group">
 				<label for="edit-rate">Taux</label>
-				<input id="edit-rate" type="number" v-model.number="data.tax.rate" step="0.0001">
+				<input id="edit-rate" type="number" v-model.lazy="rate" step="0.01" min="0" max="100"> %
 			</div>
 
 			<div class="form-control">
@@ -82,5 +82,15 @@ Vue.component("vue-tax-form", {
 	</article>
 </section>
 </div>`,
+	computed: {
+		rate: {
+			get: function() {
+				return Number((this.data.tax.rate * 100.0).toFixed(2));
+			},
+			set: function(value) {
+				this.data.tax.rate = Number((value / 100.0).toFixed(5));
+			}
+		}
+	}
 });
 

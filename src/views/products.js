@@ -308,6 +308,14 @@ Vue.component("vue-product-form", {
 					<input id="edit-scaled" type="checkbox" name="scaled" v-model="data.product.scaled"></dd>
 					<label for="edit-scaled">Vente au poids</label>
 				</div>
+				<div class="form-group">
+					<label for="edit-discountRate">Remise automatique</label>
+					<input id="edit-discountRate" type="number" v-model.lazy="discountRate" step="0.01" min="0" max="100"/> %
+				</div>
+				<div class="form-group">
+					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
+					<label for="edit-discountEnabled">Appliquer la remise automatique</label>
+				</div>
 			</fieldset>
 			<fieldset>
 				<legend>Référencement</legend>
@@ -334,14 +342,6 @@ Vue.component("vue-product-form", {
 				<div class="form-group">
 					<label for="edit-refPrice">Prix de référence TTC</label>
 					<input id="edit-refPrice" v-model="refPrice" disabled="true" />
-				</div>
-				<div class="form-group">
-					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
-					<label for="edit-discountEnabled">Remise auto</label>
-				</div>
-				<div class="form-group">
-					<label for="edit-discountRate">Taux de remise</label>
-					<input id="edit-discountRate" type="number" v-model="data.product.discountRate" step="0.01" />
 				</div>
 			</fieldset>
 
@@ -375,6 +375,14 @@ Vue.component("vue-product-form", {
 					break;
 			}
 			return price;
+		},
+		discountRate: {
+			get: function() {
+				return Number((this.data.product.discountRate * 100.0).toFixed(2));
+			},
+			set: function(value) {
+				this.data.product.discountRate = Number((value / 100.0).toFixed(5));
+			}
 		}
 	},
 	methods: {

@@ -68,8 +68,8 @@ Vue.component("vue-discountprofile-form", {
 				<input id="edit-label" type="text" v-model="data.discountProfile.label" required="true" />
 			</div>
 			<div class="form-group">
-				<label for="edit-rate">Taux de remise</label>
-				<input id="edit-rate" type="number" v-model.number="data.discountProfile.rate" step="0.01" min="0.0" max="1.0" />
+				<label for="edit-rate">Remise</label>
+				<input id="edit-rate" type="number" v-model.lazy="discountRate" step="0.01" min="0" max="100" /> %
 			</div>
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
@@ -78,4 +78,14 @@ Vue.component("vue-discountprofile-form", {
 	</article>
 </section>
 </div>`,
+	computed: {
+		discountRate: {
+			get: function() {
+				return Number((this.data.discountProfile.rate * 100.0).toFixed(2));
+			},
+			set: function(value) {
+				this.data.discountProfile.rate = Number((value / 100.0).toFixed(5));
+			}
+		}
+	}
 });
