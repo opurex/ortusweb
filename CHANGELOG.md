@@ -5,6 +5,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.9] - 2021-02-04
+
+### Added
+- Option to use OpenDyslexic font, user options.
+- Import categories from csv.
+- Select fields to show for tariff areas.
+- Import/export tariff area prices from/to csv.
+- Select fields to show for currencies, export to csv.
+- Select fields to show for payment modes.
+- Display the scaled price on product form.
+
+### Changed
+- Logout is now located under the user menu.
+- Sync status is shown on top and centered on home page.
+- Rates are shown and edited in percent instead of rate.
+- Reorganized scale-related fields in product form, with reference price
+
+### Fixed
+- Links on home page.
+- Z ticket payment amounts with multiple currencies (only shown in main currency).
+- Role list.
+- Payment modes can be disabled/reenabled, payment mode values can be deleted.
+
+
 ## [8.8] - 2020-12-14
 
 ### Added
