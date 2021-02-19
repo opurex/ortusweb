@@ -121,8 +121,7 @@ Vue.component("vue-category-form", {
 			<div class="form-group">
 				<label for="edit-parent">Parent</label></dt>
 				<select id="edit-parent" v-model="data.category.parent">
-					<option disabled value="">Selectionner</option>
-					<option value="">Aucun</option>
+					<option v-bind:value="null">Aucun</option>
 					<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
 				</select>
 			</div>

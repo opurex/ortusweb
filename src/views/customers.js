@@ -116,21 +116,21 @@ Vue.component("vue-customer-form", {
 				<div class="form-group">
 					<label for="edit-discountProfile">Profil de remise</label>
 					<select id="edit-discountProfile" v-model="data.customer.discountProfile">
-						<option value="">Pas de profil de remise</option>
+						<option v-bind:value="null">Pas de profil de remise</option>
 						<option v-for="discountProfile in data.discountProfiles" :key="discountProfile.id" v-bind:value="discountProfile.id">{{discountProfile.label}}</option>
 					</select>
 				</div>
 				<div class="form-group">
 					<label for="edit-tariffArea">Zone tarifaire</label>
 					<select class="form-control" id="edit-tariffArea" v-model="data.customer.tariffArea">
-						<option value="">Pas de zone tarifaire</option>
+						<option v-bind:value="null">Pas de zone tarifaire</option>
 						<option v-for="tariffArea in data.tariffAreas" :key="tariffArea.id" v-bind:value="tariffArea.id">{{tariffArea.label}}</option>
 					</select>
 				</div>
 				<div class="form-group">
 					<label for="edit-tax">TVA</label>
 					<select class="form-control" id="edit-tax" v-model="data.customer.tax">
-						<option value="">Pas de modification</option>
+						<option v-bind:value="null">Pas de modification</option>
 						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 					</select>
 				</div>
