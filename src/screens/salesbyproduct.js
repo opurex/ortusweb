@@ -36,7 +36,9 @@ function salesbyproduct_filter() {
 		"pages": 0,
 		"currentPage": 0,
 		"separateByCR": vue.screen.data.separateCashRegisters,
-		"productsQty": {}};
+		"productsQty": {},
+		"customProductsQty": {}
+	};
 	srvcall_get("api/ticket/search?count=1&dateStart=" + _salesbyproduct_data.start + "&dateStop=" + _salesbyproduct_data.stop, _salesbyproduct_countCallback);
 	gui_showLoading();
 }
@@ -79,6 +81,22 @@ function _salesbyproduct_filterCallback(request, status, response) {
 					_salesbyproduct_data.productsQty[line.product][ticket.cashRegister] += line.quantity;
 				} else {
 					_salesbyproduct_data.productsQty[line.product] += line.quantity;
+				}
+			} else {
+				if (!(line.productLabel in _salesbyproduct_data.customProductsQty)) {
+					if (_salesbyproduct_data.separateByCR) {
+						_salesbyproduct_data.customProductsQty[line.productLabel] = {};
+					} else {
+						_salesbyproduct_data.customProductsQty[line.productLabel] = 0;
+					}
+				}
+				if (_salesbyproduct_data.separateByCR) {
+					if (!(ticket.cashRegister in _salesbyproduct_data.customProductsQty[line.productLabel])) {
+						_salesbyproduct_data.customProductsQty[line.productLabel][ticket.cashRegister] = 0
+					}
+					_salesbyproduct_data.customProductsQty[line.productLabel][ticket.cashRegister] += line.quantity;
+				} else {
+					_salesbyproduct_data.customProductsQty[line.productLabel] += line.quantity;
 				}
 			}
 		}
@@ -128,6 +146,14 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 				}
 			}
 		}
+		for (let prdLabel in _salesbyproduct_data.customProductsQty) {
+			for (let j = 0; j < cashRegisters.length; j++) {
+				let cashRegister = cashRegisters[j];
+				if (!(cashRegister.id in _salesbyproduct_data.customProductsQty[prdLabel])) {
+					_salesbyproduct_data.customProductsQty[prdLabel][cashRegister.id] = 0;
+				}
+			}
+		}
 	}
 	let catById = [];
 	for (let i = 0; i < categories.length; i++) {
@@ -156,6 +182,7 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 	}
 	// Sort the categories
 	stats = stats.sort(tools_sort("dispOrder", "reference"));
+	let customProductLabels = Object.keys(_salesbyproduct_data.customProductsQty).sort()
 	// Prepare rendering
 	let lines = [];
 	for (let i = 0; i < stats.length; i++) {
@@ -196,6 +223,21 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 						}
 						lines.push(line);
 					}
+				}
+			}
+		}
+	}
+	for (let i = 0; i < customProductLabels.length; i++) {
+		let productLabel = customProductLabels[i];
+		if (!separateByCR) {
+			let qty = _salesbyproduct_data.customProductsQty[productLabel].toLocaleString();
+			lines.push(["", "", "", "", productLabel, qty, "", "", ""]);
+		} else {
+			for (let k = 0; k < cashRegisters.length; k++) {
+				let cr = cashRegisters[k];
+				if (cr.id in _salesbyproduct_data.customProductsQty[productLabel]) {
+					let qty = _salesbyproduct_data.customProductsQty[productLabel][cr.id];
+					lines.push(["", cr.label, "" ,"", productLabel, qty, "", "", ""]);
 				}
 			}
 		}
