@@ -19,9 +19,10 @@ function salesbyproduct_show() {
 				{label: "Reference", visible: false, help: "La référence du produit."},
 				{label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
 				{label: "Quantité", visible: true, help: "La quantité de produit vendue sur la période."},
-				{label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée."},
+				{label: "Vente HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée."},
 				{label: "Prix d'achat", visible: false, help: "Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente."},
 				{label: "Marge", visible: false, help: "La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente."},
+				{label: "Vente TTC", visible: false, help: "Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée."},
 			],
 		},
 	}
@@ -36,8 +37,8 @@ function salesbyproduct_filter() {
 		"pages": 0,
 		"currentPage": 0,
 		"separateByCR": vue.screen.data.separateCashRegisters,
-		"productsQty": {},
-		"customProductsQty": {}
+		"products": {},
+		"customProducts": {}
 	};
 	srvcall_get("api/ticket/search?count=1&dateStart=" + _salesbyproduct_data.start + "&dateStop=" + _salesbyproduct_data.stop, _salesbyproduct_countCallback);
 	gui_showLoading();
@@ -67,36 +68,46 @@ function _salesbyproduct_filterCallback(request, status, response) {
 		for (let j = 0; j < ticket.lines.length; j++) {
 			let line = ticket.lines[j];
 			if (line.product != null) {
-				if (!(line.product in _salesbyproduct_data.productsQty)) {
+				if (!(line.product in _salesbyproduct_data.products)) {
 					if (_salesbyproduct_data.separateByCR) {
-						_salesbyproduct_data.productsQty[line.product] = {};
+						_salesbyproduct_data.products[line.product] = {};
 					} else {
-						_salesbyproduct_data.productsQty[line.product] = 0;
+						_salesbyproduct_data.products[line.product] = {qty: 0, price: 0.0, priceTax: 0.0};
 					}
 				}
 				if (_salesbyproduct_data.separateByCR) {
-					if (!(ticket.cashRegister in _salesbyproduct_data.productsQty[line.product])) {
-						_salesbyproduct_data.productsQty[line.product][ticket.cashRegister] = 0
+					if (!(ticket.cashRegister in _salesbyproduct_data.products[line.product])) {
+						_salesbyproduct_data.products[line.product][ticket.cashRegister] = {qty: 0, price: 0.0, priceTax: 0.0};
 					}
-					_salesbyproduct_data.productsQty[line.product][ticket.cashRegister] += line.quantity;
+					_salesbyproduct_data.products[line.product][ticket.cashRegister].qty += line.quantity;
+					_salesbyproduct_data.products[line.product][ticket.cashRegister].priceTax += line.finalTaxedPrice
+					_salesbyproduct_data.products[line.product][ticket.cashRegister].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
 				} else {
-					_salesbyproduct_data.productsQty[line.product] += line.quantity;
+					_salesbyproduct_data.products[line.product].qty += line.quantity;
+					_salesbyproduct_data.products[line.product].priceTax += line.finalTaxedPrice
+					_salesbyproduct_data.products[line.product].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
 				}
 			} else {
-				if (!(line.productLabel in _salesbyproduct_data.customProductsQty)) {
+				if (!(line.productLabel in _salesbyproduct_data.customProducts)) {
 					if (_salesbyproduct_data.separateByCR) {
-						_salesbyproduct_data.customProductsQty[line.productLabel] = {};
+						_salesbyproduct_data.customProducts[line.productLabel] = {};
 					} else {
-						_salesbyproduct_data.customProductsQty[line.productLabel] = 0;
+						_salesbyproduct_data.customProducts[line.productLabel] = {qty: 0, price: 0.0, priceTax: 0.0};
 					}
 				}
 				if (_salesbyproduct_data.separateByCR) {
-					if (!(ticket.cashRegister in _salesbyproduct_data.customProductsQty[line.productLabel])) {
-						_salesbyproduct_data.customProductsQty[line.productLabel][ticket.cashRegister] = 0
+					if (!(ticket.cashRegister in _salesbyproduct_data.customProducts[line.productLabel])) {
+						_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister] = {qty: 0, price: 0.0, priceTax: 0.0};
 					}
-					_salesbyproduct_data.customProductsQty[line.productLabel][ticket.cashRegister] += line.quantity;
+					_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister].qty += line.quantity;
+					_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister].priceTax += line.finalTaxedPrice
+					_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
+
 				} else {
-					_salesbyproduct_data.customProductsQty[line.productLabel] += line.quantity;
+					_salesbyproduct_data.customProducts[line.productLabel].qty += line.quantity;
+					_salesbyproduct_data.customProducts[line.productLabel].priceTax += line.finalTaxedPrice
+					_salesbyproduct_data.customProducts[line.productLabel].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
+
 				}
 			}
 		}
@@ -135,22 +146,22 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 		for (let i = 0; i < products.length; i++) {
 			let prd = products[i];
 			if (prd.visible || vue.screen.data.includeArchives) {
-				if (!(prd.id in _salesbyproduct_data.productsQty)) {
-					_salesbyproduct_data.productsQty[prd.id] = {};
+				if (!(prd.id in _salesbyproduct_data.products)) {
+					_salesbyproduct_data.products[prd.id] = {qty: 0, price: 0.0, priceTax: 0.0};
 				}
 				for (let j = 0; j < cashRegisters.length; j++) {
 					let cashRegister = cashRegisters[j];
-					if (!(cashRegister.id in _salesbyproduct_data.productsQty[prd.id])) {
-						_salesbyproduct_data.productsQty[prd.id][cashRegister.id] = 0;
+					if (!(cashRegister.id in _salesbyproduct_data.products[prd.id])) {
+						_salesbyproduct_data.products[prd.id][cashRegister.id] = {qty: 0, price: 0.0, priceTax: 0.0};;
 					}
 				}
 			}
 		}
-		for (let prdLabel in _salesbyproduct_data.customProductsQty) {
+		for (let prdLabel in _salesbyproduct_data.customProducts) {
 			for (let j = 0; j < cashRegisters.length; j++) {
 				let cashRegister = cashRegisters[j];
-				if (!(cashRegister.id in _salesbyproduct_data.customProductsQty[prdLabel])) {
-					_salesbyproduct_data.customProductsQty[prdLabel][cashRegister.id] = 0;
+				if (!(cashRegister.id in _salesbyproduct_data.customProducts[prdLabel])) {
+					_salesbyproduct_data.customProducts[prdLabel][cashRegister.id] = {qty: 0, price: 0.0, priceTax: 0.0};;
 				}
 			}
 		}
@@ -164,10 +175,10 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 		// Put the data into the rendering data (catById)
 		let prd = products[i];
 		if (prd.visible || vue.screen.data.includeArchives) {
-			if (!(prd.id in _salesbyproduct_data.productsQty) && vue.screen.data.includeZero && !separateByCR) {
-				_salesbyproduct_data.productsQty[prd.id] = 0;
+			if (!(prd.id in _salesbyproduct_data.products) && vue.screen.data.includeZero && !separateByCR) {
+				_salesbyproduct_data.products[prd.id] = {qty: 0, price: 0.0, priceTax: 0.0};
 			}
-			if (prd.id in _salesbyproduct_data.productsQty) {
+			if (prd.id in _salesbyproduct_data.products) {
 				catById[prd.category].products.push(prd);
 			}
 		}
@@ -182,7 +193,7 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 	}
 	// Sort the categories
 	stats = stats.sort(tools_sort("dispOrder", "reference"));
-	let customProductLabels = Object.keys(_salesbyproduct_data.customProductsQty).sort()
+	let customProductLabels = Object.keys(_salesbyproduct_data.customProducts).sort()
 	// Prepare rendering
 	let lines = [];
 	for (let i = 0; i < stats.length; i++) {
@@ -196,31 +207,33 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
 			}
 			if (!separateByCR) {
-				let qty = _salesbyproduct_data.productsQty[prd.id].toLocaleString();
-				let line = [img, "", cat, prd.reference, prd.label, qty];
-				line.push((prd.priceSell * qty).toLocaleString());
+				let qty = _salesbyproduct_data.products[prd.id].qty.toLocaleString();
+				let price = _salesbyproduct_data.products[prd.id].price;
+				let line = [img, "", cat, prd.reference, prd.label, qty, price.toLocaleString()];
 				if (prd.priceBuy > 0) {
 					line.push(prd.priceBuy.toLocaleString());
-					line.push(((prd.priceSell - prd.priceBuy) * qty).toLocaleString());
+					line.push((price - prd.priceBuy * qty).toLocaleString());
 				} else {
 					line.push("");
 					line.push("");
 				}
+				line.push(_salesbyproduct_data.products[prd.id].priceTax.toLocaleString());
 				lines.push(line);
 			} else {
 				for (let k = 0; k < cashRegisters.length; k++) {
 					let cr = cashRegisters[k];
-					if (cr.id in _salesbyproduct_data.productsQty[prd.id]) {
-						let qty = _salesbyproduct_data.productsQty[prd.id][cr.id];
-						let line = [img, cr.label, cat, prd.reference, prd.label, qty];
-						line.push((prd.priceSell * qty).toLocaleString());
+					if (cr.id in _salesbyproduct_data.products[prd.id]) {
+						let qty = _salesbyproduct_data.products[prd.id][cr.id].qty;
+						let price = _salesbyproduct_data.products[prd.id][cr.id].price;
+						let line = [img, cr.label, cat, prd.reference, prd.label, qty, price.toLocaleString()];
 						if (prd.priceBuy > 0) {
 							line.push(prd.priceBuy.toLocaleString());
-							line.push(((prd.priceSell - prd.priceBuy) * qty).toLocaleString());
+							line.push((price - prd.priceBuy * qty).toLocaleString());
 						} else {
 							line.push("");
 							line.push("");
 						}
+						line.push(_salesbyproduct_data.products[prd.id][cr.id].priceTax.toLocaleString());
 						lines.push(line);
 					}
 				}
@@ -230,14 +243,18 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 	for (let i = 0; i < customProductLabels.length; i++) {
 		let productLabel = customProductLabels[i];
 		if (!separateByCR) {
-			let qty = _salesbyproduct_data.customProductsQty[productLabel].toLocaleString();
-			lines.push(["", "", "", "", productLabel, qty, "", "", ""]);
+			let qty = _salesbyproduct_data.customProducts[productLabel].qty.toLocaleString();
+			let price = _salesbyproduct_data.customProducts[productLabel].price.toLocaleString();
+			let priceTax = _salesbyproduct_data.customProducts[productLabel].priceTax.toLocaleString();
+			lines.push(["", "", "", "", productLabel, qty, price, "", "", priceTax]);
 		} else {
 			for (let k = 0; k < cashRegisters.length; k++) {
 				let cr = cashRegisters[k];
-				if (cr.id in _salesbyproduct_data.customProductsQty[productLabel]) {
-					let qty = _salesbyproduct_data.customProductsQty[productLabel][cr.id];
-					lines.push(["", cr.label, "" ,"", productLabel, qty, "", "", ""]);
+				if (cr.id in _salesbyproduct_data.customProducts[productLabel]) {
+					let qty = _salesbyproduct_data.customProducts[productLabel][cr.id].qty;
+					let price = _salesbyproduct_data.customProducts[productLabel][cr.id].price.toLocaleString();
+					let priceTax = _salesbyproduct_data.customProducts[productLabel][cr.id].priceTax.toLocaleString();
+					lines.push(["", cr.label, "" ,"", productLabel, qty, price, "", "", priceTax]);
 				}
 			}
 		}
