@@ -112,6 +112,7 @@ function _tickets_filterCallback(request, status, response) {
 function _tickets_dataRetreived() {
 	gui_hideLoading();
 	vue.screen.data.tickets = _tickets_data.tickets;
+	let total = 0.0;
 	let lines = [];
 	for (let i = 0; i < _tickets_data.tickets.length; i++) {
 		let tkt = _tickets_data.tickets[i];
@@ -156,8 +157,10 @@ function _tickets_dataRetreived() {
 		lines.push([cr, tkt.sequence, tkt.number, tools_dateTimeToString(date), customer, pmModesStr,
 			tkt.finalTaxedPrice.toLocaleString(), user,
 			{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"}]);
+		total += tkt.finalTaxedPrice;
 	}
 	Vue.set(vue.screen.data.table, "lines", lines);
+	vue.screen.data.table.footer = ["", "", "", "", "", "Total", total.toLocaleString(), "", ""];
 	if (vue.screen.data.tickets.length > 0) {
 		_tickets_selectTicket(vue.screen.data.tickets[0]);
 	} else {
