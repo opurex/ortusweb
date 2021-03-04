@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.10] - 2021-03-04
+
+### Added
+- Custom products in sales by product.
+- Sell with VAT in sales by product.
+- Total in the footer of the ticket table.
+
+### Fixed
+- Use the real sell price from the ticket in sales by product instead of the latest one
+- Empty values instead of "no changes" in select inputs from customer and category forms
+
+
 ## [8.9] - 2021-02-04
 
 ### Added
