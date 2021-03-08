@@ -80,8 +80,8 @@ Vue.component("vue-role-form", {
 			<fieldset class="form-tiny">
 				<legend>Modes de paiement</legend>
 				<div class="form-group" v-for="pm in data.paymentModes">
-					<input v-bind:id="'edit-pm-' + pm.code" type="checkbox" v-bind:value="'payment.' + pm.code" v-model="data.role.permissions" />
-					<label v-bind:for="'edit-pm-' + pm.code">{{pm.label}}</label>
+					<input v-bind:id="'edit-pm-' + pm.reference" type="checkbox" v-bind:value="'payment.' + pm.reference" v-model="data.role.permissions" />
+					<label v-bind:for="'edit-pm-' + pm.reference">{{pm.label}}</label>
 				</div>
 			</fieldset>
 			<fieldset class="form-tiny">
