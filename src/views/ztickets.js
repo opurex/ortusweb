@@ -12,11 +12,11 @@ Vue.component("vue-zticket-list", {
 		<nav class="navbar">
 			<form id="ztickets-filter" onsubmit="javascript:ztickets_filter();return false;">
 				<div class="form-group">
-					<label for="start">Du</label>
+					<label for="start">Ouverture entre le</label>
 					<vue-inputdate id="start" v-model="data.start" />
 				</div>
 				<div class="form-group">
-					<label for="stop">au</label>
+					<label for="stop">et le</label>
 					<vue-inputdate id="stop" v-model="data.stop" />
 				</div>
 				<div class="form-group">
