@@ -72,7 +72,7 @@ aside.box {
 	margin-bottom: 1em;
 }
 
-.form-group input[type=checkbox] + label {
+.form-group input[type=checkbox] {
 	vertical-align: text-bottom;
 }
 .form-group input:not([type=checkbox]),
@@ -90,16 +90,21 @@ form > .form-control {
 nav form {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: baseline;
 }
 #login nav form { /* Disable inline for login form */
 	display: inherit;
 	flex-wrap: inherit;
 }
-nav .form-group {
+nav .form-group,
+nav .form-control {
 	margin-right: 0.5em;
 }
 nav .form-group input[type=checkbox] + label {
 	margin-right: 0.25em;
+}
+nav .form-control {
+	margin-bottom: 1em;
 }
 
 /* Form tiny */
