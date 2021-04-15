@@ -4,8 +4,8 @@ Vue.component("vue-table", {
 		return {showHelp: false};
 	},
 	template: `<div class="table">
-	<div class="filters noprint" v-if="!nofilter || !noexport">
-		<p v-if="!nofilter">Afficher/masquer des colonnes <button type="button" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button> <button type="button" v-on:click="checkAllColumns">Afficher toutes les colonnes</button> <button type="button" v-on:click="uncheckAllColumns">Masquer toutes les colonnes</button> <button type="button" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></p>
+	<div class="filters noprint" v-if="table.columns.length > 0 && (!nofilter || !noexport)">
+		<p v-if="!nofilter">Afficher/masquer des colonnes <button type="button" class="btn btn-misc" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button> <button type="button" class="btn btn-misc" v-on:click="checkAllColumns">Afficher toutes les colonnes</button> <button type="button" class="btn btn-misc" v-on:click="uncheckAllColumns">Masquer toutes les colonnes</button> <button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></p>
 		<ul class="filter-columns" v-if="!nofilter" v-bind:class="{'expand-help': showHelp}">
 			<li v-for="(col, index) in table.columns">
 				<input v-model="col.visible" v-bind:id="'filter-column-' + index" type="checkbox" />

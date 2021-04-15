@@ -179,6 +179,12 @@ a.btn {
 	color: #fff;
 }
 
+.btn-misc {
+	color: #000;
+	background-color: #ddd;
+	border-color: #aaa;
+}
+
 .btn-add {
 	background-color: #a3351e;
 	border-color: #8c2e1a;
