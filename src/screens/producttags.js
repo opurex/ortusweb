@@ -105,23 +105,25 @@ function _producttags_addPdfTag(content, format, product, col, row, dh, dv) {
 		fontSize: format.price.dots,
 	}]});
 	// Price by unit
+	let priceRefText = priceOne.toLocaleString(undefined, { minimumFractionDigits: 2 }) + vue.screen.data.currency.symbol;
 	switch (product.scaleType) {
 		case 1:
-			content.push({ columns: [{
-				width: format.unit.width,
-				absolutePosition: {x: (left + format.unit.x) * MM_TO_PT, y: (top + format.unit.y) * MM_TO_PT},
-				text: priceOne.toLocaleString(undefined, { minimumFractionDigits: 2 }) + vue.screen.data.currency.symbol + " le kg",
-				fontSize: format.unit.dots,
-			}]});
+			priceRefText += " le kg";
 			break;
 		case 2:
-			content.push({ columns: [{
-				width: format.unit.width,
-				absolutePosition: { x: (left + format.unit.x) * MM_TO_PT, y: (top + format.unit.y) * MM_TO_PT},
-				text: priceOne.toLocaleString(undefined, { minimumFractionDigits: 2 }) + vue.screen.data.currency.symbol + " le litre",
-				fontSize: format.unit.dots,
-			}]});
+			priceRefText += " le litre";
 			break;
+		case 3:
+			priceRefText += " l'heure";
+			break;
+	}
+	if (product.scaleType != 0) {
+		content.push({ columns: [{
+			width: format.unit.width,
+			absolutePosition: { x: (left + format.unit.x) * MM_TO_PT, y: (top + format.unit.y) * MM_TO_PT},
+			text: priceRefText,
+			fontSize: format.unit.dots,
+		}]});
 	}
 	// Reference
 	content.push({columns: [{

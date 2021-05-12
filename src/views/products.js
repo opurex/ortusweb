@@ -125,6 +125,9 @@ Vue.component("vue-product-list", {
 					case 2:
 						scaleType = "Litre";
 						break;
+					case 3:
+						scaleType = "Heure";
+						break;
 				}
 				let line = [
 					{type: "thumbnail", src: this.imageSrc(prd)},
@@ -338,6 +341,7 @@ Vue.component("vue-product-form", {
 						<option v-bind:value="0" v-bind:disabled="data.product.scaled == true">pièce</option>
 						<option v-bind:value="1">Kilogramme</option>
 						<option v-bind:value="2">Litre</option>
+						<option v-bind:value="3">Heure</option>
 					</select>
 				</div>
 				<div class="form-group">
@@ -373,6 +377,9 @@ Vue.component("vue-product-form", {
 					break;
 				case 2:
 					price += "le litre";
+					break;
+				case 3:
+					price += "de l'heure";
 					break;
 			}
 			return price;
@@ -792,6 +799,7 @@ Vue.component("vue-product-import-table", {
 				case 0: case "0": return "-"
 				case 1: case "1": return "Poids"
 				case 2: case "2": return "Litre"
+				case 3: case "3": return "Heure"
 			}
 		},
 		tax: function(taxId) {
