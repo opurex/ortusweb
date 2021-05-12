@@ -1,13 +1,24 @@
 function preferences_show() {
-	vue.screen.data = {
-		preferDyslexicMode: storage_getOption("preferDyslexicMode", "0") == "1",
-	}
-	vue.screen.component = "vue-preferences";
+	gui_showLoading();
+	storage_open(function(event) {
+		storage_get("options", OPTION_DYSLEXICMODE, function(option) {
+			let enabled = false
+			if (option != null) {
+				enabled = option.content;
+			}
+			vue.screen.data = {
+				preferDyslexicMode: enabled == true,
+			}
+			vue.screen.component = "vue-preferences";
+			storage_close();
+			gui_hideLoading();
+		});
+	});
 }
 
 function preferences_save() {
 	gui_showLoading();
-	let preferDyslexicMode = Option(Option_prefName("preferDyslexicMode"), vue.screen.data.preferDyslexicMode ? "1" : "0");
+	let preferDyslexicMode = Option(OPTION_DYSLEXICMODE, vue.screen.data.preferDyslexicMode ? "1" : "0");
 	srvcall_post("api/option", preferDyslexicMode, preferences_saveCallback);
 }
 
@@ -16,9 +27,9 @@ function preferences_saveCallback(request, status, response) {
 		return;
 	}
 	var data = JSON.parse(response);
-	storage_setOption("preferDyslexicMode", vue.screen.data.preferDyslexicMode ? "1" : "0");
-	gui_updateDyslexicMode();
-	gui_hideLoading();
-	appData.localWriteDbSuccess();
+	gui_setDyslexicMode(data.content == "1");
+	storage_open(function(event) {
+		storage_write("options", data, appData.localWriteDbSuccess, appData.localWriteDbError);
+	}, appData.localWriteDbOpenError);
 }
 

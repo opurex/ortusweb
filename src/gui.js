@@ -53,14 +53,5 @@ function gui_setDyslexicMode(mode) {
 	}
 }
 
-function gui_updateDyslexicMode() {
-	if (vue.sessionParams.dyslexicMode != null) {
-		gui_setDyslexicMode(vue.sessionParams.dyslexicMode);
-	} else if (storage_getOption("preferDyslexicMode") == "1") {
-		gui_setDyslexicMode(true);
-	} else {
-		gui_setDyslexicMode(false);
-	}
-}
 
 Vue.component("vue-blank", {});

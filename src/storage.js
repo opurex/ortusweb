@@ -12,10 +12,8 @@ var SYNC_MODELS = [
 	"discounts",
 	"customers",
 	"discountprofiles",
-	"resources"
-];
-var LOCAL_OPTIONS = [
-	"preferDyslexicMode",
+	"resources",
+	"options"
 ];
 
 var storage_available = function(success, error) {
@@ -39,10 +37,10 @@ var storage_available = function(success, error) {
 /** Success and error are callback function with only the event as parameter. */
 var storage_open = function(success, error) {
 	if (arguments.length < 2) {
-		error = appData.dbError;
+		error = appData.generalDbError;
 	}
 	// Version is XYYZZ with X the major version, Y minor and Z local (debug)
-	var request = window.indexedDB.open("pasteque", 80005);
+	var request = window.indexedDB.open("pasteque", 80006);
 	request.onerror = error;
 	request.onsuccess = function(event) {
 		appData.db = event.target.result;
@@ -63,9 +61,6 @@ var storage_drop = function(success, error) {
 	var request = window.indexedDB.deleteDatabase("pasteque");
 	request.onerror = error;
 	request.onsuccess = success;
-	for (let i = 0; i < LOCAL_OPTIONS.length; i++) {
-		storage_setOption(LOCAL_OPTIONS[i], null);
-	}
 }
 
 /** The initializing function called on opening before onsuccess when
@@ -111,6 +106,8 @@ var _storage_install = function(event) {
 	var dpS = db.createObjectStore("discountprofiles", { keyPath: "id" });
 	// Resources
 	var resS = db.createObjectStore("resources", { keyPath: "label" });
+	// Options
+	var optS = db.createObjectStore("options", { keyPath: "name" });
 }
 
 /** Delete all objectStores from a db. */
@@ -148,12 +145,6 @@ var storage_sync = function(syncData, progress, error, complete) {
 	var transaction = appData.db.transaction(SYNC_MODELS, "readwrite");
 	transaction.oncomplete = function(event) {
 		localStorage.setItem("syncDate", Date.now());
-		for (let i = 0; i < syncData.options.length; i++) {
-			let opt = syncData.options[i];
-			if (opt.name == Option_prefName("preferDyslexicMode")) {
-				storage_setOption("preferDyslexicMode", opt.content);
-			}
-		}
 		complete(event);
 	}
 	for (var i = 0; i < SYNC_MODELS.length; i++) {
@@ -419,25 +410,6 @@ var storage_getProductsFromCategory = function(catId, callback, sortFields, erro
 			let sortedPrds = products.sort(tools_sort(sortFields[0], sortFields[1]));
 			callback(sortedPrds);
 		}
-	}
-}
-
-var storage_getOption = function(option, defaultValue) {
-	if (arguments.length < 2) {
-		defaultValue = null;
-	}
-	let val = localStorage.getItem(option);
-	if (val == null && defaultValue != null) {
-		return defaultValue
-	}
-	return val;
-}
-
-var storage_setOption = function(name, value) {
-	if (value == null) {
-		localStorage.removeItem(name);
-	} else {
-		localStorage.setItem(name, value);
 	}
 }
 

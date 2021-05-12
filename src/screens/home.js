@@ -56,12 +56,21 @@ function home_syncError(model, i, event) {
 }
 
 function home_syncComplete() {
-	vue.menu.visible = true;
-	gui_hideLoading();
-	storage_close();
-	home_show();
-	gui_updateDyslexicMode();
-	gui_hideLoading();
+	function syncDone() {
+		vue.menu.visible = true;
+		gui_hideLoading();
+		storage_close();
+		home_show();
+		gui_hideLoading();
+	}
+	storage_open(function(event) {
+		storage_get("options", OPTION_DYSLEXICMODE, function(option) {
+			if (option != null) {
+				gui_setDyslexicMode(option.content == "1")
+			}
+			syncDone()
+		}, function(error) { syncDone() });
+	});
 }
 
 function home_checkProgress() {

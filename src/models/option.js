@@ -1,7 +1,10 @@
+const OPTION_DYSLEXICMODE = Option_prefName("preferDyslexicMode");
+
 function Option(name, value) {
 	return {
 		"name": name,
 		"content": String(value),
+		"system": false
 	};
 }
 

@@ -211,20 +211,17 @@ function start() {
 		https: login_getHttps(),
 		password: ''
 	}
-	let dyslexicMode = storage_getSessionOption("dyslexicMode");
-	if (dyslexicMode != null) {
-		dyslexicMode = (dyslexicMode == "1");
-	}
-	vue.sessionParams = {
-		dyslexicMode: dyslexicMode,
-	}
-	gui_updateDyslexicMode();
 	vue.menu.visible = true;
-	// Initialize the database if required
+	// Initialize the database if required and read global options
 	if (appData.db == null) {
 		storage_open(function(event) {
-			storage_close();
-			_start_done();
+			storage_get("options", OPTION_DYSLEXICMODE, function(option) {
+				if (option != null) {
+					gui_setDyslexicMode(option.content == "1")
+				}
+				storage_close();
+				_start_done();
+			}, function(error) { storage_close(); _start_done(); });
 		});
 	} else {
 		_start_done();

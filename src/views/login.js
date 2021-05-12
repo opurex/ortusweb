@@ -55,11 +55,6 @@ Vue.component("vue-login", {
 	watch: {
 		dyslexicMode: function(val) {
 			gui_setDyslexicMode(val);
-			if (val) {
-				storage_setSessionOption("dyslexicMode", "1");
-			} else {
-				storage_setSessionOption("dyslexicMode", "0");
-			}
 		}
 	}
 });
