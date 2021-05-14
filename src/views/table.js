@@ -1,17 +1,31 @@
 Vue.component("vue-table", {
 	props: ["table", "noexport", "nofilter"],
 	data: function() {
-		return {showHelp: false};
+		return {
+			showHelp: false,
+			/** Index (int) or reference (string) as key, visible (boolean) as value. */
+			defaultColumns: {}
+		};
 	},
 	template: `<div class="table">
 	<div class="filters noprint" v-if="table.columns.length > 0 && (!nofilter || !noexport)">
-		<p v-if="!nofilter">Afficher/masquer des colonnes <button type="button" class="btn btn-misc" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button> <button type="button" class="btn btn-misc" v-on:click="checkAllColumns">Afficher toutes les colonnes</button> <button type="button" class="btn btn-misc" v-on:click="uncheckAllColumns">Masquer toutes les colonnes</button> <button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></p>
+		<h3>Afficher/masquer des colonnes</h3>
+		<ul class="filter-actions">
+			<li><button type="button" class="btn btn-misc" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="checkAllColumns">Afficher toutes les colonnes</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="uncheckAllColumns">Masquer toutes les colonnes</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></li>
+		</ul>
 		<ul class="filter-columns" v-if="!nofilter" v-bind:class="{'expand-help': showHelp}">
 			<li v-for="(col, index) in table.columns">
 				<input v-model="col.visible" v-bind:id="'filter-column-' + index" type="checkbox" />
 				<label v-bind:for="'filter-column-' + index">{{col.label}}</label>
 				<p class="help" v-if="showHelp">{{col.help}}</p>
 			</li>
+		</ul>
+		<ul class="filter-defaults" v-if="table.reference">
+			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultColumns">Restaurer l'affichage par défaut</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="saveDefaultColumns">Enregistrer comme affichage par défaut</button></li>
 		</ul>
 		<div v-if="table.lines && !noexport">
 			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter le tableau</a>
@@ -119,6 +133,75 @@ Vue.component("vue-table", {
 			for (let i = 0; i < this.table.columns.length; i++) {
 				this.table.columns[i].visible = !this.table.columns[i].visible;
 			}
+		},
+		restoreDefaultColumns: function() {
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				let key = i;
+				if ("reference" in col) {
+					key = col.reference;
+				}
+				if (key in this.defaultColumns) {
+					col.visible = this.defaultColumns[key];
+				}
+			}
+		},
+		saveDefaultColumns: function() {
+			// Read current column visibility and set local default
+			let optName = Option_prefName(this.table.reference + ".defaults")
+			let columns = {};
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				if ('reference' in col) {
+					columns[col.reference] = {"visible": col.visible};
+					this.defaultColumns[col.reference] = col.visible;
+				} else {
+					columns[i] = {"visible": col.visible};
+					this.defaultColumns[i] = col.visible;
+				}
+			}
+			// Save
+			let opt = Option(optName, JSON.stringify(columns));
+			table_saveDefaultColumns(opt);
 		}
-	}});
+	},
+	mounted: function() {
+		// Set defaultColumns from the table definition
+		for (let i = 0; i < this.table.columns.length; i++) {
+			let col = this.table.columns[i];
+			if ("reference" in col) {
+				this.defaultColumns[col.reference] = col.visible;
+			} else {
+				this.defaultColumns[i] = col.visible;
+			}
+		}
+		// Read changes from option
+		if (!this.table.reference) {
+			this.restoreDefaultColumns();
+			return;
+		}
+		let optName = Option_prefName(this.table.reference + ".defaults")
+		let thiss = this;
+		storage_open(function(event) {
+			storage_get("options", optName, function(opt) {
+				let columns = thiss.defaultColumns;
+				if (opt != null) {
+					let optVals = JSON.parse(opt.content);
+					for (let key in optVals) {
+						let col = optVals[key];
+						if (key in thiss.defaultColumns) {
+							thiss.defaultColumns[key] = col.visible;
+						} else {
+							let index = parseInt(key);
+							if (index != NaN) {
+								thiss.defaultColumns[key] = col.visible;
+							}
+						}
+					}
+				}
+				thiss.restoreDefaultColumns();
+			});
+		});
+	}
+});
 

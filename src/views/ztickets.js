@@ -42,7 +42,7 @@ Vue.component("vue-zticket-list", {
 		</nav>
 	</header>
 	<article class="box-body" id="report-content">
-		<vue-table v-bind:table="data.table"></vue-table>
+		<vue-table v-bind:table="data.table" ref="zTable"></vue-table>
 	</article>
 </section>
 </div>

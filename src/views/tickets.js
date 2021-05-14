@@ -34,7 +34,7 @@ Vue.component("vue-tickets-list", {
 		</nav>
 	</header>
 	<article class="box-body" id="report-content" style="display:flex;flex-direction:row;align-items:center;justify-content:space-around">
-		<vue-table v-bind:table="data.table"></vue-table>
+		<vue-table v-bind:table="data.table" ref="ticketTable"></vue-table>
 		<vue-tickets-content v-if="data.selectedTicket" v-bind:ticket="data.selectedTicket"></vue-tickets-content>
 	</article>
 </section>

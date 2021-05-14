@@ -184,6 +184,9 @@ fieldset.form-tiny {
 	flex-wrap: wrap;
 }
 .filters ul li {
+	margin: 0px 1ex;
+}
+.filters ul.filter-columns li {
 	margin: 0px 1em;
 	width: 15rem;
 }

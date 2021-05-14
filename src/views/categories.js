@@ -3,13 +3,14 @@ Vue.component("vue-category-list", {
 	data: function() {
 		return {
 			categoriesTable: {
+				reference: "category-list",
 				columns: [
-					{label: "Image", export: false, visible: true, help: "L'image du bouton de la catégorie. Ce champ ne peut être exporté."},
-					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque catégorie. Elle permet la modification lors de l'import des catégories."},
-					{label: "Désignation", visible: true, help: "Le nom de la catégorie tel qu'affiché sur les boutons de la caisse."},
-					{label: "Parent", visible: false, help: "La catégorie dans laquelle se trouve cette catégorie. Vide si elle n'est pas une sous-catégorie."},
-					{label: "Ordre", visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
-					{label: "Opération", export: false, visible: true},
+					{reference: "image", label: "Image", export: false, visible: true, help: "L'image du bouton de la catégorie. Ce champ ne peut être exporté."},
+					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque catégorie. Elle permet la modification lors de l'import des catégories."},
+					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la catégorie tel qu'affiché sur les boutons de la caisse."},
+					{reference: "parent", label: "Parent", visible: false, help: "La catégorie dans laquelle se trouve cette catégorie. Vide si elle n'est pas une sous-catégorie."},
+					{reference: "dispOrder", label: "Ordre", visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
+					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
 				lines: []
 			},

@@ -3,12 +3,13 @@ Vue.component("vue-tariffarea-list", {
 	data: function() {
 		return {
 			areasTable: {
+				reference: "tariffarea-list",
 				columns: [
-					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque zone. Elle permet la modification lors de l'import."},
-					{label: "Désignation", visible: true, help: "Le nom de la zone tel qu'affiché sur les boutons de la caisse."},
-					{label: "Ordre", visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
-					{label: "Tarifs", visible: false, help: "Le nombre de tarifs définis dans cette zone."},
-					{label: "Opération", export: false, visible: true},
+					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque zone. Elle permet la modification lors de l'import."},
+					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la zone tel qu'affiché sur les boutons de la caisse."},
+					{reference: "dispOrder", label: "Ordre", visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
+					{reference: "tariff", label: "Tarifs", visible: false, help: "Le nombre de tarifs définis dans cette zone."},
+					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
 				lines: []
 			},

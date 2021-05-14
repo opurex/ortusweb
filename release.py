@@ -32,6 +32,7 @@ js = [
 	"src/storage.js",
 	"src/gui.js",
 	"src/main.js",
+	"src/screens/table.js",
 	"src/screens/home.js",
 	"src/screens/categories.js",
 	"src/screens/products.js",

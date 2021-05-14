@@ -3,10 +3,11 @@ Vue.component("vue-tax-list", {
 	data: function() {
 		return {
 			taxesTable: {
+				reference: "tax-list",
 				columns: [
-					{label: "Désignation", visible: true, help: "Le nom de la taxe."},
-					{label: "Taux", visible: false, help: "Le taux appliqué."},
-					{label: "Opération", export: false, visible: true},
+					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la taxe."},
+					{reference: "rate", label: "Taux", visible: false, help: "Le taux appliqué."},
+					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
 				lines: []
 			},

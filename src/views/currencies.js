@@ -3,17 +3,18 @@ Vue.component("vue-currency-list", {
 	data: function() {
 		return {
 			currenciesTable: {
+				reference: "currency-list",
 				columns: [
-					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque devise. Elle permet la modification lors de l'import."},
-					{label: "Désignation", visible: true, help: "Le nom de la devise tel qu'affiché sur les boutons de la caisse."},
-					{label: "Principale", visible: false, help: "Si cette devise est la devise par défaut, devise de référence pour les montants."},
-					{label: "Taux", visible: true, help: "Taux de change vers la devise principale."},
-					{label: "Symbole", visible: false, help: "Le symbole monétaire de la devise."},
-					{label: "Sep. décimales", visible: false, help: "Le séparateur entre les entiers et les décimales (souvent , ou .)"},
-					{label: "Sep. milliers", visible: false, help: "Le séparateur entre les milliers (souvent vide ou espace)."},
-					{label: "Format", visible: false, help: "Le format d'affichage des valeurs."},
-					{label: "Active", visible: true, help: "Si la devise est utilisable ou non."},
-					{label: "Opération", export: false, visible: true},
+					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque devise. Elle permet la modification lors de l'import."},
+					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la devise tel qu'affiché sur les boutons de la caisse."},
+					{reference: "main", label: "Principale", visible: false, help: "Si cette devise est la devise par défaut, devise de référence pour les montants."},
+					{reference: "rate", label: "Taux", visible: true, help: "Taux de change vers la devise principale."},
+					{reference: "symbol", label: "Symbole", visible: false, help: "Le symbole monétaire de la devise."},
+					{reference: "decimalSeparator", label: "Sep. décimales", visible: false, help: "Le séparateur entre les entiers et les décimales (souvent , ou .)"},
+					{reference: "thousandsSeparator", label: "Sep. milliers", visible: false, help: "Le séparateur entre les milliers (souvent vide ou espace)."},
+					{reference: "format", label: "Format", visible: false, help: "Le format d'affichage des valeurs."},
+					{reference: "visible", label: "Active", visible: true, help: "Si la devise est utilisable ou non."},
+					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
 				lines: []
 			},

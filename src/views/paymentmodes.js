@@ -3,14 +3,15 @@ Vue.component("vue-paymentmode-list", {
 	data: function() {
 		return {
 			paymentModesTable: {
+				reference: "paymentmode-list",
 				columns: [
-					{label: "Image", export: false, visible: true, help: "L'image du bouton du mode de paiement. Ce champ ne peut être exporté."},
-					{label: "Référence", visible: false, help: "La référence doit être unique pour chaque mode de paiement."},
-					{label: "Désignation", visible: true, help: "Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."},
+					{reference: "image", label: "Image", export: false, visible: true, help: "L'image du bouton du mode de paiement. Ce champ ne peut être exporté."},
+					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque mode de paiement."},
+					{reference: "label", label: "Désignation", visible: true, help: "Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."},
 
-					{label: "Actif", visible: true, help: "Si le mode de paiement peut être encaissé ou non."},
-					{label: "Ordre", visible: false, help: "L'ordre d'affichage."},
-					{label: "Opération", export: false, visible: true},
+					{reference: "visible", label: "Actif", visible: true, help: "Si le mode de paiement peut être encaissé ou non."},
+					{reference: "dispOrder", label: "Ordre", visible: false, help: "L'ordre d'affichage."},
+					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
 				lines: []
 			},
