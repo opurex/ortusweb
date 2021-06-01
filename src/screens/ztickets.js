@@ -416,7 +416,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		}
 		vue.screen.data.table.lines.push(line);
 	}
-console.info(vue.$refs);
 	vue.$refs.screenComponent.$refs.zTable.restoreDefaultColumns();
 	gui_hideLoading();
 }
