@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.11] - 2021-06-01
+
+### Added
+- Style for table column buttons
+- Options are stored locally
+- Save columns displayed by default for tables
+- Scale type "time"
+
+### Fixed
+- Permissions for payment modes
+- Alignment of checkbox in navbars
+
+
 ## [8.10] - 2021-03-04
 
 ### Added
