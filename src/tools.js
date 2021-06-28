@@ -46,9 +46,16 @@ var tools_sort = function(field1, field2) {
 
 /** Convert a Date object to a DD/MM/YYYY string. */
 var tools_dateToString = function(dateTime) {
-	let day = dateTime.getDate();
-	let month = dateTime.getMonth() + 1;
-	let year = dateTime.getFullYear();
+	if (dateTime == null) {
+		return null;
+	}
+	if (typeof dateTime == "number") {
+		dateTime = new Date(dateTime * 1000);
+	}
+	let isoDate = dateTime.toISOString().split('T')[0].split('-');
+	let day = parseInt(isoDate[2]);
+	let month = parseInt(isoDate[1]);
+	let year = parseInt(isoDate[0]);
 	if (day < 10) {
 		day = "0" + day;
 	}
@@ -58,7 +65,13 @@ var tools_dateToString = function(dateTime) {
 	return day + "/" + month + "/" + year;
 }
 var tools_dateToDataString = function(dateTime) {
-	return dateTime.getFullYear() + "-" + (dateTime.getMonth() + 1) + "-" + dateTime.getDate();
+	if (dateTime == null) {
+		return null;
+	}
+	if (typeof dateTime == "number") {
+		dateTime = new Date(dateTime * 1000);
+	}
+	return dateTime.toISOString().split('T')[0];
 }
 /** Convert a Date object to a HH:mm string. */
 var tools_timeToString = function(dateTime) {

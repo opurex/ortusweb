@@ -40,11 +40,6 @@ function customers_showCustomer(custId) {
 
 function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles, cashRegisters, paymentModes) {
 	gui_hideLoading();
-	if (customer != null) {
-		if (customer.expireDate != null) {
-			customer.expireDate = tools_dateToString(new Date(customer.expireDate * 1000));
-		}
-	}
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	vue.screen.data = {
@@ -97,12 +92,9 @@ function customers_toggleImage() {
 
 function customers_saveCustomer() {
 	let cust = vue.screen.data.customer;
-	if (cust.expireDate == null && document.getElementById("edit-expireDate").value != "") {
-		gui_showError("Date d'expiration invalide");
-		return;
-	}
 	if (cust.expireDate != null) {
-		cust.expireDate = tools_dateToDataString(cust.expireDate);
+		// Override to send date as timestamp without messing with local data
+		cust.expireDate.toJSON = function() { return cust.expireDate.getTime() / 1000; };
 	}
 	gui_showLoading();
 	srvcall_post("api/customer", cust, _customers_saveCallbackClosure(customers_saveCustomer));
@@ -126,12 +118,12 @@ function _customers_saveCallbackClosure(originalFunc) {
 
 function _customers_saveCallback(request, status, response) {
 	let cust = vue.screen.data.customer;
+	let respCust = JSON.parse(response);
 	if (!("id" in cust)) {
-		let respCust = JSON.parse(response);
 		cust.id = respCust["id"];
 	}
 	if (cust.expireDate != null) {
-		cust.expireDate = cust.expireDate.getTime() / 1000
+		cust.expireDate = respCust.expireDate; // stay in sync with the server's format
 	}
 	let imgTag = document.getElementById("edit-image");
 	if (vue.screen.data.deleteImage) {

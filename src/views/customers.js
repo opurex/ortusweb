@@ -97,7 +97,7 @@ Vue.component("vue-customer-form", {
 				</div>
 				<div class="form-group">
 					<label for="edit-expireDate">Date d'expiration</label>
-					<input id="edit-expireDate" type="text" v-model="data.customer.expireDate" />
+					<vue-inputdate id="edit-expireDate" v-model="data.customer.expireDate" />
 				</div>
 			</fieldset>
 			<fieldset>
