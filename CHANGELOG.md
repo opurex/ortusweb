@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.12] - 2021-06-28
+
+### Added
+- Select fields to show for customers, export to csv.
+- List and sort sub-category as a tree or as a flat list like before.
+
+### Fixed
+- Customer's expire date field
+- Product form for a newly created product
+- Silent error when computing the price of reference of a new product
+
+
 ## [8.11] - 2021-06-01
 
 ### Added
