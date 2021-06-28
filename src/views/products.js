@@ -298,11 +298,11 @@ Vue.component("vue-product-form", {
 				</div>
 				<div class="form-group">
 					<label for="edit-taxedPrice">Prix de vente TTC</label>
-					<input type="number" id="edit-taxedPrice" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
+					<input type="number" id="edit-taxedPrice" v-model.number="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
 					<label for="edit-priceBuy">Prix d'achat HT</label>
-					<input type="number" id="edit-priceBuy" name="priceBuy" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
+					<input type="number" id="edit-priceBuy" name="priceBuy" v-model.number="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
 					<label for="edit-margin">Marge</label>
