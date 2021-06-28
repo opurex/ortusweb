@@ -14,6 +14,7 @@ Vue.component("vue-category-list", {
 				],
 				lines: []
 			},
+			categoryTree: {null: []},
 		};
 	},
 	template: `<div class="category-list">
@@ -38,6 +39,10 @@ Vue.component("vue-category-list", {
 						<option value="label">Désignation</option>
 					</select>
 				</li>
+				<li>
+					<input id ="tree" type="checkbox" v-model="data.tree" v-on:change="sort">
+					<label for="tree">Arborescence</label>
+				</li>
 			</ul>
 		</nav>
 	</header>
@@ -53,16 +58,69 @@ Vue.component("vue-category-list", {
 		editUrl: function(cat) {
 			return "?p=category&id=" + cat.id;
 		},
-		sort: function(event) {
+		sortFlat: function(event) {
+			let lines = [];
+			for (let i = 0; i < this.data.categories.length; i++) {
+				let cat = this.data.categories[i];
+				let line = [
+					{type: "thumbnail", src: this.imageSrc(cat)},
+					cat.reference, cat.label, cat.parentLabel,
+					cat.dispOrder,
+					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Modifier</a></div>"},
+				];
+				lines.push(line);
+			}
 			switch (this.data.sort) {
 				case "dispOrder":
-					Vue.set(this.categoriesTable, "lines", this.categoriesTable.lines.sort(tools_sort(4, 1)));
+					lines = lines.sort(tools_sort(4, 2));
 					break;
 				case "label":
-					Vue.set(this.categoriesTable, "lines", this.categoriesTable.lines.sort(tools_sort(2)));
-			break;
+					lines = lines.sort(tools_sort(2));
+					break;
 			}
+			Vue.set(this.categoriesTable, "lines", lines);
 		},
+		sortTree: function(event) {
+			switch (this.data.sort) {
+				case "dispOrder":
+					for (let key in this.categoryTree) {
+						Vue.set(this.categoryTree, key, this.categoryTree[key].sort(tools_sort("dispOrder", "label")));
+					}
+					break;
+				case "label":
+					for (let key in this.categoryTree) {
+						Vue.set(this.categoryTree, key, this.categoryTree[key].sort(tools_sort("label")));
+					}
+					break;
+			}
+			let sortedLines = [];
+			let thiss = this;
+			let recursivePush = function(categories, depth) {
+				for (let i = 0; i < categories.length; i++) {
+					let cat = categories[i];
+					let pad = "   ".repeat(depth);
+					let line = [
+						{type: "thumbnail", src: thiss.imageSrc(cat)},
+						pad + cat.reference, pad + cat.label, cat.parentLabel,
+						cat.dispOrder,
+						{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(cat) + "\">Modifier</a></div>"},
+					];
+					sortedLines.push(line);
+					if (cat.id in thiss.categoryTree) {
+						recursivePush(thiss.categoryTree[cat.id], depth + 1);
+					}
+				}
+			}
+			recursivePush(this.categoryTree[0], 0);
+			Vue.set(this.categoriesTable, "lines", sortedLines);
+		},
+		sort: function() {
+			if (this.data.tree) {
+				this.sortTree();
+			} else {
+				this.sortFlat();
+			}
+		}
 	},
 	mounted: function() {
 		let catById = {};
@@ -73,16 +131,17 @@ Vue.component("vue-category-list", {
 		for (let i = 0; i < this.data.categories.length; i++) {
 			let cat = this.data.categories[i];
 			let parentLabel = "";
+			let parentId = 0;
 			if (cat.parent != null) {
-				parentLabel = catById[cat.parent].label;
+				cat.parentLabel = catById[cat.parent].label;
+				parentId = cat.parent;
+			} else {
+				cat.parentLabel = "";
 			}
-			let line = [
-				{type: "thumbnail", src: this.imageSrc(cat)},
-				cat.reference, cat.label, parentLabel,
-				cat.dispOrder,
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Modifier</a></div>"},
-			];
-			this.categoriesTable.lines.push(line);
+			if (!(parentId in this.categoryTree)) {
+				this.categoryTree[parentId] = [];
+			}
+			this.categoryTree[parentId].push(cat);
 		}
 		this.sort();
 	}

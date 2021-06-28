@@ -4,6 +4,7 @@ function categories_show() {
 	storage_open(function(event) {
 		storage_readStore("categories", function(categories) {
 			vue.screen.data.categories = categories;
+			vue.screen.data.tree = true;
 			vue.screen.component = "vue-category-list"
 			storage_close();
 			gui_hideLoading();
