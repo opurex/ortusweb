@@ -151,8 +151,7 @@ function product_updatePrice() {
 		}
 	}
 	if (tax == null) {
-		tax = vue.screen.data.taxes[0];
-		product.tax = tax.id;
+		return;
 	}
 	let taxRate = tax.rate;
 	let priceSell = Number(sellVat / (1.0 + taxRate)).toFixed(5);
