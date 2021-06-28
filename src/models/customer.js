@@ -12,6 +12,7 @@ function Customer_default() {
 		"addr2": "",
 		"zipCode": "",
 		"city": "",
+		"region": "",
 		"country": "",
 		"tax": null,
 		"discountProfile": null,

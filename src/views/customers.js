@@ -1,5 +1,39 @@
 Vue.component("vue-customer-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			customersTable: {
+				reference: "customer-list",
+				columns: [
+					{reference: "image", label: "Image", export: false, visible: true, help: "L'image de profil du client. Ce champ ne peut être exporté."},
+					{reference: "dispName", label: "Nom affiché", visible: true, help: "Le nom du client tel qu'affiché ou imprimé"},
+					{reference: "card", label: "Carte", visible: false, help: "Le numéro ou nom de carte."},
+					{reference: "balance", label: "Solde", visible: true, help: "Le solde du compte client. Positif lorsque le compte pré-payé est chargé, négatif lorsque le compte a des dettes."},
+					{reference: "maxDebt", label: "Dette max", visible: false, help: "Le montant de dette maximal autorisé pour ce compte."},
+					{reference: "notes", label: "Note", visible: false, help: "Les notes de la fiche client."},
+					{reference: "expireDate", label: "Date d'expiration", visible: false, help: "La date d'expiration du compte client."},
+					{reference: "visible", label: "Actif", visible: false, help: "Indique si le compte client peut être utilisé ou non."},
+					{reference: "discountProfile", label: "Profil de remise", help: "Le profil de remise automatiquement associé.", visible: false},
+					{reference: "tariffArea", label: "Zone tarifaire", help: "La zone tarifaire automatiquement associée.", visible: false},
+					{reference: "tax", label: "TVA", help: "Le taux de TVA automatiquement associé.", visible: false},
+					{reference: "firstName", label: "Prénom", help: "Information de contact.", visible: false},
+					{reference: "lastName", label: "Nom", help: "Information de contact.", visible: false},
+					{reference: "email", label: "Courriel", help: "Information de contact.", visible: false},
+					{reference: "phone1", label: "Téléphone", help: "Information de contact.", visible: false},
+					{reference: "phone2", label: "Téléphone 2", help: "Information de contact.", visible: false},
+					{reference: "fax", label: "Fax", help: "Information de contact.", visible: false},
+					{reference: "addr1", label: "Adresse", help: "Information de contact.", visible: false},
+					{reference: "addr2", label: "Adresse 2", help: "Information de contact.", visible: false},
+					{reference: "zipCode", label: "Code postal", help: "Information de contact.", visible: false},
+					{reference: "city", label: "Ville", help: "Information de contact.", visible: false},
+					{reference: "region", label: "Région", help: "Information de contact.", visible: false},
+					{reference: "country", label: "Pays", help: "Information de contact.", visible: false},
+					{reference: "operation", label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div class="customer-list">
 <section class="box box-medium">
 	<header>
@@ -16,24 +50,7 @@ Vue.component("vue-customer-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<thead>
-				<tr>
-					<th>Nom</th>
-					<th>Solde</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody id="customer-list">
-				<tr v-for="customer in data.customers">
-					<td>
-						<img class="thumbnail thumbnail-text" v-bind:src="imageSrc(customer)" />{{customer.dispName}}
-					</td>
-					<td>{{customer.balance.toLocaleString()}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(customer)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="customersTable"></vue-table>
 	</article>
 </section>
 </div>
@@ -49,7 +66,58 @@ Vue.component("vue-customer-list", {
 		editUrl: function(cust) {
 			return "?p=customer&id=" + cust.id;
 		}
-
+	},
+	mounted: function() {
+		let taLabels = {};
+		let taxLabels = {};
+		let dpLabels = {};
+		for (let i = 0; i < this.data.tariffAreas.length; i++) {
+			let ta = this.data.tariffAreas[i];
+			taLabels[ta.id] = ta.label;
+		}
+		for (let i = 0; i < this.data.taxes.length; i++) {
+			let tax = this.data.taxes[i];
+			taxLabels[tax.id] = tax.label;
+		}
+		for (let i = 0; i < this.data.discountProfiles.length; i++) {
+			let dp = this.data.discountProfiles[i];
+			dpLabels[dp.id] = dp.label;
+		}
+		for (let i = 0; i < this.data.customers.length; i++) {
+			let cust = this.data.customers[i];
+			if (cust.tariffArea != null) {
+				cust.tariffArea = taLabels[cust.tariffArea];
+			} else {
+				cust.tariffArea = "-";
+			}
+			if (cust.tax != null) {
+				cust.tax = taxLabels[cust.tax];
+			} else {
+				cust.tax = "-";
+			}
+			if (cust.discountProfile != null) {
+				cust.discountProfile = dpLabels[cust.discountProfile];
+			} else {
+				cust.discountProfile = "-";
+			}
+			if (cust.expireDate != null) {
+				cust.expireDate = tools_dateToString(cust.expireDate);
+			} else {
+				cust.expireDate = "-";
+			}
+			let line = [
+				{type: "thumbnail", src: this.imageSrc(cust)},
+				cust.dispName, cust.card, cust.balance, cust.maxDebt,
+				cust.note, cust.expireDate,
+				{type: "bool", value: cust.visible},
+				cust.discountProfile, cust.tariffArea, cust.tax, cust.firstName,
+				cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
+				cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
+				cust.country,
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"},
+			];
+			this.customersTable.lines.push(line);
+		}
 	}
 });
 

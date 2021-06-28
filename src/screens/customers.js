@@ -1,14 +1,14 @@
 function customers_show() {
 	gui_showLoading();
 	storage_open(function(event) {
-		storage_readStore("customers", function(customers) {
-			_customers_showCustomers(customers);
+		storage_readStores(["taxes", "tariffareas", "discountprofiles", "customers"], function(data) {
+			_customers_showCustomers(data["customers"], data["taxes"], data["tariffareas"], data["discountprofiles"]);
 			storage_close();
 		});
 	});
 }
 
-function _customers_showCustomers(customers) {
+function _customers_showCustomers(customers, taxes, tariffAreas, discountProfiles) {
 	gui_hideLoading();
 	var sortedCusts = customers.sort(tools_sort("dispName", "card"));
 	for (let i = 0; i < sortedCusts.length; i++) {
@@ -17,6 +17,9 @@ function _customers_showCustomers(customers) {
 	}
 	vue.screen.data = {
 		"customers": sortedCusts,
+		"taxes": taxes,
+		"tariffAreas": tariffAreas,
+		"discountProfiles": discountProfiles,
 	}
 	vue.screen.component = "vue-customer-list";
 }
