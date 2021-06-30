@@ -80,6 +80,9 @@ function route(screen) {
 	case "salesbyproduct":
 		salesbyproduct_show();
 		break;
+	case "salesbycategory":
+		salesbycategory_show();
+		break;
 	case "salesdetails":
 		salesdetails_show();
 		break;
