@@ -10,7 +10,7 @@ Vue.component("vue-paymentmode-list", {
 					{reference: "label", label: "Désignation", visible: true, help: "Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."},
 
 					{reference: "visible", label: "Actif", visible: true, help: "Si le mode de paiement peut être encaissé ou non."},
-					{reference: "dispOrder", label: "Ordre", visible: false, help: "L'ordre d'affichage."},
+					{reference: "dispOrder", label: "Ordre", export_as_number: true, visible: false, help: "L'ordre d'affichage."},
 					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
 				lines: []

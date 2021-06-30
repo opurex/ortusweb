@@ -106,3 +106,7 @@ var tools_stringToDate = function(stringDate) {
 		return new Date(parts[2], parts[1] - 1, parts[0]);
 	}
 }
+var tools_stringToNumber = function(stringNumber) {
+	// return parseFloat(stringNumber.replace(/\s/g, '').replace(',', '.'))
+	return stringNumber.replace(/\s/g, '')
+}
