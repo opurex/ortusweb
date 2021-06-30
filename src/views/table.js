@@ -11,9 +11,26 @@ Vue.component("vue-table", {
 	<div class="filters noprint" v-if="table.columns.length > 0 && (!nofilter || !noexport)">
 		<h3>Afficher/masquer des colonnes</h3>
 		<ul class="filter-actions">
-			<li><button type="button" class="btn btn-misc" v-on:click="toggleHelp"><template v-if="showHelp">Cacher le descriptif des champs</template><template v-else>Afficher le descriptif des champs</template></button></li>
-			<li><button type="button" class="btn btn-misc" v-on:click="checkAllColumns">Afficher toutes les colonnes</button></li>
-			<li><button type="button" class="btn btn-misc" v-on:click="uncheckAllColumns">Masquer toutes les colonnes</button></li>
+			<li>
+				<button type="button" class="btn btn-misc" v-on:click="toggleHelp">
+					<template v-if="showHelp">
+					<img src="res/img/column_descr_hide.png" alt="" style="height: 26px; padding-right: 5px;" />
+					<span style="float: right; margin-top: 5px;">Cacher le descriptif des champs</span>
+					</template>
+					<template v-else>
+					<img src="res/img/column_descr_show.png" alt="" style="height: 26px; padding-right: 5px;" />
+					<span style="float: right; margin-top: 5px;">Afficher le descriptif des champs</span>
+					</template>
+				</button>
+			</li>
+			<li><button type="button" class="btn btn-misc" v-on:click="checkAllColumns">
+			<img src="res/img/column_expand.png" alt="" style="height: 26px; padding-right: 5px;" />
+			<span style="float: right; margin-top: 5px;">Afficher toutes les colonnes</span>
+			</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="uncheckAllColumns">
+			<img src="res/img/column_collapse.png" alt="" style="height: 26px; padding-right: 5px;" />
+			<span style="float: right; margin-top: 5px;">Masquer toutes les colonnes</span>
+			</button></li>
 			<li><button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></li>
 		</ul>
 		<ul class="filter-columns" v-if="!nofilter" v-bind:class="{'expand-help': showHelp}">
@@ -24,8 +41,14 @@ Vue.component("vue-table", {
 			</li>
 		</ul>
 		<ul class="filter-defaults" v-if="table.reference">
-			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultColumns">Restaurer l'affichage par défaut</button></li>
-			<li><button type="button" class="btn btn-misc" v-on:click="saveDefaultColumns">Enregistrer comme affichage par défaut</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultColumns">
+			<img src="res/img/column_restore_params.png" alt="" style="height: 26px; padding-right: 5px;" />
+			<span style="float: right; margin-top: 5px;">Restaurer l'affichage par défaut</span>
+			</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="saveDefaultColumns">
+			<img src="res/img/column_save_params.png" alt="" style="height: 26px; padding-right: 5px;" />
+			<span style="float: right; margin-top: 5px;">Enregistrer comme affichage par défaut</span>
+			</button></li>
 		</ul>
 		<div v-if="table.lines && !noexport">
 			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter le tableau</a>
