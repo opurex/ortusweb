@@ -15,8 +15,8 @@ function salesbycategory_show() {
             "columns": [
                 {reference: "image", label: "Image", visible: true, export: false, help: "L'image de la catégorie. Ce champ ne peut être exporté."},
                 {reference: "cashRegister", label: "Caisse", visible: false, help: "La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."},
-                {reference: "label", label: "Désignation", visible: true, help: "La catégorie actuelle du produit."},
-                {reference: "reference", label: "Reference", visible: false, help: "La référence du produit."},
+                {reference: "label", label: "Catégorie", visible: true, help: "Le nom de la catégorie."},
+                {reference: "reference", label: "Reference", visible: false, help: "La référence de la catégorie."},
                 {reference: "quantity", label: "Quantité", export_as_number: true, visible: true, help: "La quantité de produits vendus sur la période."},
                 {reference: "priceSell", label: "Total ventes HT", export_as_number: true, visible: false, help: "Le montant de chiffre d'affaire hors taxes réalisé par les produits de la catégorie sur la période concernée."                },
                 {reference: "priceBuy", label: "Total achats HT", export_as_number: true, visible: false, help: "Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente."                },
@@ -253,7 +253,8 @@ function _salesbycategory_render(cashRegisters, categories, products) {
                 priceBuy.toLocaleString(),
                 margin.toLocaleString(),
                 priceVAT.toLocaleString()]);
-        } else {
+
+            cat.reference        } else {
             for (let k = 0 ; k < cashRegisters.length; k++) {
                 let cr = cashRegisters[k];
 
