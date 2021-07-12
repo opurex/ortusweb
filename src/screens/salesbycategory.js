@@ -208,7 +208,6 @@ function _salesbycategory_render(cashRegisters, categories, products) {
     }
     // Sort the categories
     stats = stats.sort(tools_sort("dispOrder", "reference"));
-    let customProductLabels = Object.keys(_salesbycategory_data.customProducts).sort()
     // Prepare rendering
     let lines = [];
     for (let i = 0; i < stats.length; i++) {
@@ -292,25 +291,78 @@ function _salesbycategory_render(cashRegisters, categories, products) {
     }
 
     // TODO : A category with custom product
-    // for (let i = 0; i < customProductLabels.length; i++) {
-    //     let productLabel = customProductLabels[i];
-    //     if (!separateByCR) {
-    //         let qty = _salesbyproduct_data.customProducts[productLabel].qty.toLocaleString();
-    //         let price = _salesbyproduct_data.customProducts[productLabel].price.toLocaleString();
-    //         let priceTax = _salesbyproduct_data.customProducts[productLabel].priceTax.toLocaleString();
-    //         lines.push(["", "", "", "", productLabel, qty, price, "", "", priceTax]);
-    //     } else {
-    //         for (let k = 0; k < cashRegisters.length; k++) {
-    //             let cr = cashRegisters[k];
-    //             if (cr.id in _salesbyproduct_data.customProducts[productLabel]) {
-    //                 let qty = _salesbyproduct_data.customProducts[productLabel][cr.id].qty;
-    //                 let price = _salesbyproduct_data.customProducts[productLabel][cr.id].price.toLocaleString();
-    //                 let priceTax = _salesbyproduct_data.customProducts[productLabel][cr.id].priceTax.toLocaleString();
-    //                 lines.push(["", cr.label, "" ,"", productLabel, qty, price, "", "", priceTax]);
-    //             }
-    //         }
-    //     }
-    // }
+    let customProductLabels = Object.keys(_salesbycategory_data.customProducts).sort()
+    if (!separateByCR) {
+        let qty = 0.0;
+        let price = 0.0;
+        let priceTax = 0.0;
+
+        for (let i = 0 ; i < customProductLabels.length ; i++) {
+            let productLabel = customProductLabels[i];
+
+            qty += _salesbycategory_data.customProducts[productLabel].qty;
+            price += _salesbycategory_data.customProducts[productLabel].price;
+            priceTax += _salesbycategory_data.customProducts[productLabel].priceTax;
+        }
+
+        lines.push([
+            "",
+            "",
+            "",
+            "",
+            qty,
+            price.toLocaleString(),
+            "",
+            "",
+            priceTax.toLocaleString()])
+    } else {
+        for (let i = 0; i < cashRegisters.length; i++) {
+            let cr = cashRegisters[i];
+            let qty = 0.0;
+            let price = 0.0;
+            let priceTax = 0.0;
+
+            for (let j = 0 ; j < customProductLabels.length ; j++) {
+                let productLabel = customProductLabels[j];
+
+                qty += _salesbycategory_data.customProducts[productLabel][cr.id].qty;
+                price += _salesbycategory_data.customProducts[productLabel][cr.id].price;
+                priceTax += _salesbycategory_data.customProducts[productLabel][cr.id].priceTax;
+            }
+
+            lines.push([
+                "",
+                cr.label,
+                "",
+                "",
+                qty,
+                price.toLocaleString(),
+                "",
+                "",
+                priceTax.toLocaleString()])
+
+        }
+    }
+    for (let i = 0; i < customProductLabels.length; i++) {
+        let productLabel = customProductLabels[i];
+        if (!separateByCR) {
+            let qty = _salesbycategory_data.customProducts[productLabel].qty.toLocaleString();
+            let price = _salesbycategory_data.customProducts[productLabel].price.toLocaleString();
+            let priceTax = _salesbycategory_data.customProducts[productLabel].priceTax.toLocaleString();
+
+            console.log(productLabel, qty, price, priceTax);
+        } else {
+            // for (let k = 0; k < cashRegisters.length; k++) {
+            //     let cr = cashRegisters[k];
+            //     if (cr.id in _salesbycategory_data.customProducts[productLabel]) {
+            //         let qty = _salesbycategory_data.customProducts[productLabel][cr.id].qty;
+            //         let price = _salesbycategory_data.customProducts[productLabel][cr.id].price.toLocaleString();
+            //         let priceTax = _salesbycategory_data.customProducts[productLabel][cr.id].priceTax.toLocaleString();
+            //         lines.push(["", cr.label, "" ,"", productLabel, qty, price, "", "", priceTax]);
+            //     }
+            // }
+        }
+    }
 
     vue.screen.data.table.title = "Ventes par catégorie du "
         + tools_dateToString(vue.screen.data.start)
