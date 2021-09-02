@@ -5,7 +5,7 @@ function salesdetails_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	storage_open(function(event) {
-		storage_readStores(["cashRegisters", "products", "categories"], function(data) {
+		storage_readStores(["cashRegisters", "products", "categories", "paymentmodes"], function(data) {
 			let catById = {};
 			let prdById = {};
 			let crById = {};
@@ -27,11 +27,13 @@ function salesdetails_show() {
 				"crById": crById,
 				"prdById": prdById,
 				"catById": catById,
+				"paymentModes": data["paymentmodes"],
 				"table": {
 					"reference": "salesDetail-list",
 					"title": null,
 					"columns": [
 						{reference: "cashRegister", label: "Caisse", visible: false, help: "Le nom de la caisse."},
+						{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
 						{reference: "number", label: "Ticket", export_as_number: true, visible: false, help: "Le numéro du ticket de la caisse."},
 						{reference: "date", label: "Date", visible: false, help: "La date de réalisation de la vente."},
 						{reference: "line", label: "Ligne", export_as_number: true, visible: false, help: "Le numéro de ligne du ticket."},
@@ -114,8 +116,27 @@ function _salesdetails_render(tickets) {
 		let ticket = tickets[i];
 		let inCompo = false;
 		let articleLine = 0;
+
+		let pmModes = {};
+		for (let j = 0; j < ticket.payments.length; j++) {
+			let payment = ticket.payments[j];
+			if (!(payment.paymentMode in pmModes)) {
+				pmModes[payment.paymentMode] = true;
+			}
+		}
+		let pmModesStr = "";
+		for (pm in pmModes) {
+			for (let j = 0; j < vue.screen.data.paymentModes.length; j++) {
+				pmMode = vue.screen.data.paymentModes[j]
+				if (pm == pmMode.id) {
+					pmModesStr += ", " + pmMode.label;
+				}
+			}
+		}
+		pmModesStr = pmModesStr.substring(2);
 		for (let j = 0; j < ticket.lines.length; j++) {
 			let tktLine = ticket.lines[j];
+			let method = pmModesStr
 			let date = new Date(ticket.date * 1000);
 			let category = "";
 			let reference = "";
@@ -158,6 +179,7 @@ function _salesdetails_render(tickets) {
 				margin = (finalPrice - (tktLine.quantity * prd.priceBuy)).toLocaleString();
 			}
 			lines.push([vue.screen.data.crById[ticket.cashRegister].label,
+				method,
 				ticket.number,
 				tools_dateTimeToString(date),
 				line,
