@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.13] - 2021-09-15
+
+### Added
+- Add icons to table filter button
+- Add logic for icons to table filter buttons
+- Add Sales (with distinct VAT) by category
+- Add custom products in salesByCategory
+- Add payment method column on salesdetails.js
+
+### Fixed
+- Format number on CSV export
+- Fix some missnamed column titles
+
 ## [8.12] - 2021-06-28
 
 ### Added
