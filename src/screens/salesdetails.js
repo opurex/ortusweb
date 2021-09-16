@@ -36,6 +36,7 @@ function salesdetails_show() {
 						{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
 						{reference: "number", label: "Ticket", export_as_number: true, visible: false, help: "Le numéro du ticket de la caisse."},
 						{reference: "date", label: "Date", visible: false, help: "La date de réalisation de la vente."},
+						{reference: "semaine", label: "Semaine", export_as_number: true, visible: false, help: "Le numero de la semaine dans l'année."},
 						{reference: "line", label: "Ligne", export_as_number: true, visible: false, help: "Le numéro de ligne du ticket."},
 						{reference: "articleLine", label: "Ligne-article", export_as_number: true, visible: false, help: "Le numéro de l'article du ticket. Diffère de la ligne uniquement pour les compositions. Le contenu de la composition partage le même numéro de ligne-article avec la composition elle-même."},
 						{reference: "category", label: "Catégorie", visible: true, help: "La catégorie à laquelle le produit est rattaché, si disponible."},
@@ -138,6 +139,7 @@ function _salesdetails_render(tickets) {
 			let tktLine = ticket.lines[j];
 			let method = pmModesStr
 			let date = new Date(ticket.date * 1000);
+			let week = date.getWeek()
 			let category = "";
 			let reference = "";
 			let taxedRef = tktLine.finalTaxedPrice != null;
@@ -182,6 +184,7 @@ function _salesdetails_render(tickets) {
 				method,
 				ticket.number,
 				tools_dateTimeToString(date),
+				week,
 				line,
 				articleLine,
 				category,
