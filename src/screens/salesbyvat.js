@@ -163,28 +163,16 @@ function _salesbyvat_render(cashRegisters, categories, products, taxes) {
                 }
             }
         }
-        for (let j = 0; j < cashRegisters.length; j++) {
-            let cashRegister = cashRegisters[j];
-            if (!(cashRegister.id in _salesbyvat_data.customProducts[prdLabel])) {
-                _salesbyvat_data.customProducts[prdLabel][cashRegister.id] = {
-                    qty: 0,
-                    price: 0.0,
-                    priceTax: 0.0
-                };
-                ;
-            }
-        }
-
         for (let prdLabel in _salesbyvat_data.customProducts) {
             for (let j = 0; j < taxes.length; j++) {
                 let tax = taxes[j];
-                if (!(tax.id in _salesbyvat_data.customProducts[productLabel])) {
-                    _salesbyvat_data.customProducts[productLabel][tax.id] = []
+                if (!(tax.id in _salesbyvat_data.customProducts[prdLabel])) {
+                    _salesbyvat_data.customProducts[prdLabel][tax.id] = []
                 }
                 for (let k = 0; k < cashRegisters; k++) {
                     let cr = cashRegisters[k];
-                    if (!(cr.id in _salesbyvat_data.customProducts[productLabel][tax.id])) {
-                        _salesbyvat_data.customProducts[productLabel][tax.id][cr.id] = {
+                    if (!(cr.id in _salesbyvat_data.customProducts[prdLabel][tax.id])) {
+                        _salesbyvat_data.customProducts[prdLabel][tax.id][cr.id] = {
                             qty: 0,
                             price: 0.0,
                             priceTax: 0.0
@@ -298,7 +286,7 @@ function _salesbyvat_render(cashRegisters, categories, products, taxes) {
                     line.push("")
                 }
 
-                if (vatValues[taxes[j].id].priceVat != 0 || vatValues[taxes[j].id].priceVat != 0) {
+                if (vatValues[taxes[j].id].price != 0 || vatValues[taxes[j].id].priceVat != 0) {
                     line.push((vatValues[taxes[j].id].priceVat - vatValues[taxes[j].id].price).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 5
