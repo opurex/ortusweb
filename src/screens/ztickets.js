@@ -42,6 +42,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 	let total = {
 		"tickets": 0,
 		"cs": 0.0,
+		"csTaxesTotal": 0.0,
 		"errorTotal": 0.0,
 		"custBalance": 0.0,
 		"paymentModeTotal": [],
@@ -110,6 +111,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		if (z.closeCash != null && z.expectedCash != null) {
 			closeError = z.closeCash - z.expectedCash;
 		}
+		let csTaxes = z.cs;
 		let renderZ = {
 			"cashRegister": cashRegister,
 			"sequence": z.sequence,
@@ -171,6 +173,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 						"amount": z.taxes[k].amount.toLocaleString()});
 					total.taxTotal[j].base += z.taxes[k].base;
 					total.taxTotal[j].amount += z.taxes[k].amount;
+					csTaxes += z.taxes[k].amount;
 					found = true;
 					keptTaxes[j] = true;
 					break;
@@ -184,6 +187,8 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				}
 			}
 		}
+		total.csTaxesTotal += csTaxes;
+		renderZ.csTaxes = csTaxes.toLocaleString();
 		for (let j = 0; j < categories.length; j++) {
 			let cat = categories[j];
 			let found = false;
@@ -360,9 +365,10 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		{reference: "csPeriod", label: "CA HT mois", export_as_number: true, visible: oldColumnVisible("CA mois", oldColumns, false), class: "z-oddcol", help: "Le cumul du chiffre d'affaire réalisé sur la période. Ce cumul est remis à zéro lorsque la clôture mensuelle est choisie au moment de clôturer la caisse."},
 		{reference: "csFYear", label: "CA HT année", export_as_number: true, visible: oldColumnVisible("CA année", oldColumns, false), class: "z-oddcol", help: "Le cumul du chiffre d'affaire réalisé sur l'année ou exercice fiscal. Ce cumul est remis à zéro lorsque la clôture annuelle est choisie au moment de clôturer la caisse."},
 		{reference: "csPerpetual", label: "CA HT perpétuel", export_as_number: true, visible: oldColumnVisible("CA perpétuel", oldColumns, false), class: "z-oddcol", help: "Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."},
+		{reference: "csTaxes", label: "CA + taxes", export_as_number: true, visible: oldColumnVisible("CA + taxes", oldColumns, false), class: "z-oddcol", help: "Le total TTC de la session."},
 		{reference: "custBalance", label: "Balance client", export_as_number: true, visible: oldColumnVisible("Balance client", oldColumns, false), class: "z-oddcol", help: "La variation totale des soldes des comptes clients. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."},
 	];
-	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", "", total.custBalance.toLocaleString()];
+	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", "", total.csTaxesTotal.toLocaleString(), total.custBalance.toLocaleString()];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
 		vue.screen.data.table.columns.push({reference: "pm-" + pm.reference, label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true), help: "Le montant des encaissements réalisés avec ce moyen de paiement sur la session."});
@@ -396,7 +402,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 	for (let i = 0; i < renderZs.length; i++) {
 		let z = renderZs[i];
 		let line = [z.cashRegister, z.sequence, z.openDate, z.closeDate, z.openCash, z.closeCash, z.expectedCash,
-			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear, z.csPerpetual, z.custBalance];
+			z.closeError, z.ticketCount, z.cs, z.csPeriod, z.csFYear, z.csPerpetual, z.csTaxes, z.custBalance];
 		for (let j = 0; j < z.payments.length; j++) {
 			line.push(z.payments[j].amount);
 		}
