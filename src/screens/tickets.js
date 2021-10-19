@@ -42,6 +42,7 @@ function tickets_show() {
 						{reference: "customer", label: "Client", visible: false, help: "Le compte client associé au ticket."},
 						{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
 						{reference: "finalTaxedPrice", label: "Montant", export_as_number: true, visible: true, help: "Le montant TTC du ticket."},
+						{reference: "overPerceived", label: "Trop perçu", export_as_number: true, visible: false, help: "Le montant trop perçu pour les modes de paiement sans rendu-monnaie."},
 						{reference: "user", label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
 						{reference: "operation", label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
 					],
@@ -114,6 +115,7 @@ function _tickets_dataRetreived() {
 	gui_hideLoading();
 	vue.screen.data.tickets = _tickets_data.tickets;
 	let total = 0.0;
+	let overPerceivedTotal = 0.0;
 	let lines = [];
 	for (let i = 0; i < _tickets_data.tickets.length; i++) {
 		let tkt = _tickets_data.tickets[i];
@@ -131,13 +133,17 @@ function _tickets_dataRetreived() {
 				}
 			}
 		}
+		let pmTotal = 0.0;
 		let pmModes = {};
 		for (let j = 0; j < tkt.payments.length; j++) {
 			let payment = tkt.payments[j];
+			pmTotal += tkt.payments[j].amount;
 			if (!(payment.paymentMode in pmModes)) {
 				pmModes[payment.paymentMode] = true;
 			}
 		}
+		let overPerceived = pmTotal - tkt.finalTaxedPrice;
+		overPerceivedTotal += overPerceived;
 		let pmModesStr = "";
 		for (pm in pmModes) {
 			for (let j = 0; j < vue.screen.data.paymentModes.length; j++) {
@@ -156,12 +162,12 @@ function _tickets_dataRetreived() {
 			}
 		}
 		lines.push([cr, tkt.sequence, tkt.number, tools_dateTimeToString(date), customer, pmModesStr,
-			tkt.finalTaxedPrice.toLocaleString(), user,
+			tkt.finalTaxedPrice.toLocaleString(), overPerceived.toLocaleString(), user,
 			{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"}]);
 		total += tkt.finalTaxedPrice;
 	}
 	Vue.set(vue.screen.data.table, "lines", lines);
-	vue.screen.data.table.footer = ["", "", "", "", "", "Total", total.toLocaleString(), "", ""];
+	vue.screen.data.table.footer = ["", "", "", "", "", "Total", total.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""];
 	if (vue.screen.data.tickets.length > 0) {
 		_tickets_selectTicket(vue.screen.data.tickets[0]);
 	} else {

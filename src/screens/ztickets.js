@@ -50,6 +50,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		"categoryTotal": [],
 		"catTaxTotal": [],
 		"custBalanceTotal": [],
+		"overPerceivedTotal": 0.0,
 	};
 	for (let i = 0; i < categories.length; i++) {
 		total.categoryTotal.push(0.0);
@@ -136,6 +137,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		total.tickets += z.ticketCount;
 		total.cs += z.cs;
 		total.errorTotal += closeError;
+		let paymentTotal = 0.0;
 		for (let j = 0; j < paymentModes.length; j++) {
 			let pm = paymentModes[j];
 			let found = false;
@@ -150,6 +152,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 						renderZ.payments.push({"amount": pmt.amount});
 					}
 					total.paymentModeTotal[j] += pmt.amount;
+					paymentTotal += pmt.amount;
 					found = true;
 					keptPayments[j] = true;
 				}
@@ -189,6 +192,9 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		}
 		total.csTaxesTotal += csTaxes;
 		renderZ.csTaxes = csTaxes.toLocaleString();
+		let overPerceived = paymentTotal - csTaxes;
+		total.overPerceivedTotal += overPerceived;
+		renderZ.overPerceived = overPerceived.toLocaleString();
 		for (let j = 0; j < categories.length; j++) {
 			let cat = categories[j];
 			let found = false;
@@ -340,6 +346,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 	for (let i = 0; i < total.custBalanceTotal.length; i++) {
 		total.custBalanceTotal[i] = total.custBalanceTotal[i].toLocaleString();
 	}
+	total.overPerceivedTotal = total.overPerceivedTotal.toLocaleString();
 	// Set table
 	let oldColumns = vue.screen.data.table.columns;
 	let oldColumnVisible = function(label, old, default_val) {
@@ -374,6 +381,8 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		vue.screen.data.table.columns.push({reference: "pm-" + pm.reference, label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true), help: "Le montant des encaissements réalisés avec ce moyen de paiement sur la session."});
 		vue.screen.data.table.footer.push(total.paymentModeTotal[i]);
 	}
+	vue.screen.data.table.columns.push({reference: "overPerceived", label: "Produit exceptionnel", export_as_number: true, visible: oldColumnVisible("Produit exceptionnel", oldColumns, false), help: "Le montant trop perçu pour les modes de paiement sans rendu-monnaie ou les arrondis de TVA sur remises."});
+	vue.screen.data.table.footer.push(total.overPerceivedTotal);
 	for (let i = 0; i < taxes.length; i++) {
 		let tax = taxes[i];
 		vue.screen.data.table.columns.push({reference: "tax-" + i + "-base", label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe associé au taux de TVA."});
@@ -406,6 +415,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		for (let j = 0; j < z.payments.length; j++) {
 			line.push(z.payments[j].amount);
 		}
+		line.push(z.overPerceived);
 		for (let j = 0; j < z.taxes.length; j++) {
 			line.push(z.taxes[j].base);
 			line.push(z.taxes[j].amount);
