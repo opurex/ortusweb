@@ -44,6 +44,7 @@
 	<script type="text/javascript" src="src/screens/salesbyproduct.js"></script>
 	<script type="text/javascript" src="src/screens/salesbycategory.js"></script>
 	<script type="text/javascript" src="src/screens/salesbyvat.js"></script>
+	<script type="text/javascript" src="src/screens/salesbyprodandvat.js"></script>
 	<script type="text/javascript" src="src/screens/salesdetails.js"></script>
 	<script type="text/javascript" src="src/screens/floors.js"></script>
 	<script type="text/javascript" src="src/screens/paymentmodes.js"></script>
@@ -72,6 +73,7 @@
 	<script type="text/javascript" src="src/views/tickets.js"></script>
 	<script type="text/javascript" src="src/views/salesbyproduct.js"></script>
 	<script type="text/javascript" src="src/views/salesbycategory.js"></script>
+	<script type="text/javascript" src="src/views/salesbyprodandvat.js"></script>
 	<script type="text/javascript" src="src/views/salesbyvat.js"></script>
 	<script type="text/javascript" src="src/views/salesdetails.js"></script>
 	<script type="text/javascript" src="src/views/floors.js"></script>
@@ -102,6 +104,7 @@
 	<vue-menu v-bind:menu="menu" v-bind:user="login.user"></vue-menu>
 	<div v-if="false">As you can see this site doesn't work without javascript.</div>
 	<component ref="screenComponent" id="content" class="container-fluid" v-bind:is="screen.component" v-bind:data="screen.data"></component>
+</div>
 </div>
 </body>
 </html>
