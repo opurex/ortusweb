@@ -10,20 +10,11 @@ function salesbyproduct_show() {
 		"includeArchives": false,
 		"includeZero": true,
 		"separateCashRegisters": false,
+		"separateTaxes": false,
 		"table": {
 			"reference": "salesByProduct-list",
 			"title": null,
 			"columns": [
-				{reference: "image", label: "Image", visible: true, export: false, help: "L'image du produit. Ce champ ne peut être exporté."},
-				{reference: "cashRegister", label: "Caisse", visible: false, help: "La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."},
-				{reference: "category", label: "Catégorie", visible: true, help: "La catégorie actuelle du produit."},
-				{reference: "reference", label: "Reference", visible: false, help: "La référence du produit."},
-				{reference: "label", label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
-				{reference: "quantity", label: "Quantité", export_as_number: true, visible: true, help: "La quantité de produit vendue sur la période."},
-				{reference: "priceSell", label: "Vente HT", export_as_number: true, visible: false, help: "Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée."},
-				{reference: "priceBuy", label: "Prix d'achat", export_as_number: true, visible: false, help: "Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente."},
-				{reference: "margin", label: "Marge", export_as_number: true, visible: false, help: "La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente."},
-				{reference: "priceSellVat", label: "Vente TTC", export_as_number: true, visible: false, help: "Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée."},
 			],
 		},
 	}
@@ -38,8 +29,18 @@ function salesbyproduct_filter() {
 		"pages": 0,
 		"currentPage": 0,
 		"separateByCR": vue.screen.data.separateCashRegisters,
+		"separateByTax": vue.screen.data.separateTaxes,
 		"products": {},
-		"customProducts": {}
+		"customProducts": {},
+		"initSalesData": function() {
+			return {
+				"qty": 0,
+				"price": 0.0,
+				"priceTax": 0.0,
+				"tax": 0.0,
+				"taxDetails": {},
+			};
+		},
 	};
 	srvcall_get("api/ticket/search?count=1&dateStart=" + _salesbyproduct_data.start + "&dateStop=" + _salesbyproduct_data.stop, _salesbyproduct_countCallback);
 	gui_showLoading();
@@ -68,49 +69,60 @@ function _salesbyproduct_filterCallback(request, status, response) {
 		let ticket = tickets[i];
 		for (let j = 0; j < ticket.lines.length; j++) {
 			let line = ticket.lines[j];
+			// Initialize product data for the first time
 			if (line.product != null) {
 				if (!(line.product in _salesbyproduct_data.products)) {
 					if (_salesbyproduct_data.separateByCR) {
 						_salesbyproduct_data.products[line.product] = {};
 					} else {
-						_salesbyproduct_data.products[line.product] = {qty: 0, price: 0.0, priceTax: 0.0};
+						_salesbyproduct_data.products[line.product] = _salesbyproduct_data.initSalesData();
 					}
 				}
 				if (_salesbyproduct_data.separateByCR) {
 					if (!(ticket.cashRegister in _salesbyproduct_data.products[line.product])) {
-						_salesbyproduct_data.products[line.product][ticket.cashRegister] = {qty: 0, price: 0.0, priceTax: 0.0};
+						_salesbyproduct_data.products[line.product][ticket.cashRegister] = _salesbyproduct_data.initSalesData();
 					}
-					_salesbyproduct_data.products[line.product][ticket.cashRegister].qty += line.quantity;
-					_salesbyproduct_data.products[line.product][ticket.cashRegister].priceTax += line.finalTaxedPrice
-					_salesbyproduct_data.products[line.product][ticket.cashRegister].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
-				} else {
-					_salesbyproduct_data.products[line.product].qty += line.quantity;
-					_salesbyproduct_data.products[line.product].priceTax += line.finalTaxedPrice
-					_salesbyproduct_data.products[line.product].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
 				}
 			} else {
 				if (!(line.productLabel in _salesbyproduct_data.customProducts)) {
 					if (_salesbyproduct_data.separateByCR) {
 						_salesbyproduct_data.customProducts[line.productLabel] = {};
 					} else {
-						_salesbyproduct_data.customProducts[line.productLabel] = {qty: 0, price: 0.0, priceTax: 0.0};
+						_salesbyproduct_data.customProducts[line.productLabel] = _salesbyproduct_data.initSalesData();
 					}
 				}
 				if (_salesbyproduct_data.separateByCR) {
 					if (!(ticket.cashRegister in _salesbyproduct_data.customProducts[line.productLabel])) {
-						_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister] = {qty: 0, price: 0.0, priceTax: 0.0};
+						_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister] = _salesbyproduct_data.initSalesData();
 					}
-					_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister].qty += line.quantity;
-					_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister].priceTax += line.finalTaxedPrice
-					_salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
-
-				} else {
-					_salesbyproduct_data.customProducts[line.productLabel].qty += line.quantity;
-					_salesbyproduct_data.customProducts[line.productLabel].priceTax += line.finalTaxedPrice
-					_salesbyproduct_data.customProducts[line.productLabel].price += (line.finalTaxedPrice / (1.0 + line.taxRate))
-
 				}
 			}
+			// Pick the correct sales data
+			let salesData = null;
+			if (line.product != null) {
+				if (_salesbyproduct_data.separateByCR) {
+					salesData = _salesbyproduct_data.products[line.product][ticket.cashRegister];
+				} else {
+					salesData = _salesbyproduct_data.products[line.product];
+				}
+			} else {
+				if (_salesbyproduct_data.separateByCR) {
+					salesData = _salesbyproduct_data.customProducts[line.productLabel][ticket.cashRegister];
+				} else {
+					salesData = _salesbyproduct_data.customProducts[line.productLabel];
+				}
+			}
+			// Update the sales data
+			let price = (line.finalTaxedPrice / (1.0 + line.taxRate));
+			salesData.qty += line.quantity;
+			salesData.priceTax += line.finalTaxedPrice;
+			salesData.price += price;
+			// Include tax details
+			if (!(line.tax in salesData.taxDetails)) {
+				salesData.taxDetails[line.tax] = {"base": 0.0, "amount": 0.0};
+			}
+			salesData.taxDetails[line.tax].base += price;
+			salesData.taxDetails[line.tax].amount += line.finalTaxedPrice - price;
 		}
 	}
 	_salesbyproduct_data.currentPage++;
@@ -125,44 +137,101 @@ function _salesbyproduct_filterCallback(request, status, response) {
 function _salesbyproduct_dataRetreived() {
 	gui_showLoading();
 	storage_open(function(event) {
-		storage_readStores(["categories", "products", "cashRegisters"], function(data) {
+		storage_readStores(["categories", "products", "cashRegisters", "taxes"], function(data) {
+			let cr = null;
+			let taxes = null;
 			if (vue.screen.data.separateCashRegisters) {
-				_salesbyproduct_render(data["cashRegisters"], data["categories"], data["products"]);
-			} else {
-				_salesbyproduct_render(null, data["categories"], data["products"]);
+				cr = data["cashRegisters"];
 			}
+			if (vue.screen.data.separateTaxes) {
+				taxes = data["taxes"];
+			}
+			_salesbyproduct_render(cr, data["categories"], data["products"], taxes);
 			storage_close();
 		});
 	});
 }
 
-function _salesbyproduct_render(cashRegisters, categories, products) {
+function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 	// Sort for display
 	let separateByCR = cashRegisters != null;
 	if (cashRegisters != null) {
 		cashRegisters = cashRegisters.sort(tools_sort("reference"));
 	}
-	if (separateByCR && vue.screen.data.includeZero) {
-		// Initialize all missing 0 in separated cash registers
-		for (let i = 0; i < products.length; i++) {
-			let prd = products[i];
-			if (prd.visible || vue.screen.data.includeArchives) {
-				if (!(prd.id in _salesbyproduct_data.products)) {
-					_salesbyproduct_data.products[prd.id] = {qty: 0, price: 0.0, priceTax: 0.0};
+	let separateByTax = taxes != null;
+	if (vue.screen.data.includeZero) {
+		// Initialize all missing products
+		if (separateByCR) {
+			for (let i = 0; i < products.length; i++) {
+				let prd = products[i];
+				if (prd.visible || vue.screen.data.includeArchives) {
+					if (!(prd.id in _salesbyproduct_data.products)) {
+						_salesbyproduct_data.products[prd.id] = {};
+					}
+					for (let j = 0; j < cashRegisters.length; j++) {
+						let cashRegister = cashRegisters[j];
+						if (!(cashRegister.id in _salesbyproduct_data.products[prd.id])) {
+							_salesbyproduct_data.products[prd.id][cashRegister.id] = _salesbyproduct_data.initSalesData();
+						}
+					}
 				}
+			}
+			for (let prdLabel in _salesbyproduct_data.customProducts) {
 				for (let j = 0; j < cashRegisters.length; j++) {
 					let cashRegister = cashRegisters[j];
-					if (!(cashRegister.id in _salesbyproduct_data.products[prd.id])) {
-						_salesbyproduct_data.products[prd.id][cashRegister.id] = {qty: 0, price: 0.0, priceTax: 0.0};;
+					if (!(cashRegister.id in _salesbyproduct_data.customProducts[prdLabel])) {
+						_salesbyproduct_data.customProducts[prdLabel][cashRegister.id] = _salesbyproduct_data.initSalesData();
+					}
+				}
+			}
+		} else {
+			for (let i = 0; i < products.length; i++) {
+				let prd = products[i];
+				if (prd.visible || vue.screen.data.includeArchives) {
+					if (!(prd.id in _salesbyproduct_data.products)) {
+						_salesbyproduct_data.products[prd.id] = _salesbyproduct_data.initSalesData();
 					}
 				}
 			}
 		}
-		for (let prdLabel in _salesbyproduct_data.customProducts) {
-			for (let j = 0; j < cashRegisters.length; j++) {
-				let cashRegister = cashRegisters[j];
-				if (!(cashRegister.id in _salesbyproduct_data.customProducts[prdLabel])) {
-					_salesbyproduct_data.customProducts[prdLabel][cashRegister.id] = {qty: 0, price: 0.0, priceTax: 0.0};;
+	}
+	// Fill missing tax detail with 0
+	if (separateByTax) {
+		for (let prdId in _salesbyproduct_data.products) {
+			if (separateByCR) {
+				for (let cr in _salesbyproduct_data.products[prdId]) {
+					for (let i = 0; i < taxes.length; i++) {
+						let tax = taxes[i];
+						if (!(tax.id in _salesbyproduct_data.products[prdId][cr].taxDetails)) {
+							_salesbyproduct_data.products[prdId][cr].taxDetails[tax.id] = {"base": 0.0, "amount": 0.0};
+						}
+					}
+				}
+			} else {
+				for (let i = 0; i < taxes.length; i++) {
+					let tax = taxes[i];
+					if (!(tax.id in _salesbyproduct_data.products[prdId].taxDetails)) {
+						_salesbyproduct_data.products[prdId].taxDetails[tax.id] = {"base": 0.0, "amount": 0.0};
+					}
+				}
+			}
+		}
+		for (let prdId in _salesbyproduct_data.customProducts) {
+			if (separateByCR) {
+				for (let cr in _salesbyproduct_data.customProducts[prdId]) {
+					for (let i = 0; i < taxes.length; i++) {
+						let tax = taxes[i];
+						if (!(tax.id in _salesbyproduct_data.customProducts[prdId][cr].taxDetails)) {
+							_salesbyproduct_data.customProducts[prdId][cr].taxDetails[tax.id] = {"base": 0.0, "amount": 0.0};
+						}
+					}
+				}
+			} else {
+				for (let i = 0; i < taxes.length; i++) {
+					let tax = taxes[i];
+					if (!(tax.id in _salesbyproduct_data.customProducts[prdId].taxDetails)) {
+						_salesbyproduct_data.customProducts[prdId].taxDetails[tax.id] = {"base": 0.0, "amount": 0.0};
+					}
 				}
 			}
 		}
@@ -177,7 +246,7 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 		let prd = products[i];
 		if (prd.visible || vue.screen.data.includeArchives) {
 			if (!(prd.id in _salesbyproduct_data.products) && vue.screen.data.includeZero && !separateByCR) {
-				_salesbyproduct_data.products[prd.id] = {qty: 0, price: 0.0, priceTax: 0.0};
+				_salesbyproduct_data.products[prd.id] = _salesbyproduct_data.initSalesData();
 			}
 			if (prd.id in _salesbyproduct_data.products) {
 				catById[prd.category].products.push(prd);
@@ -194,7 +263,7 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 	}
 	// Sort the categories
 	stats = stats.sort(tools_sort("dispOrder", "reference"));
-	let customProductLabels = Object.keys(_salesbyproduct_data.customProducts).sort()
+	let customProductLabels = Object.keys(_salesbyproduct_data.customProducts).sort();
 	// Prepare rendering
 	let lines = [];
 	for (let i = 0; i < stats.length; i++) {
@@ -219,6 +288,20 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 					line.push("");
 				}
 				line.push(_salesbyproduct_data.products[prd.id].priceTax.toLocaleString());
+				if (separateByTax) {
+					for (let k = 0; k < taxes.length; k++) {
+						let taxDetail = _salesbyproduct_data.products[prd.id].taxDetails[taxes[k].id];
+						if (taxDetail.base != 0.0) {
+							line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+							line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+							line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+						} else {
+							line.push("");
+							line.push("");
+							line.push("");
+						}
+					}
+				}
 				lines.push(line);
 			} else {
 				for (let k = 0; k < cashRegisters.length; k++) {
@@ -235,6 +318,20 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 							line.push("");
 						}
 						line.push(_salesbyproduct_data.products[prd.id][cr.id].priceTax.toLocaleString());
+						if (separateByTax) {
+							for (let l = 0; l < taxes.length; l++) {
+								let taxDetail = _salesbyproduct_data.products[prd.id][cr.id].taxDetails[taxes[l].id];
+								if (taxDetail.base != 0.0) {
+									line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+									line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+									line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+								} else {
+									line.push("");
+									line.push("");
+									line.push("");
+								}
+							}
+						}
 						lines.push(line);
 					}
 				}
@@ -247,7 +344,22 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 			let qty = _salesbyproduct_data.customProducts[productLabel].qty.toLocaleString();
 			let price = _salesbyproduct_data.customProducts[productLabel].price.toLocaleString();
 			let priceTax = _salesbyproduct_data.customProducts[productLabel].priceTax.toLocaleString();
-			lines.push(["", "", "", "", productLabel, qty, price, "", "", priceTax]);
+			let line = ["", "", "", "", productLabel, qty, price, "", "", priceTax];
+			if (separateByTax) {
+				for (let l = 0; l < taxes.length; l++) {
+					let taxDetail = _salesbyproduct_data.customProducts[productLabel].taxDetails[taxes[l].id];
+					if (taxDetail.base != 0.0) {
+						line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+						line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+						line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+					} else {
+						line.push("");
+						line.push("");
+						line.push("");
+					}
+				}
+			}
+			lines.push(line);
 		} else {
 			for (let k = 0; k < cashRegisters.length; k++) {
 				let cr = cashRegisters[k];
@@ -255,15 +367,74 @@ function _salesbyproduct_render(cashRegisters, categories, products) {
 					let qty = _salesbyproduct_data.customProducts[productLabel][cr.id].qty;
 					let price = _salesbyproduct_data.customProducts[productLabel][cr.id].price.toLocaleString();
 					let priceTax = _salesbyproduct_data.customProducts[productLabel][cr.id].priceTax.toLocaleString();
-					lines.push(["", cr.label, "" ,"", productLabel, qty, price, "", "", priceTax]);
+					let line = ["", "", "", "", productLabel, qty, price, "", "", priceTax];
+					if (separateByTax) {
+						for (let l = 0; l < taxes.length; l++) {
+							let taxDetail = _salesbyproduct_data.customProducts[productLabel][cr.id].taxDetails[taxes[l].id];
+							if (taxDetail.base != 0.0) {
+								line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+								line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+								line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+							} else {
+								line.push("");
+								line.push("");
+								line.push("");
+							}
+						}
+					}
+					lines.push(line);
 				}
 			}
 		}
 	}
+	// Set table
+	let oldColumns = vue.screen.data.table.columns;
+	let oldColumnVisible = function(label, old, default_val) {
+		for (let i = 0; i < old.length; i++) {
+			if (old[i].label == label) {
+				return old[i].visible;
+			}
+		}
+		return default_val;
+	};
 	vue.screen.data.table.title = "Ventes par produits du "
 			+ tools_dateToString(vue.screen.data.start)
 			+ " au "
 			+ tools_dateToString(vue.screen.data.stop);
+	vue.screen.data.table.columns = [
+		{reference: "image", label: "Image", visible: oldColumnVisible("Image", oldColumns, true), export: false, help: "L'image du produit. Ce champ ne peut être exporté."},
+		{reference: "cashRegister", label: "Caisse", visible: oldColumnVisible("Caisse", oldColumns, false), help: "La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."},
+		{reference: "category", label: "Catégorie", visible: oldColumnVisible("Catégorie", oldColumns, true), help: "La catégorie actuelle du produit."},
+		{reference: "reference", label: "Reference", visible: oldColumnVisible("Reference", oldColumns, false), help: "La référence du produit."},
+		{reference: "label", label: "Désignation", visible: oldColumnVisible("Désignation", oldColumns, true), help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
+		{reference: "quantity", label: "Quantité", export_as_number: true, visible: oldColumnVisible("Quantité", oldColumns, true), help: "La quantité de produit vendue sur la période.", class: "z-oddcol"},
+		{reference: "priceSell", label: "Vente HT", export_as_number: true, visible: oldColumnVisible("Vente HT", oldColumns, false), help: "Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.", class: "z-oddcol"},
+		{reference: "priceBuy", label: "Prix d'achat", export_as_number: true, visible: oldColumnVisible("Prix d'achat", oldColumns, false), help: "Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.", class: "z-oddcol"},
+		{reference: "margin", label: "Marge", export_as_number: true, visible: oldColumnVisible("Marge", oldColumns, false), help: "La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.", class: "z-oddcol"},
+		{reference: "priceSellVat", label: "Vente TTC", export_as_number: true, visible: oldColumnVisible("Vente TTC", oldColumns, false), help: "Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.", class: "z-oddcol"},
+	];
+	if (separateByTax) {
+		for (let i = 0; i < taxes.length; i++) {
+			let tax = taxes[i];
+			let col = {reference: "tax-" + i + "-base", label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, false), help: "Le montant de chiffre d'affaire hors taxe associé au taux de TVA."};
+			if (i % 2 != 0) {
+				col.class = "z-oddcol";
+			}
+			vue.screen.data.table.columns.push(col);
+			col = {reference: "tax-" + i + "-amount", label: tax.label + " TVA", visible: oldColumnVisible(tax.label + " TVA", oldColumns, false), help: "Le montant de TVA collectée associé au taux de TVA."};
+			if (i % 2 != 0) {
+				col.class = "z-oddcol";
+			}
+			vue.screen.data.table.columns.push(col);
+			col = {reference: "tax-" + i + "-total", label: tax.label + " TTC", visible: oldColumnVisible(tax.label + " TTC", oldColumns, false), help: "Le montant TTC associé au taux de TVA."};
+			if (i % 2 != 0) {
+				col.class = "z-oddcol";
+			}
+			vue.screen.data.table.columns.push(col);
+			//vue.screen.data.table.footer.push(total.taxTotal[i].base);
+			//vue.screen.data.table.footer.push(total.taxTotal[i].amount);
+		}
+	}
 	Vue.set(vue.screen.data.table, "lines", lines);
 	gui_hideLoading();
 }

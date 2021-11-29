@@ -31,6 +31,10 @@ Vue.component("vue-salesbyproduct", {
 				<input id="separate-by-cr" type="checkbox" v-model="data.separateCashRegisters" />
 				<label for="separate-by-cr">Détailler par caisse</label>
 			</div>
+			<div class="form-group">
+				<input id="separate-by-tax" type="checkbox" v-model="data.separateTaxes" />
+				<label for="separate-by-tax">Détailler par taux de TVA</label>
+			</div>
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 			</div>

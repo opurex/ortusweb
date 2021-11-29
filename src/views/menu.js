@@ -78,7 +78,6 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("sales_tickets"), "name": "Tickets", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesbyproduct"), "name": "Par produit", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesbycategory"), "name": "Par catégorie", "icon": _menu_getIcon(null)},
-				{"target": _menu_getTargetUrl("salesbyprodandvat"), "name": "TVA par produit", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesdetails"), "name": "Détail", "icon": _menu_getIcon(null)},
 			]},
 			{"name": "Configuration",
