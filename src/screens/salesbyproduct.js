@@ -32,6 +32,15 @@ function salesbyproduct_filter() {
 		"separateByTax": vue.screen.data.separateTaxes,
 		"products": {},
 		"customProducts": {},
+		"total": {
+			"qty": 0,
+			"price": 0.0,
+			"priceTax": 0.0,
+			"priceBuy": 0.0,
+			"margin": 0.0,
+			"tax": 0.0,
+			"taxDetails": {},
+		},
 		"initSalesData": function() {
 			return {
 				"qty": 0,
@@ -117,12 +126,20 @@ function _salesbyproduct_filterCallback(request, status, response) {
 			salesData.qty += line.quantity;
 			salesData.priceTax += line.finalTaxedPrice;
 			salesData.price += price;
+			_salesbyproduct_data.total.qty += line.quantity;
+			_salesbyproduct_data.total.price += price;
+			_salesbyproduct_data.total.priceTax += line.finalTaxedPrice;
 			// Include tax details
 			if (!(line.tax in salesData.taxDetails)) {
 				salesData.taxDetails[line.tax] = {"base": 0.0, "amount": 0.0};
 			}
 			salesData.taxDetails[line.tax].base += price;
 			salesData.taxDetails[line.tax].amount += line.finalTaxedPrice - price;
+			if (!(line.tax in _salesbyproduct_data.total.taxDetails)) {
+				_salesbyproduct_data.total.taxDetails[line.tax] = {"base": 0.0, "amount": 0.0};
+			}
+			_salesbyproduct_data.total.taxDetails[line.tax].base += price;
+			_salesbyproduct_data.total.taxDetails[line.tax].amount += line.finalTaxedPrice - price;
 		}
 	}
 	_salesbyproduct_data.currentPage++;
@@ -235,6 +252,12 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				}
 			}
 		}
+		for (let i = 0; i < taxes.length; i++) {
+			let tax = taxes[i];
+			if (!(tax.id in _salesbyproduct_data.total.taxDetails)) {
+				_salesbyproduct_data.total.taxDetails[tax.id] = {"base": 0.0, "amount": 0.0};
+			}
+		}
 	}
 	let catById = [];
 	for (let i = 0; i < categories.length; i++) {
@@ -281,8 +304,10 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				let price = _salesbyproduct_data.products[prd.id].price;
 				let line = [img, "", cat, prd.reference, prd.label, qty, price.toLocaleString()];
 				if (prd.priceBuy > 0) {
-					line.push(prd.priceBuy.toLocaleString());
+					line.push((prd.priceBuy * qty).toLocaleString());
 					line.push((price - prd.priceBuy * qty).toLocaleString());
+					_salesbyproduct_data.total.priceBuy += prd.priceBuy * qty;
+					_salesbyproduct_data.total.margin += price - prd.priceBuy * qty;
 				} else {
 					line.push("");
 					line.push("");
@@ -311,13 +336,15 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 						let price = _salesbyproduct_data.products[prd.id][cr.id].price;
 						let line = [img, cr.label, cat, prd.reference, prd.label, qty, price.toLocaleString()];
 						if (prd.priceBuy > 0) {
-							line.push(prd.priceBuy.toLocaleString());
+							line.push((prd.priceBuy * qty).toLocaleString());
 							line.push((price - prd.priceBuy * qty).toLocaleString());
+							_salesbyproduct_data.total.priceBuy += prd.priceBuy * qty;
+							_salesbyproduct_data.total.margin += price - prd.priceBuy * qty;
 						} else {
 							line.push("");
 							line.push("");
 						}
-						line.push(_salesbyproduct_data.products[prd.id][cr.id].priceTax.toLocaleString());
+						line.push(_salesbyproduct_data.products[prd.id][cr.id].priceTax.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 						if (separateByTax) {
 							for (let l = 0; l < taxes.length; l++) {
 								let taxDetail = _salesbyproduct_data.products[prd.id][cr.id].taxDetails[taxes[l].id];
@@ -413,6 +440,14 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 		{reference: "margin", label: "Marge", export_as_number: true, visible: oldColumnVisible("Marge", oldColumns, false), help: "La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.", class: "z-oddcol"},
 		{reference: "priceSellVat", label: "Vente TTC", export_as_number: true, visible: oldColumnVisible("Vente TTC", oldColumns, false), help: "Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.", class: "z-oddcol"},
 	];
+	vue.screen.data.table.footer = [
+		"", "", "", "", "Total",
+		_salesbyproduct_data.total.qty.toLocaleString(),
+		_salesbyproduct_data.total.price.toLocaleString(),
+		_salesbyproduct_data.total.priceBuy.toLocaleString(),
+		_salesbyproduct_data.total.margin.toLocaleString(),
+		_salesbyproduct_data.total.priceTax.toLocaleString(),
+	];
 	if (separateByTax) {
 		for (let i = 0; i < taxes.length; i++) {
 			let tax = taxes[i];
@@ -431,8 +466,10 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				col.class = "z-oddcol";
 			}
 			vue.screen.data.table.columns.push(col);
-			//vue.screen.data.table.footer.push(total.taxTotal[i].base);
-			//vue.screen.data.table.footer.push(total.taxTotal[i].amount);
+			let totalTaxDetail = _salesbyproduct_data.total.taxDetails[tax.id]
+			vue.screen.data.table.footer.push(totalTaxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer.push(totalTaxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer.push((totalTaxDetail.base + totalTaxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 		}
 	}
 	Vue.set(vue.screen.data.table, "lines", lines);

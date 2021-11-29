@@ -32,6 +32,15 @@ function salesbycategory_filter() {
 		"products": {}, // Products data by id
 		"productCat": {}, // Category id from product id
 		"categories": {}, // Category sales data by category id (0 for custom products)
+		"total": {
+			"qty": 0,
+			"price": 0.0,
+			"priceTax": 0.0,
+			"priceBuy": 0.0,
+			"margin": 0.0,
+			"tax": 0.0,
+			"taxDetails": {},
+		},
 		"initSalesData": function() {
 			return {
 				"qty": 0,
@@ -113,11 +122,22 @@ function _salesbycategory_filterCallback(request, status, response) {
 			salesData.priceBuy += priceBuy;
 			salesData.margin += price - priceBuy;
 			salesData.tax += line.finalTaxedPrice - price;
+			_salesbycategory_data.total.qty += line.quantity;
+			_salesbycategory_data.total.price += price;
+			_salesbycategory_data.total.priceTax += line.finalTaxedPrice;
+			_salesbycategory_data.total.priceBuy += priceBuy;
+			_salesbycategory_data.total.margin += price - priceBuy;
+			_salesbycategory_data.total.tax += line.finalTaxedPrice - price;
 			if (!(line.tax in salesData["taxDetails"])) {
 				salesData["taxDetails"][line.tax] = {"base": 0.0, "amount": 0.0};
 			}
 			salesData["taxDetails"][line.tax].base += price;
 			salesData["taxDetails"][line.tax].amount += line.finalTaxedPrice - price;
+			if (!(line.tax in _salesbycategory_data.total.taxDetails)) {
+				_salesbycategory_data.total.taxDetails[line.tax] = {"base": 0.0, "amount": 0.0};
+			}
+			_salesbycategory_data.total.taxDetails[line.tax].base += price;
+			_salesbycategory_data.total.taxDetails[line.tax].amount += line.finalTaxedPrice - price;
 		}
 	}
 	_salesbycategory_data.currentPage++;
@@ -225,6 +245,11 @@ function _salesbycategory_render(cashRegisters, categories, taxes) {
 						_salesbycategory_data.categories[catId].taxDetails[taxes[i].id] = {"base": 0.0, "amount": 0.0};
 					}
 				}
+			}
+		}
+		for (let i = 0; i < taxes.length; i++) {
+			if (!(taxes[i].id in _salesbycategory_data.total.taxDetails)) {
+				_salesbycategory_data.total.taxDetails[taxes[i].id] = {"base": 0.0, "amount": 0.0};
 			}
 		}
 	}
@@ -344,6 +369,15 @@ function _salesbycategory_render(cashRegisters, categories, taxes) {
 		{reference: "priceSellVat", label: "Ventes TTC", export_as_number: true, visible: oldColumnVisible("Ventes TTC", oldColumns, false), help: "Le montant de chiffre d'affaire TTC réalisé par les produits de la catégorie sur la période concernée.", class: "z-oddcol"},
 		{reference: "taxTotal", label: "Total TVA", export_as_number: true, visible: oldColumnVisible("Total TVA", oldColumns, false), help: "Le montant de la TVA collectée sur les produits de la catégorie sur la période concernée.", class: "z-oddcol"},
 	];
+	vue.screen.data.table.footer = [
+		"", "", "", "Total",
+		_salesbycategory_data.total.qty.toLocaleString(),
+		_salesbycategory_data.total.price.toLocaleString(),
+		_salesbycategory_data.total.priceBuy.toLocaleString(),
+		_salesbycategory_data.total.margin.toLocaleString(),
+		_salesbycategory_data.total.priceTax.toLocaleString(),
+		_salesbycategory_data.total.tax.toLocaleString(),
+	];
 	if (separateByTaxes) {
 		for (let i = 0; i < taxes.length; i++) {
 			let tax = taxes[i];
@@ -362,8 +396,10 @@ function _salesbycategory_render(cashRegisters, categories, taxes) {
 				col.class = "z-oddcol";
 			}
 			vue.screen.data.table.columns.push(col);
-			//vue.screen.data.table.footer.push(total.taxTotal[i].base);
-			//vue.screen.data.table.footer.push(total.taxTotal[i].amount);
+			let totalTaxDetail = _salesbycategory_data.total.taxDetails[tax.id];
+			vue.screen.data.table.footer.push(totalTaxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer.push(totalTaxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer.push((totalTaxDetail.base + totalTaxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 		}
 	}
 	vue.screen.data.table.title = "Ventes par catégorie du "
