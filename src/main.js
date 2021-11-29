@@ -83,9 +83,6 @@ function route(screen) {
 	case "salesbycategory":
 		salesbycategory_show();
 		break;
-	case "salesbyvat":
-		salesbyvat_show();
-		break;
 	case "salesbyprodandvat":
 		salesbyprodandvat_show();
 		break;
