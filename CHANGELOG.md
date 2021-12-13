@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.14] - 2021-12-13
+
+### Added
+- Cs + taxes, over perceived in z-tickets
+- Month and week number in sales details
+- Taxes details in sales by product
+- Total footer for sales by product and sales by category
+
+### Changed
+- Sales by category by tax is merged into sales by category
+- Files for packaging are read dynamically
+
+
 ## [8.13] - 2021-09-15
 
 ### Added
