@@ -1,92 +1,27 @@
 import os
 import sys
 import shutil
+import re
 
 path = os.path.dirname(os.path.realpath(__file__))
 
 version = "v" + sys.argv[1]
 
-css = [
-	"res/css/structure.css",
-	"res/css/style.css",
-]
-js = [
-	"src/tools.js",
-	"src/models/category.js",
-	"src/models/product.js",
-	"src/models/tariffarea.js",
-	"src/models/customer.js",
-	"src/models/floor.js",
-	"src/models/paymentmode.js",
-	"src/models/user.js",
-	"src/models/role.js",
-	"src/models/cashregister.js",
-	"src/models/resource.js",
-	"src/models/discountprofile.js",
-	"src/models/currency.js",
-	"src/models/producttagformats.js",
-	"src/models/tax.js",
-	"src/models/option.js",
-	"src/srvcall.js",
-	"src/login.js",
-	"src/storage.js",
-	"src/gui.js",
-	"src/main.js",
-	"src/screens/table.js",
-	"src/screens/home.js",
-	"src/screens/categories.js",
-	"src/screens/products.js",
-	"src/screens/tariffareas.js",
-	"src/screens/customers.js",
-	"src/screens/ztickets.js",
-	"src/screens/tickets.js",
-	"src/screens/salesbyproduct.js",
-	"src/screens/salesbycategory.js",
-	"src/screens/salesdetails.js",
-	"src/screens/floors.js",
-	"src/screens/paymentmodes.js",
-	"src/screens/users.js",
-	"src/screens/roles.js",
-	"src/screens/cashregisters.js",
-	"src/screens/resources.js",
-	"src/screens/discountprofiles.js",
-	"src/screens/currencies.js",
-	"src/screens/producttags.js",
-	"src/screens/taxes.js",
-	"src/screens/preferences.js",
-	"src/views/loading.js",
-	"src/views/home.js",
-	"src/views/login.js",
-	"src/views/message.js",
-	"src/views/inputdate.js",
-	"src/views/catalogpicker.js",
-	"src/views/menu.js",
-	"src/views/categories.js",
-	"src/views/products.js",
-	"src/views/tariffareas.js",
-	"src/views/customers.js",
-	"src/views/ztickets.js",
-	"src/views/tickets.js",
-	"src/views/salesbyproduct.js",
-	"src/views/salesbycategory.js",
-	"src/views/salesdetails.js",
-	"src/views/floors.js",
-	"src/views/table.js",
-	"src/views/paymentmodes.js",
-	"src/views/users.js",
-	"src/views/roles.js",
-	"src/views/cashregisters.js",
-	"src/views/resources.js",
-	"src/views/discountprofiles.js",
-	"src/views/currencies.js",
-	"src/views/producttags.js",
-	"src/views/taxes.js",
-	"src/views/preferences.js",
-]
+# List css and javascript source files from index.html
+css_regex = re.compile('<link rel="stylesheet" type="text/css" href="res/css/(.+)">')
+src_regex = re.compile('<script type="text/javascript" src="src/(.+)"></script>')
 
+index_file = open(path + "/index.html", "r")
+index = index_file.read()
+index_file.close()
+
+css = css_regex.findall(index)
+js = src_regex.findall(index)
+
+# Generate packed css and javascript files
 css_packed = ""
 for c in css:
-	file = open(path + "/" + c, "r")
+	file = open(path + "/res/css/" + c, "r")
 	css_packed = css_packed + file.read()
 	file.close()
 css_name = path + "/dist/res/css/css-" + version + ".css"
@@ -98,7 +33,7 @@ css_dist.close()
 
 js_packed = ""
 for j in js:
-	file = open(path + "/" + j, "r")
+	file = open(path + "/src/" + j, "r")
 	js_packed = js_packed + file.read()
 	file.close()
 js_name = path + "/dist/js-" + version + ".js"
@@ -108,6 +43,7 @@ js_dist = open(js_name, "w")
 js_dist.write(js_packed)
 js_dist.close()
 
+# Clear dist libs and update them
 shutil.rmtree(path + "/dist/res/fonts", True)
 shutil.rmtree(path + "/dist/res/img", True)
 shutil.rmtree(path + "/dist/libs", True)
@@ -115,6 +51,8 @@ shutil.copytree(path + "/res/fonts", path + "/dist/res/fonts")
 shutil.copytree(path + "/res/img", path + "/dist/res/img")
 shutil.copytree(path + "/libs", path + "/dist/libs")
 #os.remove(path + "/dist/libs/vue-dev.js")
+
+# Create index.html from index_dist.html and packed files
 index_file = open(path + "/index_dist.html", "r")
 index = index_file.read()
 index_file.close()
