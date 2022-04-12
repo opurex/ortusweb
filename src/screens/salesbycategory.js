@@ -216,7 +216,7 @@ function _salesbycategory_render(cashRegisters, categories, taxes) {
 		}
 		if (separateByCR) {
 			// Set 0 for custom products only if there are some
-			if (_salesbycategory_data.categories[0].length > 0) {
+			if ((0 in _salesbycategory_data.categories) &&  _salesbycategory_data.categories[0].length > 0) {
 				let salesData = _salesbycategory_data.categories[0];
 				for (let j = 0; j < cashRegisters.length; j++) {
 					let cashRegister = cashRegisters[j];
