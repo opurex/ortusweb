@@ -300,9 +300,9 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
 			}
 			if (!separateByCR) {
-				let qty = _salesbyproduct_data.products[prd.id].qty.toLocaleString();
+				let qty = _salesbyproduct_data.products[prd.id].qty;
 				let price = _salesbyproduct_data.products[prd.id].price;
-				let line = [img, "", cat, prd.reference, prd.label, qty, price.toLocaleString()];
+				let line = [img, "", cat, prd.reference, prd.label, qty.toLocaleString(), price.toLocaleString()];
 				if (prd.priceBuy > 0) {
 					line.push((prd.priceBuy * qty).toLocaleString());
 					line.push((price - prd.priceBuy * qty).toLocaleString());
