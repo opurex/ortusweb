@@ -1,19 +1,21 @@
 function paymentmodes_show() {
 	gui_showLoading();
 	vue.screen.data = {paymentModes: [], sort: "dispOrder"};
-	vue.screen.component = "vue-paymentmode-list";
 	storage_open(function(event) {
-		storage_readStore("paymentmodes", function(paymentModes) {
-			vue.screen.data.paymentModes = paymentModes.sort(tools_sort("dispOrder", "reference"));
+		storage_readStores(["paymentmodes", "roles"], function(data) {
+			vue.screen.data.paymentModes = data.paymentmodes.sort(tools_sort("dispOrder", "reference"));
+			vue.screen.data.paymentModes.forEach(pm => {
+				pm.roles = [];
+				data.roles.forEach(role => {
+					if (role.permissions.indexOf("payment." + pm.reference) != -1) {
+						pm.roles.push(role.name);
+					}
+				});
+			});
+			vue.screen.component = "vue-paymentmode-list";
 			gui_hideLoading();
 			storage_close();
-			let cashWarning = true;
-			for (let i = 0; i < paymentModes.length; i++) {
-				if (paymentModes[i].reference == "cash") {
-					cashWarning = false;
-					break;
-				}
-			}
+			let cashWarning = (!data.paymentmodes.find(pm => pm.reference == "cash"));
 			vue.screen.data.cashWarning = cashWarning;
 		});
 	});

@@ -10,6 +10,7 @@ Vue.component("vue-paymentmode-list", {
 					{reference: "label", label: "Désignation", visible: true, help: "Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."},
 
 					{reference: "visible", label: "Actif", visible: true, help: "Si le mode de paiement peut être encaissé ou non."},
+					{reference: "roles", label: "Rôles", visible: true, help: "Les rôles autorisés à encaisser avec ce mode de paiement."},
 					{reference: "dispOrder", label: "Ordre", export_as_number: true, visible: false, help: "L'ordre d'affichage."},
 					{reference: "operation", label: "Opération", export: false, visible: true},
 				],
@@ -52,20 +53,15 @@ Vue.component("vue-paymentmode-list", {
 	},
 	mounted: function() {
 		let thiss = this;
-		storage_open(function(event) {
-			storage_readStore("paymentmodes", function(pms) {
-				for (let i = 0; i < pms.length; i++) {
-					let pm = pms[i];
-					let line = [
-						{type: "thumbnail", src: thiss.imageSrc(pm)},
-						pm.reference, pm.label,
-						{type: "bool", value: pm.visible}, pm.dispOrder,
-						{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(pm) + "\">Modifier</a></div>"},
-					];
-					thiss.paymentModesTable.lines.push(line);
-				}
-				storage_close();
-			});
+		this.data.paymentModes.forEach(pm => {
+			let line = [
+				{type: "thumbnail", src: thiss.imageSrc(pm)},
+				pm.reference, pm.label,
+				{type: "bool", value: pm.visible},
+				pm.roles.join(", "), pm.dispOrder,
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(pm) + "\">Modifier</a></div>"},
+			];
+			this.paymentModesTable.lines.push(line);
 		});
 	},
 });
