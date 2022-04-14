@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.15] - 2022-04-14
+
+### Added
+- Show allowed roles in payment mode list
+
+### Fixed
+- NaN with decimal quantities in sales by product
+- Sales by category without custom products
+
+
 ## [8.14] - 2021-12-13
 
 ### Added
