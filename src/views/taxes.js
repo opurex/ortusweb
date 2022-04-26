@@ -66,32 +66,14 @@ Vue.component("vue-tax-form", {
 	</header>
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:taxes_saveTax(); return false;">
-			<div class="form-group">
-				<label for="edit-label">Désignation</label>
-				<input id="edit-label" type="text" v-model="data.tax.label" required="true" />
-			</div>
-
-			<div class="form-group">
-				<label for="edit-rate">Taux</label>
-				<input id="edit-rate" type="number" v-model.lazy="rate" step="0.01" min="0" max="100"> %
-			</div>
-
+			<vue-input-text label="Désignation" v-model="data.tax.label" v-bind:required="true" id="edit-label" />
+			<vue-input-rate label="Taux" v-model.number="data.tax.rate" id="edit-rate" />
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
 		</form>
 	</article>
 </section>
-</div>`,
-	computed: {
-		rate: {
-			get: function() {
-				return Number((this.data.tax.rate * 100.0).toFixed(2));
-			},
-			set: function(value) {
-				this.data.tax.rate = Number((value / 100.0).toFixed(5));
-			}
-		}
-	}
+</div>`
 });
 

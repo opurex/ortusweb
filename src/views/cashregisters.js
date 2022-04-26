@@ -60,14 +60,8 @@ Vue.component("vue-cashregister-form", {
 	</header>
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:cashregister_saveCashRegister(); return false;">
-			<div class="form-group">
-				<label for="edit-reference">Référence</label>
-				<input id="edit-reference" type="text" v-model="data.cashRegister.reference" required="true" />
-			</div>
-			<div class="form-group">
-				<label for="edit-label">Désignation</label>
-				<input id="edit-label" type="text" v-model="data.cashRegister.label" required="true" />
-			</div>
+			<vue-input-text label="Référence" v-model="data.cashRegister.reference" v-bind:required="true" id="edit-reference" />
+			<vue-input-text label="Désignation" v-model="data.cashRegister.label" v-bind:required="true" id="edit-label" />
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>

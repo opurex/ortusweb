@@ -162,22 +162,14 @@ Vue.component("vue-category-form", {
 	</header>
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:category_saveCategory(); return false;">
-			<div class="form-group">
-				<label for="edit-label">Désignation</label>
-				<input id="edit-label" type="text" v-model="data.category.label" required="true" />
-			</div>
+			<vue-input-text label="Désignation" v-model="data.category.label" v-bind:required="true" id="edit-label" />
 			<div class="form-group">
 				<label for="edit-image">Image</label>
 				<img v-if="data.category.hasImage" id="category-image" v-bind:src="imageSrc(data.category)" />
 				<input id="edit-image" type="file" accept="image/*" />
 				<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:category_toggleImage();" >{{data.deleteImageButton}}</button>
 			</div>
-
-			<div class="form-group">
-				<label for="edit-reference">Référence</label>
-				<input id="edit-reference" type="text" v-model="data.category.reference" required="true" />
-			</div>
-
+			<vue-input-text label="Référence" v-model="data.category.reference" v-bind:required="true" id="edit-label" />
 			<div class="form-group">
 				<label for="edit-parent">Parent</label></dt>
 				<select id="edit-parent" v-model="data.category.parent">
@@ -185,12 +177,7 @@ Vue.component("vue-category-form", {
 					<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
 				</select>
 			</div>
-
-			<div class="form-group">
-				<label for="edit-dispOrder">Ordre</label>
-				<input id="edit-dispOrder" type="number" v-model.number="data.category.dispOrder">
-			</div>
-
+			<vue-input-number label="Ordre" v-model="data.category.dispOrder" id="edit-dispOrder" />
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>

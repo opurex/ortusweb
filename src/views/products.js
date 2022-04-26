@@ -254,10 +254,7 @@ Vue.component("vue-product-form", {
 		<form class="form-large" id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
 			<fieldset>
 				<legend>Affichage</legend>
-				<div class="form-group">
-					<label for="edit-label">Désignation</label>
-					<input id="edit-label" type="text" v-model="data.product.label" required="true" />
-				</div>
+				<vue-input-text label="Désignation" v-model="data.product.label" v-bind:required="true" id="edit-label" />
 				<div class="form-group">
 					<label for="edit-image">Image</label>
 					<img v-if="data.product.hasImage" id="product-image" class="img img-thumbnail" v-bind:src="imageSrc(data.product)" />
@@ -270,18 +267,9 @@ Vue.component("vue-product-form", {
 						<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
 					</select>
 				</div>
-				<div class="form-group">
-					<label for="edit-dispOrder">Ordre</label>
-					<input class="form-control" id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" />
-				</div>
-				<div class="form-group">
-					<input id="edit-visible" type="checkbox" v-model="data.product.visible">
-					<label for="edit-visible">En vente</label>
-				</div>
-				<div class="form-group">
-					<input id="edit-prepay" type="checkbox" v-model="data.product.prepay" />
-					<label for="edit-prepay">Recharge prépayé</label>
-				</div>
+				<vue-input-number label="Ordre" v-model.number="data.product.dispOrder" id="edit-dispOrder" />
+				<vue-input-checkbox label="En vente" v-model="data.product.visible" id="edit-visible" />
+				<vue-input-checkbox label="Recharge prépayé" v-model="data.product.prepay" id="edit-prepay" />
 			</fieldset>
 			<fieldset>
 				<legend>Prix</legend>
@@ -308,32 +296,17 @@ Vue.component("vue-product-form", {
 					<label for="edit-margin">Marge</label>
 					<input type="text" id="edit-margin" name="margin" v-model="data.product.margin" disabled="true" />
 				</div>
-				<div class="form-group">
-					<label for="edit-discountRate">Remise automatique</label>
-					<input id="edit-discountRate" type="number" v-model.lazy="discountRate" step="0.01" min="0" max="100"/> %
-				</div>
-				<div class="form-group">
-					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
-					<label for="edit-discountEnabled">Appliquer la remise automatique</label>
-				</div>
+				<vue-input-rate label="Remise automatique" v-model="data.product.discountRate" id="edit-discountRate" />
+				<vue-input-checkbox label="Appliquer la remise automatique" v-model="data.product.discountEnabled" id="edit-discountEnabled" />
 			</fieldset>
 			<fieldset>
 				<legend>Référencement</legend>
-				<div class="form-group">
-					<label for="edit-reference">Référence</label>
-					<input id="edit-reference" type="text" v-model="data.product.reference" required="true" />
-				</div>
-				<div class="form-group">
-					<label for="edit-barcode">Code barre</label>
-					<input id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" />
-				</div>
+				<vue-input-text label="Référence" v-model="data.product.reference" v-bind:required="true" id="edit-reference" />
+				<vue-input-text label="Code barre" v-model="data.product.barcode" id="edit-barcode" />
 			</fieldset>
 			<fieldset>
 				<legend>Volumétrie et contenance</legend>
-				<div class="form-group">
-					<input id="edit-scaled" type="checkbox" name="scaled" v-model="data.product.scaled"></dd>
-					<label for="edit-scaled">Vente en vrac</label>
-				</div>
+				<vue-input-checkbox label="Vente en vrac" v-model="data.product.scaled" id="edit-scaled" />
 				<div class="form-group">
 					<label for="edit-scaleValue">Contenance</label>
 					<input id="edit-scaleValue" type="number" step="0.01" v-model="data.product.scaleValue" v-if="data.product.scaled == false" />
@@ -383,14 +356,6 @@ Vue.component("vue-product-form", {
 					break;
 			}
 			return price;
-		},
-		discountRate: {
-			get: function() {
-				return Number((this.data.product.discountRate * 100.0).toFixed(2));
-			},
-			set: function(value) {
-				this.data.product.discountRate = Number((value / 100.0).toFixed(5));
-			}
 		}
 	},
 	methods: {
