@@ -32,25 +32,10 @@ function _categories_showCategory(category, categories) {
 	vue.screen.data = {
 		category: category,
 		categories: categories,
-		deleteImage: false,
-		deleteImageButton: "Supprimer",
-		hadImage: category.hasImage // Save for later check
+		image: null,
 	}
 	vue.screen.component = "vue-category-form";
 	gui_hideLoading();
-}
-
-function category_toggleImage() {
-	if (vue.screen.data.category.hasImage) {
-		vue.screen.data.category.hasImage = false;
-		vue.screen.data.deleteImage = true;
-		document.getElementById("edit-image").value = "";
-		vue.screen.data.deleteImageButton = "Restaurer";
-	} else {
-		vue.screen.data.category.hasImage = true;
-		vue.screen.data.deleteImage = false;
-		vue.screen.data.deleteImageButton = "Supprimer"
-	}
 }
 
 function category_saveCategory() {
@@ -88,33 +73,13 @@ function category_saveCallback(request, status, response) {
 		let respCat = JSON.parse(response);
 		cat.id = respCat["id"];
 	}
-	let imgTag = document.getElementById("edit-image");
-	if (vue.screen.data.deleteImage) {
-		cat.hasImage = false;
-		srvcall_delete("api/image/category/" + encodeURIComponent(cat.id), function(request, status, response) {
-			_category_saveCommit(cat);
-		});
-	} else if (imgTag.files.length != 0) {
-		cat.hasImage = true;
-		if (vue.screen.data.hadImage) {
-			srvcall_patch("api/image/category/" + encodeURIComponent(cat.id), imgTag.files[0], function(request, status, response) {
-				_category_saveCommit(cat);
-			});
-		} else {
-			srvcall_put("api/image/category/" + encodeURIComponent(cat.id), imgTag.files[0], function(request, status, response) {
-				_category_saveCommit(cat);
-			});
-		}
-	} else {
-		_category_saveCommit(cat);
-	}
+	srvcall_imageSave("category", cat, cat.id, vue.screen.data.image, _category_saveCommit);
 }
 
 function _category_saveCommit(cat) {
-	if (cat.hasImage) {
-		// Force image refresh
-		cat.hasImage = false;
-		cat.hasImage = true;
+	if (vue.screen.data.image) {
+		cat.hasImage = !vue.screen.data.image.delete;
+		vue.screen.data.image = null; // Refresh form
 	}
 	// Update in local database
 	storage_open(function(event) {

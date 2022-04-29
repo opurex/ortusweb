@@ -134,6 +134,35 @@ function srvcall_imageUrl(modelClass, model) {
 	}
 }
 
+/** Send a request to write/update/delete an image from a vue-input-image component.
+ * @param modelName The model name that is put in the url, for example "category".
+ * @param record The record to update it's image. It must have hasImage set to it's previous state.
+ * I.e. false if a new image is set, true if the image is updated or deleted.
+ * @param modelId The id that is put in the url. Generaly record.id but subrecords have a different modelId.
+ * @param newImage An object retreived from a vue-input-image component.
+ * @param callback The function called after the api call, with the untouched record as parameter.
+ */
+function srvcall_imageSave(modelName, record, modelId, newImage, callback) {
+	let hadImage = record.hasImage;
+	if (hadImage && newImage && newImage.delete) {
+		srvcall_delete("api/image/" + modelName + "/" + encodeURIComponent(modelId), function(request, status, response) {
+			callback(record);
+		});
+	} else if (newImage && newImage.file) {
+		if (hadImage) {
+			srvcall_patch("api/image/" + modelName + "/" + encodeURIComponent(modelId), newImage.file, function(request, status, response) {
+				callback(record);
+			});
+		} else {
+			srvcall_put("api/image/" + modelName + "/" + encodeURIComponent(modelId), newImage.file, function(request, status, response) {
+				callback(record);
+			});
+		}
+	} else {
+		callback(record);
+	}
+}
+
 /** Helper class to get the default behaviour for faulty responses.
  * @return False if the response is ok to be used (it has not been catched).
  * True if the response has been catched and has already been proceeded. */

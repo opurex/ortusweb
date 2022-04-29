@@ -163,12 +163,7 @@ Vue.component("vue-category-form", {
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:category_saveCategory(); return false;">
 			<vue-input-text label="Désignation" v-model="data.category.label" v-bind:required="true" id="edit-label" />
-			<div class="form-group">
-				<label for="edit-image">Image</label>
-				<img v-if="data.category.hasImage" id="category-image" v-bind:src="imageSrc(data.category)" />
-				<input id="edit-image" type="file" accept="image/*" />
-				<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:category_toggleImage();" >{{data.deleteImageButton}}</button>
-			</div>
+			<vue-input-image label="Image" modelName="category" v-bind:modelId="data.category.id.toString()" v-model="data.image" v-bind:hadImage="data.category.hasImage" id="edit-image" />
 			<vue-input-text label="Référence" v-model="data.category.reference" v-bind:required="true" id="edit-label" />
 			<div class="form-group">
 				<label for="edit-parent">Parent</label></dt>
@@ -184,16 +179,7 @@ Vue.component("vue-category-form", {
 		</form>
 	</article>
 </section>
-</div>`,
-	methods: {
-		imageSrc: function(cat) {
-			if (cat.hasImage) {
-				return login_getHostUrl() + "/api/image/category/" + cat.id + "?Token=" + login_getToken();
-			} else {
-				return login_getHostUrl() + "/api/image/category/default?Token=" + login_getToken();
-			}
-		}
-	}
+</div>`
 });
 
 Vue.component("vue-category-import", {
