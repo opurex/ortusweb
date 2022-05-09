@@ -191,9 +191,18 @@ Vue.component("vue-category-import", {
 			editedCategories: [],
 			editedValues: [],
 			unchangedCategories: [],
+			linkedRecords: {
+				category: this.data.categories,
+			},
 			showUnchanged: false,
 			unknownColumns: [],
 			errors: [],
+			tableColumns: [
+				{field: "reference", label: "Référence"},
+				{field: "label", label: "Désignation"},
+				{field: "parent", label: "Parent", type: "record", modelName: "category"},
+				{field: "dispOrder", label: "Ordre", type: "number"},
+			]
 		};
 	},
 	template: `<div class="category-import">
@@ -216,36 +225,17 @@ Vue.component("vue-category-import", {
 		</nav>
 	</header>
 	<div class="box-body">
-		<h2>Nouvelles catégories</h2>
-		<vue-category-import-table v-bind:categories="newCategories" v-bind:allCategories="data.categories"></vue-category-import-table>
-		<h2>Catégories modifiées</h2>
-		<p v-if="editedCategories.length > 0">Les cases sur fond rouge indiquent les changements.</p>
-		<vue-category-import-table v-bind:categories="editedCategories" v-bind:editedValues="editedValues" v-bind:allCategories="data.categories"></vue-category-import-table>
-		<h2>Catégories non modifiées</h2>
-		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{unchangedCategories.length}} catégories</template></a></div>
-		<vue-category-import-table v-show="showUnchanged" v-bind:categories="unchangedCategories" v-bind:allCategories="data.categories"></vue-category-import-table>
-		<h2 v-if="unknownColumns.length > 0 || errors.length > 0">Erreurs de lecture</h2>
-		<table class="table table-bordered table-hover" v-if="unknownColumns.length > 0 || errors.length > 0">
-			<thead>
-				<tr>
-					<th>Ligne</th>
-					<th>Erreur</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-if="unknownColumns.length > 0">
-					<td>1</td>
-					<td>Les colonnes suivantes ont été ignorées : <template v-for="col in unknownColumns">{{col}} </template>.</td>
-				<tr>
-				<tr v-for="err in errors">
-					<td>{{err.line}}</td>
-					<td>{{err.error}}</td>
-				</tr>
-			</tbody>
-		</table>
-		<div>
-			<a class="btn btn-edit" v-if="newCategories.length > 0 || editedCategories.length > 0" v-on:click="saveChanges">Enregister les modifications</a>
-		</div>
+		<vue-import-preview newTitle="Nouvelles catégories" editTitle="Catégories modifiées" untouchedTitle="Catégories non modifiées" modelsLabel="catégories"
+			v-bind:newRecords="newCategories"
+			v-bind:editedRecords="editedCategories"
+			v-bind:editedValues="editedValues"
+			v-bind:untouchedRecords="unchangedCategories"
+			v-bind:allRecords="data.categories"
+			v-bind:linkedRecords="linkedRecords"
+			v-bind:tableColumns="tableColumns"
+			v-bind:unknownColumns="unknownColumns"
+			v-bind:errors="errors"
+			v-on:save="saveChanges" />
 	</div>
 </section>
 </div>`,
@@ -283,45 +273,4 @@ Vue.component("vue-category-import", {
 			this.errors = [];
 		},
 	}
-});
-
-Vue.component("vue-category-import-table", {
-	props: ["title", "categories", "editedValues", "allCategories", "taxes"],
-	template: `<div class="because">
-<h2>{{title}}</h2>
-<table class="table table-bordered table-hover">
-	<thead>
-		<tr>
-			<th>Référence</th>
-			<th>Désignation</th>
-			<th>Parent</th>
-			<th>Ordre</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr v-for="(category, index) in categories">
-			<td v-bind:style="hasChanged(index, 'reference')">{{category.reference}}</td>
-			<td v-bind:style="hasChanged(index, 'label')">{{category.label}}</td>
-			<td v-bind:style="hasChanged(index, 'parent')">{{parentCategory(category.parent)}}</td>
-			<td v-bind:style="hasChanged(index, 'dispOrder')">{{category.dispOrder}}</td>
-		</tr>
-	</tbody>
-</table>
-</div>`,
-	methods: {
-		parentCategory: function(catId) {
-			for (let i = 0; i < this.allCategories.length; i++) {
-				if (this.allCategories[i].id == catId) {
-					return this.allCategories[i].label;
-				}
-			}
-			return "";
-		},
-		hasChanged: function(index, field) {
-			if (this.editedValues && this.editedValues[index][field]) {
-				return "font-weight:bold;background-color:#a36052;color:#fff";
-			}
-			return "";
-		}
-	},
 });
