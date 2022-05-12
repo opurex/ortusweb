@@ -47,6 +47,7 @@ Vue.component("vue-input-image", {
 			} else {
 				this.hasImage = true;
 				this.deleteImage = false;
+				this.$emit('input', {'file': null, 'delete': false});
 			}
 		},
 		fileChanged: function(event) {
