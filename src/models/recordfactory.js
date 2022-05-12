@@ -12,16 +12,16 @@ class RecordFactory {
 	create(values) {
 		this.#reset();
 		let record = {};
-		for (key in modelDef.fields) {
-			if (key in values) {
+		for (let key in this.#modelDef.fields) {
+			if (values && (key in values)) {
 				record[key] = values[key];
-				if ("default" in modelDef.fields[key] && values[key] != modelDef.fields[key].default) {
+				if ("default" in this.#modelDef.fields[key] && values[key] != this.#modelDef.fields[key].default) {
 					this.#changes.push(key);
 				}
-			} else if ("default" in modelDef.fields[key]) {
-				record[key] = modelDef.fields[key].default;
+			} else if ("default" in this.#modelDef.fields[key]) {
+				record[key] = this.#modelDef.fields[key].default;
 			} else {
-				console.error("Missing required " + key + " to create a " + modelDef.modelName);
+				console.error("Missing required " + key + " to create a " + this.#modelDef.modelName);
 				this.#errors.push(key);
 			}
 		}

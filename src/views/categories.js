@@ -163,7 +163,7 @@ Vue.component("vue-category-form", {
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:category_saveCategory(); return false;">
 			<vue-input-text label="Désignation" v-model="data.category.label" v-bind:required="true" id="edit-label" />
-			<vue-input-image label="Image" modelName="category" v-bind:modelId="data.category.id.toString()" v-model="data.image" v-bind:hadImage="data.category.hasImage" id="edit-image" />
+			<vue-input-image label="Image" modelName="category" v-bind:modelId="data.modelDef.modelId(data.category)" v-model="data.image" v-bind:hadImage="data.category.hasImage" id="edit-image" />
 			<vue-input-text label="Référence" v-model="data.category.reference" v-bind:required="true" id="edit-label" />
 			<div class="form-group">
 				<label for="edit-parent">Parent</label></dt>

@@ -23,13 +23,14 @@ function categories_showCategory(id) {
 				});
 			} else {
 				storage_close();
-				_categories_showCategory(Category_default(), categories);
+				_categories_showCategory(new RecordFactory(CategoryDef).create(), categories);
 			}
 		});
 	});
 }
 function _categories_showCategory(category, categories) {
 	vue.screen.data = {
+		modelDef: CategoryDef,
 		category: category,
 		categories: categories,
 		image: null,

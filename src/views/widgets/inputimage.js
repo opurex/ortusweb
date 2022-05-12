@@ -54,7 +54,7 @@ Vue.component("vue-input-image", {
 			this.$emit('input', {'file': event.target.files[0], 'delete': this.deleteImage });
 		},
 		imageSrc: function() {
-			if (this.hasImage) {
+			if (this.hasImage && this.modelId) {
 				return login_getHostUrl() + "/api/image/" + encodeURIComponent(this.modelName) + "/" + encodeURIComponent(this.modelId) + "?Token=" + login_getToken();
 			} else {
 				return login_getHostUrl() + "/api/image/" + encodeURIComponent(this.modelName) + "/default?Token=" + login_getToken();
