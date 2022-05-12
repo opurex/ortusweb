@@ -101,12 +101,6 @@ function categories_showImport() {
 }
 
 function _categories_parseCsv(fileContent, callback) {
-	let csv = new CSV(fileContent, {header: true, cast: false});
-	let rawCategories = csv.parse();
-	if (rawCategories.length == 0) {
-		callback({newProducts: [], editedProducts: [], unchangedProducts: [],
-			unknownColumns: [], errors: []});
-	}
 	gui_showLoading();
 	let columnMappingDef = {
 		reference: "reference",
@@ -117,114 +111,21 @@ function _categories_parseCsv(fileContent, callback) {
 		disporder: "dispOrder",
 		"ordre": "dispOrder",
 	};
-	columnMapping = {};
-	unknownColumns = [];
-	for (let key in rawCategories[0]) {
-		if (key.toLowerCase() in columnMappingDef) {
-			columnMapping[key] = columnMappingDef[key.toLowerCase()];
-		} else {
-			unknownColumns.push(key);
-		}
-	}
-	let newCategories = [];
-	let editedCategories = [];
-	let editedValues = [];
-	let unchangedCategories = [];
-	let errors = [];
 	storage_open(function(event) {
-		storage_readStores(["categories"], function(data) {
-			// Map by reference for easy mapping
-			let categories = data["categories"];
-			let categoryByRef = [];
-			let categoryByLabel = [];
-			for (let i = 0; i < categories.length; i++) {
-				categoryByRef[categories[i].reference] = categories[i];
-				categoryByLabel[categories[i].label] = categories[i];
-			}
-			// Convert the incoming csv lines to category data
-			function mapValues(line, mapping) {
-				let ret = {};
-				for (key in line) {
-					if (key in mapping) {
-						ret[mapping[key]] = line[key];
-					}
-				}
-				return ret;
-			}
-			function convertBool(value) {
-				return (value != "0" && value != 0 && value != "");
-			}
-			function convertNum(value) {
-				let v = value.replace(",", ".");
-				v = v.replace(" ", "");
-				return parseFloat(v);
-			}
-			function convertValues(value) {
-				if ("dispOrder" in value)
-					value.dispOrder = parseInt(value.dispOrder);
-				return value;
-			}
-			for (let i = 0; i < rawCategories.length; i++) {
-				let value = mapValues(rawCategories[i], columnMapping);
-				value = convertValues(value);
-				// Find parent category id
-				let parentCategoryId = null;
-				if ("parent" in value && value.parent != "") {
-					if (value.parent in categoryByRef) {
-						categoryId = categoryByRef[value.parent].id
-						value.parent = categoryId;
-					} else if (value.category in categoryByLabel) {
-						categoryId = categoryByLabel[value.parent].id
-						value.parent = categoryId;
-					} else if (value) {
-						errors.push({line: i + 2, error: "Le champ parent est invalide."});
-						continue;
-					}
-				} else {
-					value.parent = null;
-				}
-				// Load or create a new product
-				let cat = null;
-				let newCategory = !(value.reference in categoryByRef);
-				if (newCategory) {
-					cat = Category_default();
-				} else {
-					cat = categoryByRef[value.reference];
-				}
-				// Merge values
-				let editedVals = [];
-				let changed = false;
-				for (key in value) {
-					if (isNaN(value[key])) {
-						// Error
-					}
-					if (cat[key] != value[key]) {
-						editedVals[key] = true;
-						changed = true;
-						cat[key] = value[key];
-					}
-				}
-				// Put into the return values
-				if (newCategory) {
-					newCategories.push(cat);
-				} else {
-					if (changed) {
-						editedCategories.push(cat)
-						editedValues.push(editedVals);
-					} else {
-						unchangedCategories.push(cat);
-					}
-				}
-			}
-			// Done
+		storage_readStore("categories", function(categories) {
+			let parser = new CsvParser(CategoryDef, columnMappingDef, categories,
+					[{modelDef: CategoryDef, "records": categories}]);
+			let imported = parser.parseContent(fileContent);
 			gui_hideLoading();
 			storage_close();
-			vue.screen.data.newCategories = newCategories;
-			vue.screen.data.editedCategories = editedCategories;
-			callback({newCategories: newCategories, editedCategories: editedCategories,
-					editedValues: editedValues,
-					unchangedCategories: unchangedCategories,
-					unknownColumns: unknownColumns, errors: errors});
+			vue.screen.data.newCategories = imported.newRecords;
+			vue.screen.data.editedCategories = imported.editedRecords;
+			callback({newCategories: imported.newRecords,
+					editedCategories: imported.editedRecords,
+					editedValues: imported.editedValues,
+					unchangedCategories: imported.unchangedRecords,
+					unknownColumns: imported.unknownColumns,
+					errors: imported.errors});
 		});
 	});
 }

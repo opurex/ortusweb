@@ -7,3 +7,13 @@ function Category_default() {
 	};
 }
 
+let CategoryDef = {
+	modelName: "category",
+	fields: {
+		"reference": { type: "string", default: "" },
+		"label": { type: "string", default: "" },
+		"dispOrder": { type: "number", default: 0 },
+		"parent": { type: "record", modelName: "category", default: null },
+	},
+	refField: "reference",
+}

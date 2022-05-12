@@ -48,7 +48,7 @@ Vue.component("vue-import-preview", {
 				<tr>
 				<tr v-for="err in errors">
 					<td>{{err.line}}</td>
-					<td>{{err.error}}</td>
+					<td>{{errorMessage(err)}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -62,6 +62,11 @@ Vue.component("vue-import-preview", {
     methods: {
 	save: function() {
 		this.$emit('save', null);
+	},
+	errorMessage: function(err) {
+		if (err.error == "RecordNotFound") {
+			return err.column + " : la valeur \"" + err.value + "\" n'a pas pu être retrouvée";
+		}
 	}
     }
 });
