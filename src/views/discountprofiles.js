@@ -1,5 +1,18 @@
 Vue.component("vue-discountprofile-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			dpTable: {
+				reference: "discountProfile-list",
+				columns: [
+					{reference: "label", label: "Désignation", visible: true, help: "Le nom du profil de remise tel qu'affiché sur les boutons de la caisse."},
+					{reference: "rate", label: "Remise", visible: true, help: "La remise appliquée."},
+					{reference: "operation", label: "Opération", export: false, visible: true},
+				],
+				lines: []
+			},
+		};
+	},
 	template: `<div class="discountprofile-list">
 <section class="box box-medium">
 	<header>
@@ -16,25 +29,7 @@ Vue.component("vue-discountprofile-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th>Remise</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="profile in data.discountProfiles">
-					<td>{{profile.label}}</td>
-					<td>{{percent(profile.rate)}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(profile)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="dpTable"></vue-table>
 	</article>
 </section>
 </div>`,
@@ -45,6 +40,18 @@ Vue.component("vue-discountprofile-list", {
 		editUrl: function(profile) {
 			return "?p=discountprofile&id=" + profile.id;
 		},
+	},
+	mounted: function() {
+		let lines = [];
+		let thiss = this;
+		this.data.discountProfiles.forEach(function(dp) {
+			let line = [
+				dp.label, (dp.rate * 100).toLocaleString() + "%",
+				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(dp) + "\">Modifier</a></div>"},
+			];
+			lines.push(line);
+		})
+		Vue.set(this.dpTable, "lines", lines);
 	},
 });
 
