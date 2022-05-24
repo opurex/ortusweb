@@ -1,4 +1,4 @@
-Vue.component("vue-input-number", {
+Vue.component("vue-input-textarea", {
 	props: {
 		id: {
 			type: String,
@@ -9,29 +9,17 @@ Vue.component("vue-input-number", {
 			required: true,
 		},
 		value: {
-			type: Number,
-			default: 0,
+			type: String,
+			default: "",
 		},
 		required: {
 			type: Boolean,
-			default: false,
+			default: false
 		},
-		step: {
-			type: Number,
-			default: 1,
-		},
-		min: {
-			type: Number,
-			default: null,
-		},
-		max: {
-			type: Number,
-			default: null,
-		}
 	},
 	template:`<div class="form-group">
 	<label v-bind:for="id">{{label}}</label>
-	<input v-bind:id="id" type="number" v-model.number="localValue" v-bind:required="required" v-bind:step="step" v-bind:min="min" v-bind:max="max" />
+	<textarea v-bind:id="id" v-model="localValue" v-bind:required="required"></textarea>
 </div>
 `,
 	computed: {

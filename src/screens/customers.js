@@ -34,7 +34,7 @@ function customers_showCustomer(custId) {
 					storage_close();
 				});
 			} else {
-				_customers_showCustomer(Customer_default(), data["taxes"], data["tariffareas"], data["discountprofiles"]);
+				_customers_showCustomer(new RecordFactory(CustomerDef).create(), data["taxes"], data["tariffareas"], data["discountprofiles"]);
 				storage_close();
 			}
 		});
@@ -46,15 +46,14 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	vue.screen.data = {
+		"modelDef": CustomerDef,
 		"customer": customer,
 		"taxes": taxes,
 		"tariffAreas": tariffAreas,
 		"discountProfiles": discountProfiles,
 		"cashRegisters": cashRegisters,
 		"paymentModes": paymentModes,
-		"deleteImage": false,
-		"deleteImageButton": "Supprimer",
-		"hadImage": customer.hasImage, // Save for later check
+		"image": null,
 		"start": start,
 		"stop": stop,
 		"customerHistory": {
@@ -78,19 +77,6 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 		},
 	}
 	vue.screen.component = "vue-customer-form";
-}
-
-function customers_toggleImage() {
-	if (vue.screen.data.customer.hasImage) {
-		vue.screen.data.customer.hasImage = false;
-		vue.screen.data.deleteImage = true;
-		document.getElementById("edit-image").value = "";
-		vue.screen.data.deleteImageButton = "Restaurer";
-	} else {
-		vue.screen.data.customer.hasImage = true;
-		vue.screen.data.deleteImage = false;
-		vue.screen.data.deleteImageButton = "Supprimer";
-	}
 }
 
 function customers_saveCustomer() {
@@ -128,33 +114,13 @@ function _customers_saveCallback(request, status, response) {
 	if (cust.expireDate != null) {
 		cust.expireDate = respCust.expireDate; // stay in sync with the server's format
 	}
-	let imgTag = document.getElementById("edit-image");
-	if (vue.screen.data.deleteImage) {
-		cust.hasImage = false;
-		srvcall_delete("api/image/customer/" + encodeURIComponent(cust.id), function(request, status, response) {
-			_customers_saveCommit(cust);
-		});
-	} else if (imgTag.files.length != 0) {
-		cust.hasImage = true;
-		if (vue.screen.data.hadImage) {
-			srvcall_patch("api/image/customer/" + encodeURIComponent(cust.id), imgTag.files[0], function(request, status, response) {
-				_customers_saveCommit(cust);
-			});
-		} else {
-			srvcall_put("api/image/customer/" + encodeURIComponent(cust.id), imgTag.files[0], function(request, status, response) {
-				_customers_saveCommit(cust);
-			});
-		}
-	} else {
-		_customers_saveCommit(cust);
-	}
+	srvcall_imageSave("customer", cust, cust.id, vue.screen.data.image, _customers_saveCommit);
 }
 
 function _customers_saveCommit(cust) {
-	if (cust.hasImage) {
-		// Force image refresh
-		cust.hasImage = false;
-		cust.hasImage = true;
+	if (vue.screen.data.image) {
+		cust.hasImage = !vue.screen.data.image.delete;
+		vue.screen.data.image = null; // Refresh form
 	}
 	// Update in local database
 	storage_open(function(event) {

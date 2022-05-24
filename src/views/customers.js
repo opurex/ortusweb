@@ -141,28 +141,11 @@ Vue.component("vue-customer-form", {
 		<form id="edit-customer-form" class="form-large" onsubmit="javascript:customers_saveCustomer(); return false;">
 			<fieldset>
 				<legend>Affichage</legend>
-				<div class="form-group">
-					<label for="edit-dispName">Nom affiché</label>
-					<input id="edit-dispName" type="text" v-model="data.customer.dispName" required="true" />
-				</div>
-				<div class="form-group">
-					<label for="edit-card">Carte</label>
-					<input id="edit-card" type="text" v-model="data.customer.card" />
-				</div>
-				<div class="form-group">
-					<label for="edit-image">Image</label>
-					<img v-if="data.customer.hasImage" id="customer-image" class="img img-thumbnail" v-bind:src="imageSrc(data.customer)" />
-					<input id="edit-image" type="file" accept="image/*" />
-					<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:customers_toggleImage();return false;" >{{data.deleteImageButton}}</a>
-				</div>
-				<div class="form-group">
-					<label for="edit-visible">Actif</label>
-					<input id="edit-visible" type="checkbox" v-model="data.customer.visible" />
-				</div>
-				<div class="form-group">
-					<label for="edit-note">Notes</label>
-					<textarea id="edit-note" v-model="data.customer.note"></textarea>
-				</div>
+				<vue-input-text label="Nom affiché" v-model="data.customer.dispName" v-bind:required="true" id="edit-dispName" />
+				<vue-input-text label="Carte" v-model="data.customer.card" id="edit-card" />
+				<vue-input-image label="Image" modelName="customer" v-bind:modelId="data.modelDef.modelId(data.customer)" v-model="data.image" v-bind:hadImage="data.customer.hasImage" id="edit-image" />
+				<vue-input-checkbox label="Actif" v-model="data.customer.visible" id="edit-visible" />
+				<vue-input-textarea label="Notes" v-model="data.customer.note" id="edit-note" />
 				<div class="form-group">
 					<label for="edit-expireDate">Date d'expiration</label>
 					<vue-inputdate id="edit-expireDate" v-model="data.customer.expireDate" />
@@ -174,10 +157,7 @@ Vue.component("vue-customer-form", {
 					<label for="show-balance">Solde</label>
 					<input type="number" id="show-balance" v-model="data.customer.balance" disabled="true">
 				</div>
-				<div class="form-group">
-					<label for="edit-maxDebt">Dette max.</label>
-					<input type="number" id="edit-maxDebt" v-model="data.customer.maxDebt" step="0.01" />
-				</div>
+				<vue-input-number label="Dette max." v-model="data.customer.maxDebt" step="0.01" min="0.0" id="edit-maxDebt" />
 			</fieldset>
 			<fieldset>
 				<legend>Tarifications spéciales</legend>
@@ -205,54 +185,18 @@ Vue.component("vue-customer-form", {
 			</fieldset>
 			<fieldset>
 				<legend>Coordonnées</legend>
-				<div class="form-group">
-					<label for="edit-firstName">Prénom</label>
-					<input id="edit-firstName" type="text" v-model="data.customer.firstName" />
-				</div>
-				<div class="form-group">
-					<label for="edit-lastName">Nom</label>
-					<input id="edit-lastName" type="text" v-model="data.customer.lastName" />
-				</div>
-				<div class="form-group">
-					<label for="edit-email">Email</label>
-					<input id="edit-email" type="text" v-model="data.customer.email" />
-				</div>
-				<div class="form-group">
-					<label for="edit-phone1">Téléphone</label>
-					<input id="edit-phone1" type="text" v-model="data.customer.phone1" />
-				</div>
-				<div class="form-group">
-					<label for="edit-phone2">Téléphone 2</label>
-					<input id="edit-phone2" type="text" v-model="data.customer.phone2" />
-				</div>
-				<div class="form-group">
-					<label for="edit-fax">Fax</label>
-					<input id="edit-fax" type="text" v-model="data.customer.fax" />
-				</div>
-				<div class="form-group">
-					<label for="edit-addr1">Adresse</label>
-					<input id="edit-addr1" type="text" v-model="data.customer.addr1" />
-				</div>
-				<div class="form-group">
-					<label for="edit-addr2">Adresse 2</label>
-					<input id="edit-addr2" type="text" v-model="data.customer.addr2" />
-				</div>
-				<div class="form-group">
-					<label for="edit-zipCode">Code postal</label>
-					<input id="edit-zipCode" type="text" v-model="data.customer.zipCode" />
-				</div>
-				<div class="form-group">
-					<label for="edit-city">Ville</label>
-					<input id="edit-city" type="text" v-model="data.customer.city" />
-				</div>
-				<div class="form-group">
-					<label for="edit-region">Région</label>
-					<input  id="edit-region" type="text" v-model="data.customer.region" />
-				</div>
-				<div class="form-group">
-					<label for="edit-country">Pays</label>
-					<input id="edit-country" type="text" v-model="data.customer.country" />
-				</div>
+				<vue-input-text label="Prénom" v-model="data.customer.firstName" id="edit-firstName" />
+				<vue-input-text label="Nom" v-model="data.customer.lastName" id="edit-lastName" />
+				<vue-input-text label="Email" v-model="data.customer.email" id="edit-email" />
+				<vue-input-text label="Téléphone" v-model="data.customer.phone1" id="edit-phone1" />
+				<vue-input-text label="Téléphone 2" v-model="data.customer.phone2" id="edit-phone2" />
+				<vue-input-text label="Fax" v-model="data.customer.fax" id="edit-fax" />
+				<vue-input-text label="Adresse" v-model="data.customer.addr1" id="edit-addr1" />
+				<vue-input-text label="Adresse 2" v-model="data.customer.addr2" id="edit-addr2" />
+				<vue-input-text label="Code Postal" v-model="data.customer.zipCode" id="edit-zipCode" />
+				<vue-input-text label="Ville" v-model="data.customer.city" id="edit-city" />
+				<vue-input-text label="Région" v-model="data.customer.region" id="edit-region" />
+				<vue-input-text label="Pays" v-model="data.customer.country" id="edit-country" />
 			</fieldset>
 
 			<div class="form-control">
