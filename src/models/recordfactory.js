@@ -14,7 +14,14 @@ class RecordFactory {
 		let record = {};
 		for (let key in this.#modelDef.fields) {
 			if (values && (key in values)) {
-				record[key] = values[key];
+				switch (this.#modelDef.fields[key].type) {
+					case "date":
+						record[key] = new PTDate(values[key]);
+						break;
+					default:
+						record[key] = values[key];
+						break;
+				}
 				if ("default" in this.#modelDef.fields[key] && values[key] != this.#modelDef.fields[key].default) {
 					this.#changes.push(key);
 				}
@@ -31,7 +38,16 @@ class RecordFactory {
 		this.#reset();
 		for (let key in this.#modelDef.fields) {
 			if (key in values) {
-				if (record[key] != values[key]) {
+				let edited = false;
+				switch (this.#modelDef.fields[key].type) {
+					case "date":
+						edited = !tools_dateEquals(record[key], values[key]);
+						break;
+					default:
+						edited = record[key] != values[key];
+						break;
+				}
+				if (edited) {
 					record[key] = values[key];
 					this.#changes.push(key);
 				}

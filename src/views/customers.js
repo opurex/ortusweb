@@ -46,6 +46,7 @@ Vue.component("vue-customer-list", {
 		<nav class="navbar">
 			<ul>
 				<li><a class="btn btn-add" href="?p=customer">Ajouter un client</a></li>
+				<li><a class="btn btn-add" href="?p=customerImport">Importer un fichier</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -85,32 +86,21 @@ Vue.component("vue-customer-list", {
 		}
 		for (let i = 0; i < this.data.customers.length; i++) {
 			let cust = this.data.customers[i];
-			if (cust.tariffArea != null) {
-				cust.tariffArea = taLabels[cust.tariffArea];
-			} else {
-				cust.tariffArea = "-";
-			}
-			if (cust.tax != null) {
-				cust.tax = taxLabels[cust.tax];
-			} else {
-				cust.tax = "-";
-			}
-			if (cust.discountProfile != null) {
-				cust.discountProfile = dpLabels[cust.discountProfile];
-			} else {
-				cust.discountProfile = "-";
-			}
-			if (cust.expireDate != null) {
-				cust.expireDate = tools_dateToString(cust.expireDate);
-			} else {
-				cust.expireDate = "-";
-			}
+			(cust.discountProfile != null) ?
+				cust.dpLabel = dpLabels[cust.discountProfile] :
+				cust.dpLabel = "";
+			(cust.tariffArea != null) ?
+				cust.taLabel = taLabels[cust.tariffArea] :
+				cust.taLabel = "";
+			(cust.tax != null) ?
+				cust.taxLabel = taxLabels[cust.tax] :
+				cust.taxLabel = "";
 			let line = [
 				{type: "thumbnail", src: this.imageSrc(cust)},
 				cust.dispName, cust.card, cust.balance, cust.maxDebt,
-				cust.note, cust.expireDate,
+				cust.note, tools_dateToString(cust.expireDate),
 				{type: "bool", value: cust.visible},
-				cust.discountProfile, cust.tariffArea, cust.tax, cust.firstName,
+				cust.dpLabel, cust.taLabel, cust.taxLabel, cust.firstName,
 				cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
 				cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
 				cust.country,
@@ -157,7 +147,7 @@ Vue.component("vue-customer-form", {
 					<label for="show-balance">Solde</label>
 					<input type="number" id="show-balance" v-model="data.customer.balance" disabled="true">
 				</div>
-				<vue-input-number label="Dette max." v-model="data.customer.maxDebt" step="0.01" min="0.0" id="edit-maxDebt" />
+				<vue-input-number label="Dette max." v-model="data.customer.maxDebt" v-bind:step="0.01" v-bind:min="0.0" id="edit-maxDebt" />
 			</fieldset>
 			<fieldset>
 				<legend>Tarifications spéciales</legend>
@@ -264,3 +254,114 @@ Vue.component("vue-customer-form", {
 	}
 });
 
+Vue.component("vue-customer-import", {
+	props: ["data"],
+	data: function() {
+		return {
+			csv: null,
+			newCustomers: [],
+			editedCustomers: [],
+			editedValues: [],
+			unchangedCustomers: [],
+			linkedRecords: {
+				discountProfile: this.data.discountProfiles,
+				tariffArea: this.data.tariffAreas,
+				tax: this.data.taxes,
+			},
+			showUnchanged: false,
+			unknownColumns: [],
+			errors: [],
+			tableColumns: [
+				{field: "dispName", label: "Nom affiché"},
+				{field: "card", label: "Carte"},
+				{field: "maxDebt", label: "Dette max", type: "number"},
+				{field: "notes", label: "Note"},
+				{field: "expireDate", label: "Date d'expiration", type: "date"},
+				{field: "visible", label: "Actif", type: "boolean"},
+				{field: "discountProfile", label: "Profil de remise", type: "record", modelName: "discountProfile"},
+				{field: "tariffArea", label: "Zone tarifaire", type: "record", modelName: "tariffArea"},
+				{field: "tax", label: "TVA", type: "record", modelName: "tax"},
+				{field: "firstName", label: "Prénom"},
+				{field: "lastName", label: "Nom"},
+				{field: "email", label: "Courriel"},
+				{field: "phone1", label: "Téléphone"},
+				{field: "phone2", label: "Téléphone 2"},
+				{field: "fax", label: "Fax"},
+				{field: "addr1", label: "Adresse"},
+				{field: "addr2", label: "Adresse 2"},
+				{field: "zipCode", label: "Code postal"},
+				{field: "city", label: "Ville"},
+				{field: "region", label: "Région"},
+				{field: "country", label: "Pays"},
+			]
+		};
+	},
+	template: `<div class="customer-import">
+<section class="box box-large">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=customers">Liste des clients</a></li>
+				<li><h1>Modification des fiches client par fichier csv</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li>
+					<label for="csv-file">Fichier</label>
+					<input ref="csvRef" type="file" accept="text/csv" id="csv-file" name="csv" v-on:change="readCsv" />
+				</li>
+			</ul>
+		</nav>
+	</header>
+	<div class="box-body">
+		<vue-import-preview newTitle="Nouvelles fiches" editTitle="Fiches modifiées" untouchedTitle="Fiches non modifiées" modelsLabel="fiches client"
+			v-bind:newRecords="newCustomers"
+			v-bind:editedRecords="editedCustomers"
+			v-bind:editedValues="editedValues"
+			v-bind:untouchedRecords="unchangedCustomers"
+			v-bind:allRecords="data.customers"
+			v-bind:linkedRecords="linkedRecords"
+			v-bind:tableColumns="tableColumns"
+			v-bind:unknownColumns="unknownColumns"
+			v-bind:errors="errors"
+			v-on:save="saveChanges" />
+	</div>
+</section>
+</div>`,
+	methods: {
+		readCsv: function (event) {
+			let fileName = event.target.files[0].name;
+			let thiss = this;
+			let reader = new FileReader();
+			let callback = function(data) {
+				thiss.newCustomers = data.newCustomers;
+				thiss.editedCustomers = data.editedCustomers;
+				thiss.editedValues = data.editedValues;
+				thiss.unchangedCustomers  = data.unchangedCustomers;
+				thiss.unknownColumns = data.unknownColumns;
+				thiss.errors = data.errors;
+			}
+			reader.onload = function(readerEvent) {
+				let fileContent = readerEvent.target.result;
+				let data = _customers_parseCsv(fileContent, callback);
+			};
+			reader.readAsText(event.target.files[0]);
+		},
+		saveChanges: function() {
+			customers_saveCustomers();
+		},
+		reset: function() {
+			this.csv = null;
+			this.$refs.csvRef.value = "";
+			this.newCustomers = [];
+			this.editedCustomers = [];
+			this.editedValues = [];
+			this.unchangedCustomers = [];
+			this.showUnchanged = false;
+			this.unknownColumns = [];
+			this.errors = [];
+		},
+	}
+});

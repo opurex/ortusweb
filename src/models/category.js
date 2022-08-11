@@ -14,4 +14,5 @@ let CategoryDef = {
 		"hasImage": { type: "boolean", default: false },
 	},
 	refField: "reference",
+	lookupFields: ["reference", "label"],
 }

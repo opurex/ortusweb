@@ -3,7 +3,7 @@ Vue.component("vue-inputdate", {
 	template: `<input type="date" v-bind:value="dateAsString(value)" v-on:input="setValue">`,
 	methods: {
 		dateAsString: function(date) {
-			return tools_dateToDataString(date);
+			return new PTDate(date).toDataString();
 		},
 		setValue: function(event) {
 			this.$emit('input', event.target.valueAsDate);

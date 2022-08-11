@@ -44,25 +44,18 @@ var tools_sort = function(field1, field2) {
 	}
 }
 
+/** Compare two dates disregarding time.
+ * @param original The original date. This is the one that should be kept when the dates are considered equals.
+ * @param updated The new date.
+ * @return True when both date shares the same year, month and date. */
+var tools_dateEquals = function(original, updated) {
+	return new PTDate(original).equals(new PTDate(updated));
+}
+
 /** Convert a Date object to a DD/MM/YYYY string. */
 var tools_dateToString = function(dateTime) {
-	if (dateTime == null) {
-		return null;
-	}
-	if (typeof dateTime == "number") {
-		dateTime = new Date(dateTime * 1000);
-	}
-	let isoDate = dateTime.toISOString().split('T')[0].split('-');
-	let day = parseInt(isoDate[2]);
-	let month = parseInt(isoDate[1]);
-	let year = parseInt(isoDate[0]);
-	if (day < 10) {
-		day = "0" + day;
-	}
-	if (month < 10) {
-		month = "0" + month;
-	}
-	return day + "/" + month + "/" + year;
+	let ptDate = new PTDate(dateTime);
+	return ptDate.toString();
 }
 var tools_dateToDataString = function(dateTime) {
 	if (dateTime == null) {

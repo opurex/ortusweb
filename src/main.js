@@ -68,6 +68,9 @@ function route(screen) {
 	case "customers":
 		customers_show();
 		break;
+	case "customerImport":
+		customers_showImport();
+		break;
 	case "paymentmodes":
 		paymentmodes_show();
 		break;

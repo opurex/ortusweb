@@ -31,5 +31,6 @@ let CustomerDef = {
 		"expireDate": {type: "date", default: null},
 		"hasImage": {type: "boolean", default: false},
 	},
-	refField: "id",
+	refField: "dispName",
+	lookupFields: ["dispName", "email", "phone1", "phone2"],
 }

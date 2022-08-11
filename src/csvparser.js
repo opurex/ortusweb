@@ -93,17 +93,26 @@ class CsvParser {
 					console.error("Model name " + modelName + " is not referenced in linkedRecords");
 					return null;
 				}
-				let refFieldName = linkRec.modelDef.refField;
-				let refField = linkRec.modelDef.fields[refFieldName];
-				let linkedRecord = linkRec.records.find(r => r[refFieldName] == this.#convertStrVal(value, refField.type));
+				let lookupFields = linkRec.modelDef.lookupFields;
+				let linkedRecord; // undefined, not null
+				lookupFields.every(field => {
+					linkedRecord = linkRec.records.find(r => r[field] == this.#convertStrVal(value, linkRec.modelDef.fields[field].type));
+					if (typeof linkedRecord != "undefined") {
+						return false;
+					}
+					return true;
+				});
 				if (typeof linkedRecord == "undefined") {
 					this.#errors.push({line: lineNum + 2, field: fieldName, column: key, error: "RecordNotFound", value: value});
 					return null;
 				}
 				return linkedRecord.id;
 			case "string":
+			case "text":
 			case "boolean":
-			case "number": return this.#convertStrVal(value, field.type);
+			case "number":
+			case "date":
+				return this.#convertStrVal(value, field.type);
 			default:
 				console.error("Unknown column type \"" + field.type + "\" for " + key);
 				return value;
@@ -114,6 +123,7 @@ class CsvParser {
 			case "string": return stringVal;
 			case "boolean": return (stringVal ? true : false);
 			case "number": return parseFloat(stringVal);
+			case "date": return new PTDate(stringVal);
 		}
 		return stringVal;
 	}

@@ -108,6 +108,7 @@ Vue.component("vue-import-preview-table", {
 					case 2: case "2": return "Litre"
 					case 3: case "3": return "Heure"
 				}
+				case "date": return new PTDate(val).toString();
 				case "record":
 					if (val == null) {
 						return "";

@@ -246,3 +246,149 @@ function _customers_showHistory(tickets, products) {
 	Vue.set(vue.screen.data.customerHistory, "footer", ["", "", "", "", "", "", "", "", "", "", "", "Totaux", total.toLocaleString(), taxedTotal.toLocaleString()]);
 	gui_hideLoading();
 }
+
+function customers_showImport() {
+	storage_open(function(event) {
+		storage_readStores(["customers", "discountprofiles", "tariffareas", "taxes"], function(data) {
+			vue.screen.data = {
+				"customers": data.customers,
+				"discountProfiles": data.discountprofiles,
+				"tariffAreas": data.tariffareas,
+				"taxes": data.taxes,
+			}
+			vue.screen.component = "vue-customer-import";
+			storage_close();
+		});
+	});
+}
+
+function _customers_parseCsv(fileContent, callback) {
+	gui_showLoading();
+	let columnMappingDef = {
+		dispName: "dispName", "nom affiché": "dispName",
+		card: "card", "carte": "card",
+		maxDebt: "maxDebt", "dette max": "maxDebt",
+		note: "note", "notes": "note",
+		expireDate: "expireDate", "date d'expiration": "expireDate",
+		visible: "visible", "actif": "visible",
+		discountProfile: "discountProfile", "profil de remise": "discountProfile",
+		tariffArea: "tariffArea", "zone tarifaire": "tariffArea",
+		tax: "tax", "tva": "tax",
+		firstName: "firstName", "prénom": "firstName",
+		lastName: "lastName", "nom": "lastName",
+		email: "email", "courriel": "email",
+		phone1: "phone1", "téléphone": "phone1",
+		phone2: "phone2", "téléphone 2": "phone2",
+		fax: "fax", "fax": "fax",
+		addr1: "addr1", "adresse": "addr1",
+		addr2: "addr2", "adresse 2": "addr2",
+		zipCode: "zipCode", "code postal": "zipCode",
+		city: "city", "ville": "city",
+		region: "region", "région": "region",
+		country: "country", "pays": "country",
+	};
+	storage_open(function(event) {
+		storage_readStores(["customers", "discountprofiles", "tariffareas", "taxes"], function(data) {
+			let parser = new CsvParser(CustomerDef, columnMappingDef, data.customers,
+					[{modelDef: DiscountProfileDef, "records": data.discountprofiles},
+					{modelDef: TariffAreaDef, "records": data.tariffareas},
+					{modelDef: TaxDef, "records": data.taxes}]);
+			let imported = parser.parseContent(fileContent);
+			gui_hideLoading();
+			storage_close();
+			vue.screen.data.newCustomers = imported.newRecords;
+			vue.screen.data.editedCustomers = imported.editedRecords;
+			callback({newCustomers: imported.newRecords,
+					editedCustomers: imported.editedRecords,
+					editedValues: imported.editedValues,
+					unchangedCustomers: imported.unchangedRecords,
+					unknownColumns: imported.unknownColumns,
+					errors: imported.errors});
+		});
+	});
+}
+
+function customers_saveCustomers() {
+	let calls = [];
+	for (let i = 0; i < vue.screen.data.newCustomers.length; i++) {
+		let cust = vue.screen.data.newCustomers[i];
+		calls.push({id: "new-" + i, method: "POST", target: "api/customer", data: cust});
+	}
+	for (let i = 0; i < vue.screen.data.editedCustomers.length; i++) {
+		let cust = vue.screen.data.editedCustomers[i];
+		calls.push({id: "edit-" + i, method: "POST", target: "api/customer", data: cust});
+	}
+	vue.screen.data.progress = 0;
+	vue.screen.data.progressTotal = calls.length;
+	gui_showProgress(vue.screen.data.progress, vue.screen.data.progressTotal);
+	srvcall_multicall(calls, customers_saveMultipleCallback, _customers_progress);
+}
+
+function _customers_progress() {
+	vue.screen.data.progress++;
+	gui_showProgress(vue.screen.data.progress, vue.screen.data.progressTotal);
+}
+
+function customers_saveMultipleCallback(results) {
+	if (Object.keys(results).length > 0) {
+		let res = results[Object.keys(results)[0]];
+		let showMsg = function() {
+			gui_hideLoading();
+			gui_showWarning("Les données n'ont pas été envoyées, veuillez réitérer l'opération.");
+		}
+		if (srvcall_callbackCatch(res.request, res.status, res.response, showMsg)) {
+			return;
+		}
+	}
+	errors = [];
+	saves = [];
+	for (let reqId in results) {
+		let request = results[reqId].request;
+		let status = results[reqId].status;
+		let response = results[reqId].response;
+		if (status == 400) {
+			errors.push("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			continue;
+		}
+		if (reqId.substr(0, 4) == "new-") {
+			let num = parseInt(reqId.substr(4));
+			let cust = vue.screen.data.newCustomers[num];
+			let respCust = JSON.parse(response);
+			cust.id = respCust.id;
+			saves.push(cust);
+		} else {
+			let num = parseInt(reqId.substr(5));
+			let cust = vue.screen.data.editedCustomers[num];
+			cust.expireDate = new PTDate(cust.expireDate).toDataString();
+			saves.push(cust);
+		}
+	}
+	// Commit changes locally
+	let commitSuccess = function(data) {
+		gui_hideLoading();
+		if (errors.length > 0) {
+			if (saves.length > 0) {
+				errors.push("Les autres enregistrements ont été pris en compte. Vous pouvez recharger le fichier pour retrouver les erreurs.");
+			}
+			gui_showError(errors);
+		} else {
+			gui_showMessage("Les données ont été enregistrées.");
+		}
+		vue.screen.data = {};
+		vue.$refs.screenComponent.reset();
+		customers_showImport();
+	}
+	if (saves.length == 0) {
+		gui_hideLoading();
+		if (errors.length == 0) {
+			gui_showErrors("Aucune opération.");
+		} else {
+			gui_showErrors(errors);
+		}
+	} else {
+		storage_open(function(event) {
+			storage_write("customers", saves,
+				commitSuccess, appData.localWriteDbError);
+		}, appData.localWriteDbOpenError);
+	}
+}
