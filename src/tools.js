@@ -70,13 +70,17 @@ var tools_dateToDataString = function(dateTime) {
 var tools_timeToString = function(dateTime) {
 	let hours = dateTime.getHours();
 	let minutes = dateTime.getMinutes();
+	let seconds = dateTime.getSeconds();
 	if (hours < 10) {
 		hours = "0" + hours;
 	}
 	if (minutes < 10) {
 		minutes = "0" + minutes;
 	}
-	return hours + ":" + minutes;
+	if (seconds < 10) {
+		seconds = "0" + seconds;
+	}
+	return hours + ":" + minutes + ":" + seconds;
 }
 /** Convert a Date object to a DD/MM/YYYY HH:mm string. */
 var tools_dateTimeToString = function(dateTime) {
