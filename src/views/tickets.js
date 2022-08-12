@@ -55,7 +55,14 @@ Article      Prix          Total
 --------------------------------
 <template v-for="line in ticket.lines">
 {{line.label}}
-{{padBefore(line.price, 17)}}{{padBefore("x" + line.quantity, 5)}}{{padBefore(line.finalTaxedPrice, 10)}}
+{{padBefore(line.price, 17)}}{{padBefore("x" + line.quantity, 5)}}{{padBefore(line.taxedPrice, 10)}}
+<template v-if="line.discountRate">
+* Remise {{padBefore(line.discountRate, 5)}} {{padBefore(line.discountAmount, 17)}}
+</template>
+</template>
+<template v-if="ticket.discountRate">
+Total avant remise {{padBefore(ticket.taxedPrice,13)}}
+Remise {{ticket.discountRate}} {{padBefore(ticket.discountAmount, 21)}}
 </template>
 
 

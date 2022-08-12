@@ -213,6 +213,9 @@ _tickets_selectTicket = function(ticket) {
 		lines: [],
 		payments: [],
 		taxes: [],
+		discountRate: (ticket.discountRate == 0.0) ? null : ((ticket.discountRate*100).toLocaleString() + "%"),
+		discountAmount: (ticket.finalTaxedPrice - ticket.taxedPrice).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+		taxedPrice: ticket.taxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 		finalPrice: ticket.finalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 		finalTaxedPrice: ticket.finalTaxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
 		taxSum: (ticket.finalTaxedPrice - ticket.finalPrice).toLocaleString(undefined, { minimumFractionDigits: 2 }),
@@ -223,6 +226,9 @@ _tickets_selectTicket = function(ticket) {
 		line.label = tktline.productLabel;
 		line.price = tktline.taxedUnitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 });
 		line.quantity = tktline.quantity.toLocaleString();
+		line.discountRate = (tktline.discountRate == 0.0) ? null : ((tktline.discountRate*100).toLocaleString() + "%"),
+		line.discountAmount = (tktline.finalTaxedPrice - tktline.taxedPrice).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+		line.taxedPrice = tktline.taxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 });
 		line.finalTaxedPrice = tktline.finalTaxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 });
 		tkt.lines.push(line);
 	}
