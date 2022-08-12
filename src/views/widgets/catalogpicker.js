@@ -17,7 +17,7 @@ Vue.component("vue-catalog-picker", {
 		<li v-for="prd in products">
 			<button type="button" v-on:click="prdPickCallback(prd)">
 				<img v-bind:src="prdImageSrc(prd)" />
-				<label>{{prd.label}}</label>
+				<label v-bind:class="{'invisible-data': !prd.visible}">{{prd.label}}</label>
 			</button>
 		</li>
 	</ul>

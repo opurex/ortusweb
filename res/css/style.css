@@ -468,7 +468,7 @@ tbody tr:hover .z-oddcol {
 }
 
 /* Archive entries like products not currently sold. */
-.invisible-data span {
+.invisible-data {
 	font-style: italic;
 	font-size: small;
 }
