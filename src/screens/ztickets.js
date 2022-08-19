@@ -378,33 +378,33 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 	vue.screen.data.table.footer = ["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", "", total.csTaxesTotal.toLocaleString(), total.custBalance.toLocaleString()];
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
-		vue.screen.data.table.columns.push({reference: "pm-" + pm.reference, label: pm.label, visible: oldColumnVisible(pm.label, oldColumns, true), help: "Le montant des encaissements réalisés avec ce moyen de paiement sur la session."});
+		vue.screen.data.table.columns.push({reference: "pm-" + pm.reference, label: pm.label, export_as_number: true, visible: oldColumnVisible(pm.label, oldColumns, true), help: "Le montant des encaissements réalisés avec ce moyen de paiement sur la session."});
 		vue.screen.data.table.footer.push(total.paymentModeTotal[i]);
 	}
 	vue.screen.data.table.columns.push({reference: "overPerceived", label: "Produit exceptionnel", export_as_number: true, visible: oldColumnVisible("Produit exceptionnel", oldColumns, false), help: "Le montant trop perçu pour les modes de paiement sans rendu-monnaie ou les arrondis de TVA sur remises."});
 	vue.screen.data.table.footer.push(total.overPerceivedTotal);
 	for (let i = 0; i < taxes.length; i++) {
 		let tax = taxes[i];
-		vue.screen.data.table.columns.push({reference: "tax-" + i + "-base", label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe associé au taux de TVA."});
-		vue.screen.data.table.columns.push({reference: "tax-" + i + "-amount", label: tax.label + " TVA", visible: oldColumnVisible(tax.label + " TVA", oldColumns, false), class: "z-oddcol", help: "Le montant de TVA collectée associé au taux de TVA."});
+		vue.screen.data.table.columns.push({reference: "tax-" + i + "-base", label: tax.label + " base", export_as_number: true, visible: oldColumnVisible(tax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe associé au taux de TVA."});
+		vue.screen.data.table.columns.push({reference: "tax-" + i + "-amount", label: tax.label + " TVA", export_as_number: true, visible: oldColumnVisible(tax.label + " TVA", oldColumns, false), class: "z-oddcol", help: "Le montant de TVA collectée associé au taux de TVA."});
 		vue.screen.data.table.footer.push(total.taxTotal[i].base);
 		vue.screen.data.table.footer.push(total.taxTotal[i].amount);
 	}
 	for (let i = 0; i < categories.length; i++) {
 		let cat = categories[i];
-		vue.screen.data.table.columns.push({reference: "cat-" + cat.reference + "-cs", label: cat.label, visible: oldColumnVisible(cat.label, oldColumns, false), help: "Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."});
+		vue.screen.data.table.columns.push({reference: "cat-" + cat.reference + "-cs", label: cat.label, export_as_number: true, visible: oldColumnVisible(cat.label, oldColumns, false), help: "Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."});
 		vue.screen.data.table.footer.push(total.categoryTotal[i]);
 	}
 	for (let i = 0; i < catTaxes.length; i++) {
 		let catTax = catTaxes[i];
-		vue.screen.data.table.columns.push({reference: "catTax-" + i + "-base", label: catTax.cat + " " + catTax.label + " base", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."});
-		vue.screen.data.table.columns.push({reference: "catTax-" + i + "-amount", label: catTax.cat + " " + catTax.label + " TVA", visible: oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false), class: "z-oddcol", help: "Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."});
+		vue.screen.data.table.columns.push({reference: "catTax-" + i + "-base", label: catTax.cat + " " + catTax.label + " base", export_as_number: true, visible: oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false), class: "z-oddcol", help: "Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."});
+		vue.screen.data.table.columns.push({reference: "catTax-" + i + "-amount", label: catTax.cat + " " + catTax.label + " TVA", export_as_number: true, visible: oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false), class: "z-oddcol", help: "Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."});
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].base);
 		vue.screen.data.table.footer.push(total.catTaxTotal[i].amount);
 	}
 	for (let i = 0; i < customers.length; i++) {
 		let customer = customers[i];
-		vue.screen.data.table.columns.push({reference: "cust-" + customer.id + "-balance", label: customer.dispName, visible: oldColumnVisible(customer.dispName, oldColumns, false), help: "La variation du solde client"});
+		vue.screen.data.table.columns.push({reference: "cust-" + customer.id + "-balance", label: customer.dispName, export_as_number: true, visible: oldColumnVisible(customer.dispName, oldColumns, false), help: "La variation du solde client"});
 		vue.screen.data.table.footer.push(total.custBalanceTotal[i]);
 	}
 	vue.screen.data.table.lines = [];

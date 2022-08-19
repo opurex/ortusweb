@@ -118,7 +118,11 @@ Vue.component("vue-table", {
                 let line = [];
                 for (let i = 0; i < this.table.footer.length; i++) {
                     if (this.table.columns[i].visible && this.table.columns[i].export !== false) {
-                        line.push(this.table.footer[i]);
+			if (this.table.columns[i].export_as_number && this.table.columns[i].export_as_number !== false && typeof this.table.footer[i] !== "number") {
+				line.push(tools_stringToNumber(this.table.footer[i]));
+			} else {
+	                        line.push(this.table.footer[i]);
+			}
                     }
                 }
                 csvData.push(line);
