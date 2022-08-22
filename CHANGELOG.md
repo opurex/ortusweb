@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+
+## [8.16] - 2022-08-22
+
+### Added
+- Import customers from csv file
+- Discount profile list is exportable and filterable
+- Products not sold are displayed with their label in italic in catalog picker (compositions, tariff areas)
+- Show version number on home screen
+
+### Changed
+- Refactored a lot of form fields for consistency
+- Refactored importing records for maintenability
+
+### Fixed
+- Discount lines and discount are shown on tickets
+- Seconds are displayed for datetimes (mostly ticket and zticket dates)
+- Export format for some numbers for ztickets
+
+
 ## [8.15] - 2022-04-14
 
 ### Added
