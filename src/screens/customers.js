@@ -168,12 +168,13 @@ function _customers_showHistory(tickets, products) {
 	}
 	let total = 0.0;
 	let taxedTotal = 0.0;
+	let consolidatedLineNum = {};
 	let lines = [];
 	for (let i = 0; i < tickets.length; i++) {
 		let tkt = tickets[i];
-		let date = new Date(tkt.date * 1000);
+		let date = (vue.screen.data.consolidate) ? null : new Date(tkt.date * 1000);
 		let cr = crById[tkt.cashRegister];
-		let number = cr.label + "-" + tkt.number;
+		let number = (vue.screen.data.consolidate) ? "" : cr.label + "-" + tkt.number;
 		let pmIds = {};
 		let pms = [];
 		for (let j = 0; j < tkt.payments.length; j++) {
@@ -222,24 +223,60 @@ function _customers_showHistory(tickets, products) {
 			}
 			total += Math.round(finalPrice * 100) / 100.0;
 			taxedTotal += Math.round(finalTaxedPrice * 100) / 100.0;
-			// Render
-			lines.push([
-				img,
-				tools_dateTimeToString(date),
-				number,
-				payments,
-				(tkt.discountRate * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%",
-				ref,
-				line.productLabel,
-				price.toLocaleString(undefined, {maximumFractionDigits: 2}),
-				taxedPrice.toLocaleString(undefined, {maximumFractionDigits: 2}),
-				(line.taxRate * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%",
-				line.quantity.toLocaleString(),
-				(line.discountRate * 100).toLocaleString() + "%",
-				finalPrice.toLocaleString(undefined, {maximumFractionDigits: 2}),
-				finalTaxedPrice.toLocaleString(undefined, {maximumFractionDigits: 2})
-			]);
+			let consolidated = false;
+			if (vue.screen.data.consolidate) {
+				let lineRef = ref;
+				if (lineRef == "") { // Custom product
+					lineRef = "custom." + line.productLabel;
+				}
+				let lineId = lineRef + "-" + line.taxRate + "-" + line.price + "-" + line.discountRate + "-" + tkt.discountRate + "-" + pms;
+				if (lineId in consolidatedLineNum) {
+					// Consolidate quantities
+					lines[consolidatedLineNum[lineId]][10] += line.quantity;
+					lines[consolidatedLineNum[lineId]][12] += finalPrice;
+					lines[consolidatedLineNum[lineId]][13] += finalTaxedPrice;
+					consolidated = true;
+				} else {
+					consolidatedLineNum[lineId] = lines.length;
+				}
+			}
+			if (!consolidated) {
+				// Add new line
+				lines.push([
+					img,
+					date,
+					number,
+					payments,
+					tkt.discountRate,
+					ref,
+					line.productLabel,
+					price,
+					taxedPrice,
+					line.taxRate,
+					line.quantity,
+					line.discountRate,
+					finalPrice,
+					finalTaxedPrice
+				]);
+			}
 		}
+	}
+	// Convert number fo display
+	for (let i = 0; i < lines.length; i++) {
+		let line = lines[i];
+		if (vue.screen.data.consolidate) {
+			line[1] = tools_dateToString(vue.screen.data.start) + " - " + tools_dateToString(vue.screen.data.stop);
+		} else {
+			line[1] = tools_dateTimeToString(line[1]);
+		}
+		line[4] = (line[4] * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%";
+		line[7] = line[7].toLocaleString(undefined, {maximumFractionDigits: 2});
+		line[8] = line[8].toLocaleString(undefined, {maximumFractionDigits: 2});
+		line[9] = (line[9] * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%";
+		line[10] = line[10].toLocaleString(undefined, {maximumFractionDigits: 2});
+		line[11] = line[11].toLocaleString(undefined, {maximumFractionDigits: 2});
+		line[12] = line[12].toLocaleString(undefined, {maximumFractionDigits: 2});
+		line[13] = line[13].toLocaleString(undefined, {maximumFractionDigits: 2});
 	}
 	vue.screen.data.customerHistory.title = "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
 	Vue.set(vue.screen.data.customerHistory, "lines", lines);

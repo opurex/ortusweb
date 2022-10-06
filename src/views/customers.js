@@ -209,6 +209,10 @@ Vue.component("vue-customer-form", {
 					<label for="stop">au</label>
 					<vue-inputdate v-model="data.stop" />
 				</div>
+				<div class="form-group">
+					<input id="consolidate" type="checkbox" v-model="data.consolidate" />
+					<label for="consolidate">Consolider sur la période</label>
+				</div>
 				<div class="form-control">
 					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
 				</div>
