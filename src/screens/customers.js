@@ -27,21 +27,21 @@ function _customers_showCustomers(customers, taxes, tariffAreas, discountProfile
 function customers_showCustomer(custId) {
 	gui_showLoading();
 	storage_open(function(event) {
-		storage_readStores(["taxes", "tariffareas", "discountprofiles", "cashRegisters", "paymentmodes"], function(data) {
+		storage_readStores(["taxes", "tariffareas", "discountprofiles", "cashRegisters", "paymentmodes", "users"], function(data) {
 			if (custId != null) {
 				storage_get("customers", parseInt(custId), function(customer) {
-					_customers_showCustomer(customer, data["taxes"], data["tariffareas"], data["discountprofiles"], data["cashRegisters"], data["paymentmodes"]);
+					_customers_showCustomer(customer, data["taxes"], data["tariffareas"], data["discountprofiles"], data["cashRegisters"], data["paymentmodes"], data["users"]);
 					storage_close();
 				});
 			} else {
-				_customers_showCustomer(new RecordFactory(CustomerDef).create(), data["taxes"], data["tariffareas"], data["discountprofiles"]);
+				_customers_showCustomer(new RecordFactory(CustomerDef).create(), data["taxes"], data["tariffareas"], data["discountprofiles"], data["users"]);
 				storage_close();
 			}
 		});
 	});
 }
 
-function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles, cashRegisters, paymentModes) {
+function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles, cashRegisters, paymentModes, users) {
 	gui_hideLoading();
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
@@ -53,9 +53,11 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 		"discountProfiles": discountProfiles,
 		"cashRegisters": cashRegisters,
 		"paymentModes": paymentModes,
+		"users": users,
 		"image": null,
 		"start": start,
 		"stop": stop,
+		"tickets": [],
 		"customerHistory": {
 			reference: "customer-history-list",
 			columns: [
@@ -73,6 +75,21 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 				{reference: "line-discountRate", label: "Remise", visible: false, help: "Le taux de remise accordé, inclus dans les champs HT et TTC."},
 				{reference: "line-finalPrice", label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."},
 				{reference: "line-finalTaxedPrice", label: "TTC", visible: false, help: "Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket."},
+			],
+		},
+		"customerHistoryTickets": {
+			"reference": "customer-ticket-list",
+			"title": null,
+			"columns": [
+				{reference: "cashRegister", label: "Caisse", visible: false, help: "Le nom de la caisse."},
+				{reference: "sequence", label: "Séquence", export_as_number: true, visible: false, help: "Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."},
+				{reference: "number", label: "Numéro", export_as_number: true, visible: true, help: "Le numéro du ticket de la caisse."},
+				{reference: "date", label: "Date", visible: true, help: "La date de réalisation de la vente."},
+				{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
+				{reference: "finalTaxedPrice", label: "Montant", export_as_number: true, visible: true, help: "Le montant TTC du ticket."},
+				{reference: "overPerceived", label: "Trop perçu", export_as_number: true, visible: false, help: "Le montant trop perçu pour les modes de paiement sans rendu-monnaie."},
+				{reference: "user", label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
+				{reference: "operation", label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
 			],
 		},
 	}
@@ -154,6 +171,8 @@ function _customers_showHistory(tickets, products) {
 	let prdById = {};
 	let crById = {};
 	let pmById = {};
+	vue.screen.data.tickets = tickets;
+	vue.screen.data.customers = [vue.screen.data.customer];
 	for (let i = 0; i < products.length; i++) {
 		let prd = products[i];
 		prdById[prd.id] = prd;
@@ -167,9 +186,12 @@ function _customers_showHistory(tickets, products) {
 		pmById[pm.id] = pm;
 	}
 	let total = 0.0;
+	let tktsTotal = 0.0;
+	let overPerceivedTotal = 0.0;
 	let taxedTotal = 0.0;
 	let consolidatedLineNum = {};
 	let lines = [];
+	let tktLines = [];
 	for (let i = 0; i < tickets.length; i++) {
 		let tkt = tickets[i];
 		let date = (vue.screen.data.consolidate) ? null : new Date(tkt.date * 1000);
@@ -177,17 +199,33 @@ function _customers_showHistory(tickets, products) {
 		let number = (vue.screen.data.consolidate) ? "" : cr.label + "-" + tkt.number;
 		let pmIds = {};
 		let pms = [];
+		let pmTotal = 0.0;
 		for (let j = 0; j < tkt.payments.length; j++) {
 			let payment = tkt.payments[j];
 			let pm = pmById[payment.paymentMode];
 			if (!(pm.id in pmIds)) {
 				pmIds[pm.id] = pm.label;
 			}
+			pmTotal += tkt.payments[j].amount;
+			tktsTotal += tkt.payments[j].amount;
 		}
 		for (let key in pmIds) {
 			pms.push(pmIds[key]);
 		}
 		let payments = pms.join(", ");
+		let overPerceived = pmTotal - tkt.finalTaxedPrice;
+		overPerceivedTotal += overPerceived;
+		let tktDate = new Date(tkt.date * 1000);
+		let user = "";
+		for (let j = 0; j < vue.screen.data.users.length; j++) {
+			if (vue.screen.data.users[j].id == tkt.user) {
+				user = vue.screen.data.users[j].name;
+				break;
+			}
+		}
+		tktLines.push([cr.label, tkt.sequence, tkt.number, tools_dateTimeToString(tktDate), payments,
+			tkt.finalTaxedPrice.toLocaleString(), overPerceived.toLocaleString(), user,
+			{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"}]);
 		for (let j = 0; j < tkt.lines.length; j++) {
 			let line = tkt.lines[j];
 			// Set product data if any
@@ -281,6 +319,14 @@ function _customers_showHistory(tickets, products) {
 	vue.screen.data.customerHistory.title = "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
 	Vue.set(vue.screen.data.customerHistory, "lines", lines);
 	Vue.set(vue.screen.data.customerHistory, "footer", ["", "", "", "", "", "", "", "", "", "", "", "Totaux", total.toLocaleString(), taxedTotal.toLocaleString()]);
+	vue.screen.data.customerHistoryTickets.title = "Historique des tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop);
+	Vue.set(vue.screen.data.customerHistoryTickets, "lines", tktLines);
+	vue.screen.data.customerHistoryTickets.footer = ["", "", "", "", "Total", tktsTotal.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""];
+	if (vue.screen.data.tickets.length > 0) {
+		_tickets_selectTicket(vue.screen.data.tickets[0]);
+	} else {
+		_tickets_selectTicket(null);
+	}
 	gui_hideLoading();
 }
 
