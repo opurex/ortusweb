@@ -8,7 +8,6 @@ Vue.component("vue-import-preview", {
 		editedRecords: {type: Array, default: function() { return[]; }},
 		editedValues: {type: Array, default: function() { return[]; }},
 		untouchedRecords: {type: Array, default: function() { return[]; }},
-		allRecords: {type: Array, default: function() { return[]; }},
 		linkedRecords: {type: Object, default: function() { return {}; }},
 		tableColumns: {type: Array},
 		unknownColumns: {type: Array, default: function() { return[]; }},
@@ -20,17 +19,17 @@ Vue.component("vue-import-preview", {
 	template: `<div class="because">
 		<template v-if="newRecords.length > 0">
 		<h2>{{newTitle}}</h2>
-		<vue-import-preview-table v-bind:records="newRecords" v-bind:allRecords="allRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		<vue-import-preview-table v-bind:records="newRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
 		<template v-if="editedRecords.length > 0">
 		<h2>{{editTitle}}</h2>
 		<p>Les cases sur fond rouge indiquent les changements.</p>
-		<vue-import-preview-table v-bind:records="editedRecords" v-bind:editedValues="editedValues" v-bind:allRecords="allRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		<vue-import-preview-table v-bind:records="editedRecords" v-bind:editedValues="editedValues" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
 		<template v-if="untouchedRecords.length > 0">
 		<h2>{{untouchedTitle}}</h2>
 		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{untouchedRecords.length}} {{modelsLabel}}</template></a></div>
-		<vue-import-preview-table v-show="showUnchanged" v-bind:records="untouchedRecords" v-bind:allRecords="allRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		<vue-import-preview-table v-show="showUnchanged" v-bind:records="untouchedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
 		<template v-if="unknownColumns.length > 0 || errors.length > 0">
 		<h2>Erreurs de lecture</h2>
@@ -72,7 +71,7 @@ Vue.component("vue-import-preview", {
 });
 
 Vue.component("vue-import-preview-table", {
-	props: ["title", "tableColumns", "records", "editedValues", "allRecords", "linkedRecords"],
+	props: ["title", "tableColumns", "records", "editedValues", "linkedRecords"],
 	template: `<div class="because">
 <h2>{{title}}</h2>
 <table class="table table-bordered table-hover">

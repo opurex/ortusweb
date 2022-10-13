@@ -230,7 +230,6 @@ Vue.component("vue-category-import", {
 			v-bind:editedRecords="editedCategories"
 			v-bind:editedValues="editedValues"
 			v-bind:untouchedRecords="unchangedCategories"
-			v-bind:allRecords="data.categories"
 			v-bind:linkedRecords="linkedRecords"
 			v-bind:tableColumns="tableColumns"
 			v-bind:unknownColumns="unknownColumns"
