@@ -61,6 +61,7 @@ For single line text inputs.
 - `id` (string): the html id to link the label to the field.
 - `label` (string): the label for the input.
 - `value` (v-model): the value the field will be bound to with v-model.
+- `placeholder` (string): the text to display as a hint when the field is empty.
 - `required` (optional boolean, default false): if the field is required.
 
 ### vue-input-rate

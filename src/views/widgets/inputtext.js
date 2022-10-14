@@ -12,6 +12,10 @@ Vue.component("vue-input-text", {
 			type: String,
 			default: "",
 		},
+		placeholder: {
+			type: String,
+			default: "",
+		},
 		required: {
 			type: Boolean,
 			default: false
@@ -19,7 +23,7 @@ Vue.component("vue-input-text", {
 	},
 	template:`<div class="form-group">
 	<label v-bind:for="id">{{label}}</label>
-	<input v-bind:id="id" type="text" v-model="localValue" v-bind:required="required" />
+	<input v-bind:id="id" type="text" v-model="localValue" v-bind:required="required" v-bind:placeholder="placeholder" />
 </div>
 `,
 	computed: {
