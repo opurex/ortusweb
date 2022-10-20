@@ -1,4 +1,5 @@
 const OPTION_DYSLEXICMODE = Option_prefName("preferDyslexicMode");
+const OPTION_ACCOUNTING_CONFIG = Option_prefName("accountingConfig");
 
 function Option(name, value) {
 	return {

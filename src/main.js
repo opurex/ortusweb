@@ -161,6 +161,12 @@ function route(screen) {
 	case "preferences":
 		preferences_show();
 		break;
+	case "accounting_z":
+		accounting_showZ();
+		break;
+	case "accounting_config":
+		accounting_showConfig();
+		break;
 	case "home":
 	default:
 		home_show();

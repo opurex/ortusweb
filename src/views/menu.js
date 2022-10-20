@@ -91,6 +91,11 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("roles"), "name": "Permissions", "icon": _menu_getIcon("menu_role.png")},
 				{"target": _menu_getTargetUrl("resources"), "name": "Personnalisation", "icon": _menu_getIcon("menu_resources.png")},
 			]},
+			{"name": "Comptabilité",
+			"items": [
+				{"target": _menu_getTargetUrl("accounting_z"), "name": "Écritures Z", "icon": _menu_getIcon(null)},
+				{"target": _menu_getTargetUrl("accounting_config"), "name": "Configuration", "icon": _menu_getIcon(null)},
+			]},
 		],
 		"user": [
 			{"target": _menu_getTargetUrl("preferences"), "name": "Préférences", "icon": _menu_getIcon("menu_preferences.png")},
