@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.17]- 2022-10-20
+
+### Added
+- Consolidated option in customer's history
+- List tickets in customer's history
+- Configurable accounting export of z tickets
+
 
 ## [8.16] - 2022-08-22
 

@@ -15,7 +15,7 @@ Vue.component("vue-home", {
 			<li><a href="https://fr.wikibooks.org/wiki/Logiciel_Past%C3%A8que" target="_blank" >Manuel d’installation, de configuration et d’utilisation sur wikibooks</a></li>
 			<li><a href="https://framateam.org/pasteque" target="_blank">Les salons de clavardage de l'association Pastèque</a></li>
 		</ul>
-		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.16</p> 
+		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.17</p> 
 	</article>
 </section>
 <aside class="box box-tiny">
