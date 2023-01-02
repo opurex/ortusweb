@@ -5,10 +5,11 @@ function salesdetails_show() {
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	storage_open(function(event) {
-		storage_readStores(["cashRegisters", "products", "categories", "paymentmodes"], function(data) {
+		storage_readStores(["cashRegisters", "products", "categories", "paymentmodes", "customers"], function(data) {
 			let catById = {};
 			let prdById = {};
 			let crById = {};
+			let custById = {};
 			for (let i = 0; i < data["cashRegisters"].length; i++) {
 				let cr = data["cashRegisters"][i];
 				crById[cr.id] = cr
@@ -21,12 +22,17 @@ function salesdetails_show() {
 				let cat = data["categories"][i];
 				catById[cat.id] = cat;
 			}
+			for (let i = 0; i < data["customers"].length; i++) {
+				let cust = data["customers"][i];
+				custById[cust.id] = cust;
+			}
 			vue.screen.data = {
 				"start": start,
 				"stop": stop,
 				"crById": crById,
 				"prdById": prdById,
 				"catById": catById,
+				"custById": custById,
 				"paymentModes": data["paymentmodes"],
 				"table": {
 					"reference": "salesDetail-list",
@@ -38,6 +44,7 @@ function salesdetails_show() {
 						{reference: "date", label: "Date", visible: false, help: "La date de réalisation de la vente."},
 						{reference: "semaine", label: "Semaine", export_as_number: true, visible: false, help: "Le numero de la semaine dans l'année."},
 						{reference: "mois", label: "Mois", visible: false, help: "Le numéro du mois."},
+						{reference: "customer", label: "Client", visible: false, help: "Le compte client associé."},
 						{reference: "line", label: "Ligne", export_as_number: true, visible: false, help: "Le numéro de ligne du ticket."},
 						{reference: "articleLine", label: "Ligne-article", export_as_number: true, visible: false, help: "Le numéro de l'article du ticket. Diffère de la ligne uniquement pour les compositions. Le contenu de la composition partage le même numéro de ligne-article avec la composition elle-même."},
 						{reference: "category", label: "Catégorie", visible: true, help: "La catégorie à laquelle le produit est rattaché, si disponible."},
@@ -136,6 +143,10 @@ function _salesdetails_render(tickets) {
 			}
 		}
 		pmModesStr = pmModesStr.substring(2);
+		let customer = "";
+		if (ticket.customer != null) {
+			customer = vue.screen.data.custById[ticket.customer].dispName;
+		}
 		for (let j = 0; j < ticket.lines.length; j++) {
 			let tktLine = ticket.lines[j];
 			let method = pmModesStr
@@ -188,6 +199,7 @@ function _salesdetails_render(tickets) {
 				tools_dateTimeToString(date),
 				week,
 				month,
+				customer,
 				line,
 				articleLine,
 				category,
