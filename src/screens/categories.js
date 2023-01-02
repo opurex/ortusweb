@@ -135,7 +135,7 @@ function categories_saveCategories() {
 	let calls = [];
 	for (let i = 0; i < vue.screen.data.newCategories.length; i++) {
 		let cat = vue.screen.data.newCategories[i];
-		calls.push({id: "new-" + i, method: "PUT", target: "api/category/" + cat.reference, data: cat});
+		calls.push({id: "new-" + i, method: "PUT", target: "api/category/" + encodeURIComponent(cat.reference), data: cat});
 	}
 	for (let i = 0; i < vue.screen.data.editedCategories.length; i++) {
 		let cat = vue.screen.data.editedCategories[i];

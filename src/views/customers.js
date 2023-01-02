@@ -283,7 +283,7 @@ Vue.component("vue-customer-import", {
 				{field: "dispName", label: "Nom affiché"},
 				{field: "card", label: "Carte"},
 				{field: "maxDebt", label: "Dette max", type: "number"},
-				{field: "notes", label: "Note"},
+				{field: "note", label: "Note"},
 				{field: "expireDate", label: "Date d'expiration", type: "date"},
 				{field: "visible", label: "Actif", type: "boolean"},
 				{field: "discountProfile", label: "Profil de remise", type: "record", modelName: "discountProfile"},

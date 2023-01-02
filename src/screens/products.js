@@ -236,7 +236,7 @@ function products_saveProducts() {
 	let calls = [];
 	for (let i = 0; i < vue.screen.data.newProducts.length; i++) {
 		let prd = vue.screen.data.newProducts[i];
-		calls.push({id: "new-" + i, method: "PUT", target: "api/product/" + prd.reference, data: prd});
+		calls.push({id: "new-" + i, method: "PUT", target: "api/product/" + encodeURIComponent(prd.reference), data: prd});
 	}
 	for (let i = 0; i < vue.screen.data.editedProducts.length; i++) {
 		let prd = vue.screen.data.editedProducts[i];
