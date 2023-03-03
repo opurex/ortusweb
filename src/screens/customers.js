@@ -126,7 +126,7 @@ function _customers_saveCallback(request, status, response) {
 	let cust = vue.screen.data.customer;
 	let respCust = JSON.parse(response);
 	if (!("id" in cust)) {
-		cust.id = respCust["id"];
+		Vue.set(vue.screen.data.customer, "id", respCust["id"]);
 	}
 	if (cust.expireDate != null) {
 		cust.expireDate = respCust.expireDate; // stay in sync with the server's format
