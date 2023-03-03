@@ -473,6 +473,7 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 		}
 	}
 	Vue.set(vue.screen.data.table, "lines", lines);
+	vue.$refs.screenComponent.$refs.salesTable.restoreDefaultColumns();
 	gui_hideLoading();
 }
 
