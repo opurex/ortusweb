@@ -1,13 +1,13 @@
 Vue.component("vue-table", {
-    props: ["table", "noexport", "nofilter"],
-    data: function () {
-        return {
-            showHelp: false,
-            /** Index (int) or reference (string) as key, visible (boolean) as value. */
-            defaultColumns: {}
-        };
-    },
-    template: `<div class="table">
+	props: ["table", "noexport", "nofilter"],
+	data: function () {
+		return {
+			showHelp: false,
+			/** Index (int) or reference (string) as key, visible (boolean) as value. */
+			defaultColumns: {}
+		};
+	},
+		template: `<div class="table">
 	<div class="filters noprint" v-if="table.columns.length > 0 && (!nofilter || !noexport)">
 		<h3>Afficher/masquer des colonnes</h3>
 		<ul class="filter-actions">
@@ -88,150 +88,150 @@ Vue.component("vue-table", {
 	</table>
 </div>
 `,
-    methods: {
-        exportCsv: function (withExcelBom) {
-            // Get data, exclude hidden columns
-            let csvData = [];
-            csvData.push([]);
-            for (let i = 0; i < this.table.columns.length; i++) {
-                let col = this.table.columns[i];
-                if (col.visible && col.export !== false) {
-                    csvData[0].push(col.label);
-                }
-            }
+	methods: {
+		exportCsv: function (withExcelBom) {
+			// Get data, exclude hidden columns
+			let csvData = [];
+			csvData.push([]);
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				if (col.visible && col.export !== false) {
+					csvData[0].push(col.label);
+				}
+			}
 
-            for (let i = 0; i < this.table.lines.length; i++) {
-                csvData.push([]);
-                for (let j = 0; j < this.table.lines[i].length; j++) {
-                    if (this.table.columns[j].visible && this.table.columns[j].export !== false) {
-                        if (this.table.lines[i][j].type && this.table.lines[i][j].type == "bool") {
-                            csvData[i + 1].push(this.table.lines[i][j].value ? "1" : "0");
-                        } else if (this.table.columns[j].export_as_number && this.table.columns[j].export_as_number !== false && typeof this.table.lines[i][j] !== "number") {
-                            csvData[i + 1].push(tools_stringToNumber(this.table.lines[i][j]));
-                        } else {
-                            csvData[i + 1].push(this.table.lines[i][j]);
-                        }
-                    }
-                }
-            }
-            if ("footer" in this.table) {
-                let line = [];
-                for (let i = 0; i < this.table.footer.length; i++) {
-                    if (this.table.columns[i].visible && this.table.columns[i].export !== false) {
+			for (let i = 0; i < this.table.lines.length; i++) {
+				csvData.push([]);
+				for (let j = 0; j < this.table.lines[i].length; j++) {
+					if (this.table.columns[j].visible && this.table.columns[j].export !== false) {
+						if (this.table.lines[i][j].type && this.table.lines[i][j].type == "bool") {
+							csvData[i + 1].push(this.table.lines[i][j].value ? "1" : "0");
+						} else if (this.table.columns[j].export_as_number && this.table.columns[j].export_as_number !== false && typeof this.table.lines[i][j] !== "number") {
+							csvData[i + 1].push(tools_stringToNumber(this.table.lines[i][j]));
+						} else {
+							csvData[i + 1].push(this.table.lines[i][j]);
+						}
+					}
+				}
+			}
+			if ("footer" in this.table) {
+				let line = [];
+				for (let i = 0; i < this.table.footer.length; i++) {
+					if (this.table.columns[i].visible && this.table.columns[i].export !== false) {
 			if (this.table.columns[i].export_as_number && this.table.columns[i].export_as_number !== false && typeof this.table.footer[i] !== "number") {
 				line.push(tools_stringToNumber(this.table.footer[i]));
 			} else {
-	                        line.push(this.table.footer[i]);
+							line.push(this.table.footer[i]);
 			}
-                    }
-                }
-                csvData.push(line);
-            }
-            // Generate csv (with some utf-8 tweak)
-            let encodedData = new CSV(csvData).encode();
-            encodedData = encodeURIComponent(encodedData).replace(/%([0-9A-F]{2})/g,
-                function toSolidBytes(match, p1) {
-                    return String.fromCharCode('0x' + p1);
-                });
-            if (withExcelBom) {
-                encodedData = String.fromCharCode(0xef, 0xbb, 0xbf) + encodedData;
-            }
-            // Set href for download
-            let href = "data:text/csv;base64," + btoa(encodedData);
-            window.open(href, "csvexport");
-        },
-        exportCsvOther: function () {
-            this.exportCsv(false);
-        },
-        exportCsvExcel: function () {
-            this.exportCsv(true);
-        },
-        toggleHelp: function () {
-            this.showHelp = !this.showHelp;
-        },
-        checkAllColumns: function () {
-            for (let i = 0; i < this.table.columns.length; i++) {
-                this.table.columns[i].visible = true;
-            }
-        },
-        uncheckAllColumns: function () {
-            for (let i = 0; i < this.table.columns.length; i++) {
-                this.table.columns[i].visible = false;
-            }
-        },
-        invertCheckedColumns: function () {
-            for (let i = 0; i < this.table.columns.length; i++) {
-                this.table.columns[i].visible = !this.table.columns[i].visible;
-            }
-        },
-        restoreDefaultColumns: function () {
-            for (let i = 0; i < this.table.columns.length; i++) {
-                let col = this.table.columns[i];
-                let key = i;
-                if ("reference" in col) {
-                    key = col.reference;
-                }
-                if (key in this.defaultColumns) {
-                    col.visible = this.defaultColumns[key];
-                }
-            }
-        },
-        saveDefaultColumns: function () {
-            // Read current column visibility and set local default
-            let optName = Option_prefName(this.table.reference + ".defaults")
-            let columns = {};
-            for (let i = 0; i < this.table.columns.length; i++) {
-                let col = this.table.columns[i];
-                if ('reference' in col) {
-                    columns[col.reference] = {"visible": col.visible};
-                    this.defaultColumns[col.reference] = col.visible;
-                } else {
-                    columns[i] = {"visible": col.visible};
-                    this.defaultColumns[i] = col.visible;
-                }
-            }
-            // Save
-            let opt = Option(optName, JSON.stringify(columns));
-            table_saveDefaultColumns(opt);
-        }
-    },
-    mounted: function () {
-        // Set defaultColumns from the table definition
-        for (let i = 0; i < this.table.columns.length; i++) {
-            let col = this.table.columns[i];
-            if ("reference" in col) {
-                this.defaultColumns[col.reference] = col.visible;
-            } else {
-                this.defaultColumns[i] = col.visible;
-            }
-        }
-        // Read changes from option
-        if (!this.table.reference) {
-            this.restoreDefaultColumns();
-            return;
-        }
-        let optName = Option_prefName(this.table.reference + ".defaults")
-        let thiss = this;
-        storage_open(function (event) {
-            storage_get("options", optName, function (opt) {
-                let columns = thiss.defaultColumns;
-                if (opt != null) {
-                    let optVals = JSON.parse(opt.content);
-                    for (let key in optVals) {
-                        let col = optVals[key];
-                        if (key in thiss.defaultColumns) {
-                            thiss.defaultColumns[key] = col.visible;
-                        } else {
-                            let index = parseInt(key);
-                            if (index != NaN) {
-                                thiss.defaultColumns[key] = col.visible;
-                            }
-                        }
-                    }
-                }
-                thiss.restoreDefaultColumns();
-            });
-        });
-    }
+					}
+				}
+				csvData.push(line);
+			}
+			// Generate csv (with some utf-8 tweak)
+			let encodedData = new CSV(csvData).encode();
+			encodedData = encodeURIComponent(encodedData).replace(/%([0-9A-F]{2})/g,
+				function toSolidBytes(match, p1) {
+					return String.fromCharCode('0x' + p1);
+				});
+			if (withExcelBom) {
+				encodedData = String.fromCharCode(0xef, 0xbb, 0xbf) + encodedData;
+			}
+			// Set href for download
+			let href = "data:text/csv;base64," + btoa(encodedData);
+			window.open(href, "csvexport");
+		},
+		exportCsvOther: function () {
+			this.exportCsv(false);
+		},
+		exportCsvExcel: function () {
+			this.exportCsv(true);
+		},
+		toggleHelp: function () {
+			this.showHelp = !this.showHelp;
+		},
+		checkAllColumns: function () {
+			for (let i = 0; i < this.table.columns.length; i++) {
+				this.table.columns[i].visible = true;
+			}
+		},
+		uncheckAllColumns: function () {
+			for (let i = 0; i < this.table.columns.length; i++) {
+				this.table.columns[i].visible = false;
+			}
+		},
+		invertCheckedColumns: function () {
+			for (let i = 0; i < this.table.columns.length; i++) {
+				this.table.columns[i].visible = !this.table.columns[i].visible;
+			}
+		},
+		restoreDefaultColumns: function () {
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				let key = i;
+				if ("reference" in col) {
+					key = col.reference;
+				}
+				if (key in this.defaultColumns) {
+					col.visible = this.defaultColumns[key];
+				}
+			}
+		},
+		saveDefaultColumns: function () {
+			// Read current column visibility and set local default
+			let optName = Option_prefName(this.table.reference + ".defaults")
+			let columns = {};
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				if ('reference' in col) {
+					columns[col.reference] = {"visible": col.visible};
+					this.defaultColumns[col.reference] = col.visible;
+				} else {
+					columns[i] = {"visible": col.visible};
+					this.defaultColumns[i] = col.visible;
+				}
+			}
+			// Save
+			let opt = Option(optName, JSON.stringify(columns));
+			table_saveDefaultColumns(opt);
+		}
+	},
+	mounted: function () {
+		// Set defaultColumns from the table definition
+		for (let i = 0; i < this.table.columns.length; i++) {
+			let col = this.table.columns[i];
+			if ("reference" in col) {
+				this.defaultColumns[col.reference] = col.visible;
+			} else {
+				this.defaultColumns[i] = col.visible;
+			}
+		}
+		// Read changes from option
+		if (!this.table.reference) {
+			this.restoreDefaultColumns();
+			return;
+		}
+		let optName = Option_prefName(this.table.reference + ".defaults")
+		let thiss = this;
+		storage_open(function (event) {
+			storage_get("options", optName, function (opt) {
+				let columns = thiss.defaultColumns;
+				if (opt != null) {
+					let optVals = JSON.parse(opt.content);
+					for (let key in optVals) {
+						let col = optVals[key];
+						if (key in thiss.defaultColumns) {
+							thiss.defaultColumns[key] = col.visible;
+						} else {
+							let index = parseInt(key);
+							if (index != NaN) {
+								thiss.defaultColumns[key] = col.visible;
+							}
+						}
+					}
+				}
+				thiss.restoreDefaultColumns();
+			});
+		});
+	}
 });
 
