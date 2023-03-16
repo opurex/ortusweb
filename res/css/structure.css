@@ -87,7 +87,9 @@ form > .form-control {
 
 /* Navbar form */
 
-nav form {
+nav form,
+nav.table-pagination,
+nav.table-pagination ul {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;

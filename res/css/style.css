@@ -396,6 +396,10 @@ p.warning strong {
 	color: #DDD;
 }
 
+nav.table-pagination {
+	color: unset;
+	justify-content: center;
+}
 table thead {
 	position: sticky;
 	top: 4rem;

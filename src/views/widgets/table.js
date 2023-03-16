@@ -4,8 +4,23 @@ Vue.component("vue-table", {
 		return {
 			showHelp: false,
 			/** Index (int) or reference (string) as key, visible (boolean) as value. */
-			defaultColumns: {}
+			defaultColumns: {},
+			linePerPage: 250,
+			linePerPageDefault: 250,
+			currentPage: 0,
 		};
+	},
+	computed: {
+		pageCount: function() {
+			let pages = Math.floor(this.table.lines.length / this.linePerPage);
+			if (this.table.lines.length % this.linePerPage > 0) {
+				pages++;
+			}
+			if (pages > 0 && this.currentPage >= pages) {
+				this.currentPage = pages - 1;
+			}
+			return pages;
+		}
 	},
 		template: `<div class="table">
 	<div class="filters noprint" v-if="table.columns.length > 0 && (!nofilter || !noexport)">
@@ -56,6 +71,28 @@ Vue.component("vue-table", {
 		</div>
 	</div>
 	<h2 v-if="table.title">{{table.title}}</h2>
+	<nav class="table-pagination">
+		<div class="form-group">
+			<label for="pageNum">Page</label>
+			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
+			<button type="button" aria-label="Page précédente" title="Page précédente" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
+			<select id="pageNum" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
+				<option v-for="i in pageCount" v-bind:value="i - 1">{{ i }}</option>
+			</select>
+			<button type="button" aria-label="Page suivante"  title="Page suivante" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
+			<button type="button" aria-label="Dernière page"  title="Dernière page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
+		</div>
+		<div class="form-group">
+			<label for="pageSize">Nb par page</label>
+			<select v-model.number="linePerPage" id="pageSize">
+				<option value="50">50</option>
+				<option value="100">100</option>
+				<option value="250">250</option>
+				<option value="500">500</option>
+				<option value="-1">Tout</option>
+			</select>
+		</div>
+	</nav>
 	<table class="table table-bordered table-hover" v-if="table.lines">
 		<thead>
 			<tr>
@@ -65,7 +102,8 @@ Vue.component("vue-table", {
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="(line,index) in table.lines">
+			<template v-for="(line,index) in table.lines">
+			<tr v-if="visibleLine(index)">
 				<template v-for="(cell, index2) in line">
 				<td v-show="table.columns[index2].visible" v-bind:class="table.columns[index2].class">
 					<template v-if="cell.type == 'thumbnail'">
@@ -79,6 +117,7 @@ Vue.component("vue-table", {
 				</td>
 				</template>
 			</tr>
+			</template>
 		</tbody>
 		<tfoot v-if="table.footer">
 			<tr>
@@ -86,6 +125,28 @@ Vue.component("vue-table", {
 			</tr>
 		</tfoot>
 	</table>
+	<nav class="table-pagination">
+		<div class="form-group">
+			<label for="pageNum2">Page</label>
+			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
+			<button type="button" aria-label="Page précédente" title="Page précédente" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
+			<select id="pageNum2" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
+				<option v-for="i in pageCount" v-bind:value="i - 1">{{ i }}</option>
+			</select>
+			<button type="button" aria-label="Page suivante"  title="Page suivante" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
+			<button type="button" aria-label="Dernière page"  title="Dernière page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
+		</div>
+		<div class="form-group">
+			<label for="pageSize2">Nb par page</label>
+			<select v-model.number="linePerPage" id="pageSize2">
+				<option value="50">50</option>
+				<option value="100">100</option>
+				<option value="250">250</option>
+				<option value="500">500</option>
+				<option value="-1">Tout</option>
+			</select>
+		</div>
+	</nav>
 </div>
 `,
 	methods: {
@@ -190,9 +251,39 @@ Vue.component("vue-table", {
 					this.defaultColumns[i] = col.visible;
 				}
 			}
+			if (this.linePerPage != this.linePerPageDefault) {
+				columns["linePerPage"] = this.linePerPage;
+			}
 			// Save
 			let opt = Option(optName, JSON.stringify(columns));
 			table_saveDefaultColumns(opt);
+		},
+		visibleLine: function(index) {
+			if (this.linePerPage == -1) {
+				return true;
+			}
+			let start = this.currentPage * this.linePerPage;
+			return index >= start && index < start + this.linePerPage;
+		},
+		movePage: function(delta) {
+			switch (delta) {
+				case -1:
+					if (this.currentPage > 0) {
+						this.currentPage -= 1;
+					}
+					break;
+				case 1:
+					if (this.currentPage < this.pageCount - 1) {
+						this.currentPage += 1;
+					}
+					break;
+				case -2:
+					this.currentPage = 0;
+					break;
+				case 2:
+					this.currentPage = this.pageCount - 1;
+					break;
+			}
 		}
 	},
 	mounted: function () {
@@ -215,6 +306,7 @@ Vue.component("vue-table", {
 		storage_open(function (event) {
 			storage_get("options", optName, function (opt) {
 				let columns = thiss.defaultColumns;
+				let linePerPageTable = null;
 				if (opt != null) {
 					let optVals = JSON.parse(opt.content);
 					for (let key in optVals) {
@@ -223,11 +315,16 @@ Vue.component("vue-table", {
 							thiss.defaultColumns[key] = col.visible;
 						} else {
 							let index = parseInt(key);
-							if (index != NaN) {
+							if (key == "linePerPage") {
+								linePerPageTable = optVals[key];
+							} else if (index != NaN) {
 								thiss.defaultColumns[key] = col.visible;
 							}
 						}
 					}
+				}
+				if (linePerPageTable != null) {
+					thiss.linePerPage = linePerPageTable;
 				}
 				thiss.restoreDefaultColumns();
 			});
