@@ -240,22 +240,22 @@ Vue.component("vue-table", {
 		saveDefaultColumns: function () {
 			// Read current column visibility and set local default
 			let optName = Option_prefName(this.table.reference + ".defaults")
-			let columns = {};
+			let option = {"columns": {}};
 			for (let i = 0; i < this.table.columns.length; i++) {
 				let col = this.table.columns[i];
 				if ('reference' in col) {
-					columns[col.reference] = {"visible": col.visible};
+					option.columns[col.reference] = col.visible;
 					this.defaultColumns[col.reference] = col.visible;
 				} else {
-					columns[i] = {"visible": col.visible};
-					this.defaultColumns[i] = col.visible;
+					option.columns[i.toString()] = col.visible;
+					this.defaultColumns[i.toString()] = col.visible;
 				}
 			}
 			if (this.linePerPage != this.linePerPageDefault) {
-				columns["linePerPage"] = this.linePerPage;
+				option.linePerPage = this.linePerPage;
 			}
 			// Save
-			let opt = Option(optName, JSON.stringify(columns));
+			let opt = Option(optName, JSON.stringify(option));
 			table_saveDefaultColumns(opt);
 		},
 		visibleLine: function(index) {
@@ -293,7 +293,7 @@ Vue.component("vue-table", {
 			if ("reference" in col) {
 				this.defaultColumns[col.reference] = col.visible;
 			} else {
-				this.defaultColumns[i] = col.visible;
+				this.defaultColumns[i.toString()] = col.visible;
 			}
 		}
 		// Read changes from option
@@ -309,18 +309,28 @@ Vue.component("vue-table", {
 				let linePerPageTable = null;
 				if (opt != null) {
 					let optVals = JSON.parse(opt.content);
-					for (let key in optVals) {
-						let col = optVals[key];
-						if (key in thiss.defaultColumns) {
-							thiss.defaultColumns[key] = col.visible;
-						} else {
-							let index = parseInt(key);
-							if (key == "linePerPage") {
-								linePerPageTable = optVals[key];
-							} else if (index != NaN) {
-								thiss.defaultColumns[key] = col.visible;
+					if ("columns" in optVals) {
+						for (let key in optVals.columns) {
+							if (key in thiss.defaultColumns) {
+								thiss.defaultColumns[key] = optVals.columns[key];
 							}
 						}
+					} else {
+						// Legacy column format
+						for (let key in optVals) {
+							let col = optVals[key];
+							if (key in thiss.defaultColumns) {
+								thiss.defaultColumns[key] = col.visible;
+							} else {
+								let index = parseInt(key);
+								if (index != NaN) {
+									thiss.defaultColumns[key] = col.visible;
+								}
+							}
+						}
+					}
+					if ("linePerPage" in optVals) {
+						linePerPageTable = optVals.linePerPage;
 					}
 				}
 				if (linePerPageTable != null) {
