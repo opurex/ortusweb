@@ -31,6 +31,7 @@ Each column is defined by an object with the following properties:
 - `help` (string): the description of the column.
 - `export` (optional boolean, default true): when false, the column is not exported to csv even when it is visible.
 - `visible` (boolean) whether the column is displayed by default (true) or hidden (false).
+- `searchable` (optional boolean, default false) whether this column is searched when visible.
 - `export_as_number` (optional boolean, default false): when true, the number is reformatted when exported to avoid being considered a string by spreadsheet softwares.
 
 Lines

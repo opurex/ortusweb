@@ -5,6 +5,13 @@ Vue.component("vue-table", {
 			showHelp: false,
 			/** Index (int) or reference (string) as key, visible (boolean) as value. */
 			defaultColumns: {},
+			searchString: "",
+			/** True when search is done and the results should be used. */
+			useSearch: false,
+			/** True when the search will be modified. */
+			searchPending: false,
+			/** List of line indexes matching the search input. */
+			searchResults: [],
 			linePerPage: 250,
 			linePerPageDefault: 250,
 			currentPage: 0,
@@ -12,14 +19,26 @@ Vue.component("vue-table", {
 	},
 	computed: {
 		pageCount: function() {
-			let pages = Math.floor(this.table.lines.length / this.linePerPage);
-			if (this.table.lines.length % this.linePerPage > 0) {
+			let lineCount = this.table.lines.length;
+			if (this.useSearch) {
+				lineCount = this.searchResults.length;
+			}
+			let pages = Math.floor(lineCount / this.linePerPage);
+			if (lineCount % this.linePerPage > 0) {
 				pages++;
 			}
 			if (pages > 0 && this.currentPage >= pages) {
 				this.currentPage = pages - 1;
 			}
 			return pages;
+		},
+		searchable: function() {
+			for (let column of this.table.columns) {
+				if ("searchable" in column && column.searchable) {
+					return true;
+				}
+			}
+			return false;
 		}
 	},
 		template: `<div class="table">
@@ -92,6 +111,7 @@ Vue.component("vue-table", {
 				<option value="-1">Tout</option>
 			</select>
 		</div>
+		<vue-input-text id="search" label="Rechercher" v-model="searchString" v-if="searchable" />
 	</nav>
 	<table class="table table-bordered table-hover" v-if="table.lines">
 		<thead>
@@ -259,11 +279,20 @@ Vue.component("vue-table", {
 			table_saveDefaultColumns(opt);
 		},
 		visibleLine: function(index) {
-			if (this.linePerPage == -1) {
+			if (this.linePerPage == -1 && !this.useSearch) {
 				return true;
 			}
 			let start = this.currentPage * this.linePerPage;
-			return index >= start && index < start + this.linePerPage;
+			let stop = start + this.linePerPage
+			if (!this.useSearch) {
+				return index >= start && index < stop;
+			} else {
+				let searchIndex = this.searchResults.indexOf(index);
+				if (searchIndex == -1) {
+					return false;
+				}
+				return this.linePerPage == -1 || (searchIndex >= start && searchIndex < stop);
+			}
 		},
 		movePage: function(delta) {
 			switch (delta) {
@@ -284,6 +313,50 @@ Vue.component("vue-table", {
 					this.currentPage = this.pageCount - 1;
 					break;
 			}
+		},
+		runSearch: function() {
+			this.searchResults = [];
+			let lowVal = this.searchString.toLowerCase();
+			for (let i = 0; i < this.table.lines.length; i++) {
+				for (let j = 0; j < this.table.columns.length; j++) {
+					let col = this.table.columns[j];
+					if (col.visible && ("searchable" in col) && col.searchable) {
+						if (this.table.lines[i][j].toLowerCase().includes(lowVal)) {
+							this.searchResults.push(i);
+							continue;
+						}
+					}
+				}
+			}
+			this.searchPending = false;
+			this.useSearch = true;
+		}
+	},
+	watch: {
+		searchString: function(value) {
+			if (this.searchTimer) {
+				clearTimeout(this.searchTimer);
+			}
+			if (value == "") {
+				this.useSearch = false;
+				this.searchPending = false;
+				return;
+			}
+			this.searchPending = true;
+			let time = 1000;
+			switch (value.length) {
+				case 2:
+					time = 600;
+				case 3:
+					time = 500;
+				case 4:
+					time = 400;
+				default:
+					time = 250;
+			}
+			this.searchTimer = setTimeout(() => {
+				this.runSearch();
+			}, time);
 		}
 	},
 	mounted: function () {
