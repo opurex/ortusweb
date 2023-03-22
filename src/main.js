@@ -227,11 +227,16 @@ function start() {
 	// Initialize the database if required and read global options
 	if (appData.db == null) {
 		storage_open(function(event) {
-			storage_get("options", OPTION_DYSLEXICMODE, function(option) {
+			storage_get("options", OPTION_PREFERENCES, function(option) {
 				if (option != null) {
-					gui_setDyslexicMode(option.content == "1")
+					let content = JSON.parse(option.content);
+					gui_setFont(content.font)
 				}
 				storage_close();
+				let fontParam = storage_getSessionOption("font");
+				if (fontParam != null) {
+					gui_setFont(fontParam);
+				}
 				_start_done();
 			}, function(error) { storage_close(); _start_done(); });
 		});

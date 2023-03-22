@@ -34,21 +34,56 @@
 	font-weight: bold;
 	src: local("OpenDyslexic-BoldItalic"), url(../fonts/OpenDyslexic-BoldItalic.otf) format("opentype");
 }
-
+@font-face {
+	font-family:'AtkinsonHyperlegible';
+	font-style: normal;
+	font-weight: normal;
+	src: local("AtkinsonHyperlegible"), url(../fonts/Atkinson-Hyperlegible-Regular-102.woff) format("woff");
+}
+@font-face {
+	font-family:'AtkinsonHyperlegible';
+	font-style: italic;
+	font-weight: normal;
+	src: local("AtkinsonHyperlegible-Italic"), url(../fonts/Atkinson-Hyperlegible-Italic-102.woff) format("woff");
+}
+@font-face {
+	font-family:'AtkinsonHyperlegible';
+	font-style: normal;
+	font-weight: bold;
+	src: local("AtkinsonHyperlegible-Bold"), url(../fonts/Atkinson-Hyperlegible-Bold-102.woff) format("woff");
+}
+@font-face {
+	font-family:'AtkinsonHyperlegible';
+	font-style: italic;
+	font-weight: bold;
+	src: local("AtkinsonHyperlegible-BoldItalic"), url(../fonts/Atkinson-Hyperlegible-BoldItalic-102.woff) format("woff");
+}
 
 
 /* Containers */
 
 body {
 	background: #999 url(../img/fond.png) repeat center fixed;
-	font-family:"PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 	color: #555;
+	line-height: 1.5;
 }
-
+.default-font {
+	font-family:"PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif !important;
+	line-height: 1.35;
+}
+.no-font {
+	font-family: initial !important;
+}
 .dyslexic-friendly,
 .dyslexic-friendly button,
 .dyslexic-friendly input[type=text] {
 	font-family: OpenDyslexic, "Comic Sans MS", sans-serif !important;
+	line-height: 1.75;
+}
+.hyperlegible,
+.hyperlegible button,
+.hyperlegible input[type=text] {
+	font-family: AtkinsonHyperLegible, sans-serif !important;
 }
 
 .hi-contrast {

@@ -12,10 +12,25 @@ Vue.component("vue-preferences", {
 	</header>
 	<article class="box-body">
 		<form id="edit-preferences-form" class="form-large" onsubmit="javascript:preferences_save(); return false;">
-			<div class="form-group">
-				<input id="edit-dyslexia" type="checkbox" name="dyslexia" v-model="data.preferDyslexicMode" />
-				<label for="edit-dyslexia">Préférer le mode dyslexique</label>
-			</div>
+			<fieldset>
+				<legend>Police d'écriture</legend>
+				<div class="form-group">
+					<input id="font-system" type="radio" name="font" value="system" v-model="data.font" v-on:change="updateFont()" />
+					<label for="font-system" class="no-font">Désactiver la police</label>
+				</div>
+				<div class="form-group">
+					<input id="font-pt" type="radio" name="font" value="sans" v-model="data.font" v-on:change="updateFont()" />
+					<label for="font-pt" class="default-font">Sans serif</label>
+				</div>
+				<div class="form-group">
+					<input id="font-opendyslexic" type="radio" name="font" value="opendyslexic" v-model="data.font" v-on:change="updateFont()" />
+					<label for="font-opendyslexic" class="dyslexic-friendly">Open Dyslexic</label>
+				</div>
+				<div class="form-group">
+					<input id="font-atkinsonhyperlegible" type="radio" name="font" value="hyperlegible" v-model="data.font" v-on:change="updateFont()" />
+					<label for="font-atkinsonhyperlegible" class="hyperlegible">Atkinson Hyperlegible</label>
+				</div>
+			</fieldset>
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
@@ -24,5 +39,10 @@ Vue.component("vue-preferences", {
 </section>
 </div>
 `,
+	methods: {
+		updateFont: function() {
+			gui_setFont(this.data.font);
+		}
+	}
 });
 

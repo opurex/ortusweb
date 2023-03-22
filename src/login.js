@@ -17,6 +17,7 @@ var login_logout = function() {
 	sessionStorage.removeItem("token");
 	localStorage.setItem("logout", "1");
 	localStorage.removeItem("logout");
+	localStorage.removeItem("font");
 	// Drop local database and restart
 	storage_drop(function() {
 		appData.db = null;

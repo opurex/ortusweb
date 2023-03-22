@@ -1,13 +1,15 @@
 function preferences_show() {
 	gui_showLoading();
 	storage_open(function(event) {
-		storage_get("options", OPTION_DYSLEXICMODE, function(option) {
-			let enabled = false
-			if (option != null) {
-				enabled = option.content;
-			}
+		storage_get("options", OPTION_PREFERENCES, function(option) {
 			vue.screen.data = {
-				preferDyslexicMode: enabled == true,
+				font: "sans"
+			};
+			if (option != null) {
+				let content = JSON.parse(option.content);
+				if ("font" in content) {
+					vue.screen.data.font = content.font;
+				}
 			}
 			vue.screen.component = "vue-preferences";
 			storage_close();
@@ -18,8 +20,8 @@ function preferences_show() {
 
 function preferences_save() {
 	gui_showLoading();
-	let preferDyslexicMode = Option(OPTION_DYSLEXICMODE, vue.screen.data.preferDyslexicMode ? "1" : "0");
-	srvcall_post("api/option", preferDyslexicMode, preferences_saveCallback);
+	let preferences = Option(OPTION_PREFERENCES, JSON.stringify(vue.screen.data));
+	srvcall_post("api/option", preferences, preferences_saveCallback);
 }
 
 function preferences_saveCallback(request, status, response) {
@@ -27,7 +29,6 @@ function preferences_saveCallback(request, status, response) {
 		return;
 	}
 	var data = JSON.parse(response);
-	gui_setDyslexicMode(data.content == "1");
 	storage_open(function(event) {
 		storage_write("options", data, appData.localWriteDbSuccess, appData.localWriteDbError);
 	}, appData.localWriteDbOpenError);

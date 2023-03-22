@@ -64,9 +64,10 @@ function home_syncComplete() {
 		gui_hideLoading();
 	}
 	storage_open(function(event) {
-		storage_get("options", OPTION_DYSLEXICMODE, function(option) {
+		storage_get("options", OPTION_PREFERENCES, function(option) {
 			if (option != null) {
-				gui_setDyslexicMode(option.content == "1")
+				let content = JSON.parse(option.content);
+				gui_setFont(content.font)
 			}
 			syncDone()
 		}, function(error) { syncDone() });

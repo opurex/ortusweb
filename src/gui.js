@@ -45,11 +45,24 @@ function gui_showError(message, stack) {
 	_gui_showMessage("message-error", message, stack);
 }
 
-function gui_setDyslexicMode(mode) {
-	if (mode) {
-		document.body.classList.add("dyslexic-friendly");
-	} else {
-		document.body.classList.remove("dyslexic-friendly");
+function gui_setFont(font) {
+	let body = document.querySelector("body");
+	for (let c of ["default-font", "dyslexic-friendly", "hyperlegible", "no-font"]) {
+		body.classList.remove(c);
+	}
+	switch (font) {
+		case "opendyslexic":
+			body.classList.add("dyslexic-friendly");
+			break;
+		case "hyperlegible":
+			body.classList.add("hyperlegible");
+			break;
+		case "system":
+			body.classList.add("no-font");
+			break;
+		default:
+			body.classList.add("default-font");
+			break;
 	}
 }
 
