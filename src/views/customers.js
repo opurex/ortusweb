@@ -2,6 +2,11 @@ Vue.component("vue-customer-list", {
 	props: ["data"],
 	data: function() {
 		return {
+			taLabels: {},
+			taxLabels: {},
+			dpLabels: {},
+			filterVisible: this.data.filterVisible,
+			customers: [], // in data instead of computed because asychronous
 			customersTable: {
 				reference: "customer-list",
 				columns: [
@@ -48,6 +53,16 @@ Vue.component("vue-customer-list", {
 				<li><a class="btn btn-add" href="?p=customer">Ajouter un client</a></li>
 				<li><a class="btn btn-add" href="?p=customerImport">Importer un fichier</a></li>
 			</ul>
+			<ul>
+				<li>
+					<label for="filter-invisible">État</label>
+					<select id="filter-invisible" v-model="filterVisible">
+						<option value="visible">Actifve</option>
+						<option value="invisible">Inactifve</option>
+						<option value="all">Toustes</option>
+					</select>
+				</li>
+			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
@@ -66,47 +81,68 @@ Vue.component("vue-customer-list", {
 		},
 		editUrl: function(cust) {
 			return "?p=customer&id=" + cust.id;
-		}
+		},
+		assign: function(customers) {
+			this.customers = customers;
+			this.customersTable.lines = [];
+			for (let i = 0; i < this.customers.length; i++) {
+				let cust = this.customers[i];
+				if (!((this.filterVisible == "all") || (this.filterVisible == "visible" && cust.visible) || (this.filterVisible == "invisible" && !cust.visible))) {
+					continue;
+				}
+				(cust.discountProfile != null) ?
+					cust.dpLabel = this.dpLabels[cust.discountProfile] :
+					cust.dpLabel = "";
+				(cust.tariffArea != null) ?
+					cust.taLabel = this.taLabels[cust.tariffArea] :
+					cust.taLabel = "";
+				(cust.tax != null) ?
+					cust.taxLabel = this.taxLabels[cust.tax] :
+					cust.taxLabel = "";
+				let line = [
+					{type: "thumbnail", src: this.imageSrc(cust)},
+					cust.dispName, cust.card, cust.balance.toLocaleString(), cust.maxDebt,
+					cust.note, tools_dateToString(cust.expireDate),
+					{type: "bool", value: cust.visible},
+					cust.dpLabel, cust.taLabel, cust.taxLabel, cust.firstName,
+					cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
+					cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
+					cust.country,
+					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"},
+				];
+				this.customersTable.lines.push(line);
+			}
+		},
+		loadCustomers: function() {
+			let thiss = this;
+			gui_showLoading();
+			storage_open(function(event) {
+				storage_readStore("customers", function(customers) {
+					storage_close();
+					thiss.assign(customers.sort(tools_sort("dispName", "card")));
+					gui_hideLoading();
+				});
+			});
+		},
 	},
 	mounted: function() {
-		let taLabels = {};
-		let taxLabels = {};
-		let dpLabels = {};
 		for (let i = 0; i < this.data.tariffAreas.length; i++) {
 			let ta = this.data.tariffAreas[i];
-			taLabels[ta.id] = ta.label;
+			this.taLabels[ta.id] = ta.label;
 		}
 		for (let i = 0; i < this.data.taxes.length; i++) {
 			let tax = this.data.taxes[i];
-			taxLabels[tax.id] = tax.label;
+			this.taxLabels[tax.id] = tax.label;
 		}
 		for (let i = 0; i < this.data.discountProfiles.length; i++) {
 			let dp = this.data.discountProfiles[i];
-			dpLabels[dp.id] = dp.label;
+			this.dpLabels[dp.id] = dp.label;
 		}
-		for (let i = 0; i < this.data.customers.length; i++) {
-			let cust = this.data.customers[i];
-			(cust.discountProfile != null) ?
-				cust.dpLabel = dpLabels[cust.discountProfile] :
-				cust.dpLabel = "";
-			(cust.tariffArea != null) ?
-				cust.taLabel = taLabels[cust.tariffArea] :
-				cust.taLabel = "";
-			(cust.tax != null) ?
-				cust.taxLabel = taxLabels[cust.tax] :
-				cust.taxLabel = "";
-			let line = [
-				{type: "thumbnail", src: this.imageSrc(cust)},
-				cust.dispName, cust.card, cust.balance, cust.maxDebt,
-				cust.note, tools_dateToString(cust.expireDate),
-				{type: "bool", value: cust.visible},
-				cust.dpLabel, cust.taLabel, cust.taxLabel, cust.firstName,
-				cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
-				cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
-				cust.country,
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"},
-			];
-			this.customersTable.lines.push(line);
+		this.loadCustomers();
+	},
+	watch: {
+		filterVisible: function(newVisible, oldVisible) {
+			this.assign(this.customers);
 		}
 	}
 });
