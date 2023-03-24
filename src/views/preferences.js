@@ -31,6 +31,18 @@ Vue.component("vue-preferences", {
 					<label for="font-atkinsonhyperlegible" class="hyperlegible">Atkinson Hyperlegible</label>
 				</div>
 			</fieldset>
+
+			<div class="form-group">
+				<label for="tablePageSize">Nombre de lignes par page de tableau</label>
+				<select v-model.number="data.tablePageSize" id="tablePageSize">
+					<option value="50">50</option>
+					<option value="100">100</option>
+					<option value="250">250</option>
+					<option value="500">500</option>
+					<option value="-1">Tout</option>
+				</select>
+			</div>
+
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>

@@ -3,12 +3,16 @@ function preferences_show() {
 	storage_open(function(event) {
 		storage_get("options", OPTION_PREFERENCES, function(option) {
 			vue.screen.data = {
-				font: "sans"
+				font: "sans",
+				tablePageSize: 250,
 			};
 			if (option != null) {
 				let content = JSON.parse(option.content);
 				if ("font" in content) {
 					vue.screen.data.font = content.font;
+				}
+				if ("tablePageSize" in content) {
+					vue.screen.data.tablePageSize = content.tablePageSize;
 				}
 			}
 			vue.screen.component = "vue-preferences";

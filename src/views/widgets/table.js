@@ -374,14 +374,26 @@ Vue.component("vue-table", {
 			this.restoreDefaultColumns();
 			return;
 		}
-		let optName = Option_prefName(this.table.reference + ".defaults")
+		let optNames = [
+				Option_prefName(this.table.reference + ".defaults"),
+				OPTION_PREFERENCES,
+		];
 		let thiss = this;
 		storage_open(function (event) {
-			storage_get("options", optName, function (opt) {
+			storage_get("options", optNames, function (opts) {
 				let columns = thiss.defaultColumns;
-				let linePerPageTable = null;
-				if (opt != null) {
-					let optVals = JSON.parse(opt.content);
+				let linePerPage = null;
+				let tableOpt = opts[optNames[0]];
+				let prefOpt = opts[optNames[1]];
+				if (prefOpt != null) {
+					let optVals = JSON.parse(prefOpt.content);
+					if ("tablePageSize" in optVals) {
+						linePerPage = optVals.tablePageSize;
+						thiss.linePerPageDefault = linePerPage;
+					}
+				}
+				if (tableOpt != null) {
+					let optVals = JSON.parse(tableOpt.content);
 					if ("columns" in optVals) {
 						for (let key in optVals.columns) {
 							if (key in thiss.defaultColumns) {
@@ -402,12 +414,13 @@ Vue.component("vue-table", {
 							}
 						}
 					}
+					// Override general preferences
 					if ("linePerPage" in optVals) {
-						linePerPageTable = optVals.linePerPage;
+						linePerPage = optVals.linePerPage;
 					}
 				}
-				if (linePerPageTable != null) {
-					thiss.linePerPage = linePerPageTable;
+				if (linePerPage != null) {
+					thiss.linePerPage = linePerPage;
 				}
 				thiss.restoreDefaultColumns();
 			});
