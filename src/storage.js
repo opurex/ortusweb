@@ -314,22 +314,24 @@ var storage_get = function(storeName, id, callback, errorCallback) {
 		errorCallback(dbError);
 		return;
 	}
-	// Multi read
 	if (Array.isArray(id)) {
+		// Multi read
 		let size = id.length;
-		let data = [];
+		let data = {};
 		let callbackCalled = false;
 		let store = appData.db.transaction(storeName, "readonly").objectStore(storeName);
-		let success = function(event) {
-			data.push(event.target.result);
-			if (data.length == size && callbackCalled == false) {
-				callbackCalled = true;
-				callback(data);
+		let successFunc = function(reqId) {
+			return function(event) {
+				data[reqId] = event.target.result;
+				if (Object.keys(data).length == size && callbackCalled == false) {
+					callbackCalled = true;
+					callback(data);
+				}
 			}
 		}
 		for (let i = 0; i < size; i++) {
 			let request = store.get(id[i]);
-			request.onsuccess = success;
+			request.onsuccess = successFunc(id[i]);
 			request.onerror = errorCallback;
 		}
 	} else {

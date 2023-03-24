@@ -126,7 +126,8 @@ function _products_showProduct(product, categories, taxes) {
 			if (prdIds.length == 0) {
 				vue.screen.component = "vue-product-composition-form";
 			} else {
-				storage_get("products", prdIds, function(products) {
+				storage_get("products", prdIds, function(prdData) {
+					let products = Object.values(prdData);
 					for (let j = 0; j < products.length; j++) {
 						let cachePrd = products[j];
 						vue.screen.data.precache[cachePrd.id] = cachePrd;

@@ -52,11 +52,11 @@ Does the same as `storage_readStore`, but reads from multiple tables at once.
 
 ###  storage_get(storeName, id, callback, errorCallback)
 
-Read a single record from the database.
+Read a single or multiple record from the database by id.
 
 - `storeName` (string): the table/model name to read.
-- `id` (mixed): the record id to find.
-- `callback` (function(object)): the function called on success, with the record as parameter.
+- `id` (mixed): the record id to find, or an array of ids.
+- `callback` (function(object)): the function called on success, with the record as parameter. When multiple records are read, data is an object with the record id as key and the record as value. When no record is found, the value is `undefined`
 - `errorCallback` (function(event)): the function called on error.
 
 ###  storage_getIndex(storeName, index, val, callback, errorCallback)
