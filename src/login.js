@@ -18,6 +18,8 @@ var login_logout = function() {
 	localStorage.setItem("logout", "1");
 	localStorage.removeItem("logout");
 	localStorage.removeItem("font");
+	gui_setFont("sans");
+	storage_setSessionOption("font", null);
 	// Drop local database and restart
 	storage_drop(function() {
 		appData.db = null;

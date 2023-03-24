@@ -25,6 +25,7 @@ function preferences_show() {
 function preferences_save() {
 	gui_showLoading();
 	let preferences = Option(OPTION_PREFERENCES, JSON.stringify(vue.screen.data));
+	storage_setSessionOption("font", null);
 	srvcall_post("api/option", preferences, preferences_saveCallback);
 }
 

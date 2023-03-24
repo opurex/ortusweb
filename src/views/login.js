@@ -72,6 +72,15 @@ Vue.component("vue-login", {
 				gui_setFont("sans");
 				storage_setSessionOption("font", null);
 			}
+		},
+		"login.loggedIn": function(val) {
+			if (val == false) {
+				let font = storage_getSessionOption("font");
+				if (font == null) {
+					font = "default";
+				}
+				this.font = font;
+			}
 		}
 	}
 });

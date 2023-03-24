@@ -230,7 +230,7 @@ function start() {
 			storage_get("options", OPTION_PREFERENCES, function(option) {
 				if (option != null) {
 					let content = JSON.parse(option.content);
-					gui_setFont(content.font)
+					gui_setFont(content.font);
 				}
 				storage_close();
 				let fontParam = storage_getSessionOption("font");
