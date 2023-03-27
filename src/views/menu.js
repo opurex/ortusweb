@@ -80,6 +80,11 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("salesbycategory"), "name": "Par catégorie", "icon": _menu_getIcon(null)},
 				{"target": _menu_getTargetUrl("salesdetails"), "name": "Détail", "icon": _menu_getIcon(null)},
 			]},
+			{"name": "Comptabilité",
+			"items": [
+				{"target": _menu_getTargetUrl("accounting_z"), "name": "Écritures Z", "icon": _menu_getIcon(null)},
+				{"target": _menu_getTargetUrl("accounting_config"), "name": "Configuration", "icon": _menu_getIcon(null)},
+			]},
 			{"name": "Configuration",
 			"items": [
 				{"target": _menu_getTargetUrl("floors"), "name": "Plan de tables", "icon": _menu_getIcon("menu_floors.png")},
@@ -90,11 +95,6 @@ function menu_init() {
 				{"target": _menu_getTargetUrl("users"), "name": "Utilisateurs", "icon": _menu_getIcon("menu_user.png")},
 				{"target": _menu_getTargetUrl("roles"), "name": "Permissions", "icon": _menu_getIcon("menu_role.png")},
 				{"target": _menu_getTargetUrl("resources"), "name": "Personnalisation", "icon": _menu_getIcon("menu_resources.png")},
-			]},
-			{"name": "Comptabilité",
-			"items": [
-				{"target": _menu_getTargetUrl("accounting_z"), "name": "Écritures Z", "icon": _menu_getIcon(null)},
-				{"target": _menu_getTargetUrl("accounting_config"), "name": "Configuration", "icon": _menu_getIcon(null)},
 			]},
 		],
 		"user": [
