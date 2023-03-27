@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.18] - 2023-03-27
+
+### Added
+- Customer in sales details
+- Table pagination and search, page length in preferences
+- Choices for Atkinson Hyperlegible font or system font
+- Filter active/inactive/all customers in list
+
+### Changed
+- Default columns option format (retro-compatible)
+- storage_get result format for multiple read
+
+### Fixed
+- Importing products and categories with special characters
+- Customer's note
+- Showing user's default columns in sales by products
+- Show history and balance after creating a new customer
+- Clear session font on logout
+
+
 ## [8.17]- 2022-10-20
 
 ### Added
