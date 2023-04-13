@@ -530,13 +530,25 @@ function _products_parseCsv(fileContent, callback) {
 					}
 				}
 				if ("category" in value) {
-					if (value.category in categoryByRef) {
-						categoryId = categoryByRef[value.category].id
-						value.category = categoryId;
-					} else if (value.category in categoryByLabel) {
-						categoryId = categoryByLabel[value.category].id
-						value.category = categoryId;
-					} else {
+					for (let c = 0; c < categories.length; c++) {
+						if (value.category.toLowerCase() === categories[c].reference.toLowerCase()) {
+							if (value.category !== categories[c].reference) {
+								errors.push({line: i + 2, error: "Le champ catégorie est approximatif"})
+							}
+							categoryId = categories[c].id
+							value.category = categoryId;
+							break;
+						} else if (value.category.toLowerCase() === categories[c].label.toLowerCase()) {
+							if (value.category !== categories[c].label) {
+								errors.push({line: i + 2, error: "Le champ catégorie est approximatif"})
+							}
+							categoryId = categories[c].id
+							value.category = categoryId;
+							break;
+						}
+					}
+
+					if (categoryId == null) {
 						errors.push({line: i + 2, error: "Le champ catégorie n'est pas renseigné ou invalide."});
 						continue;
 					}
