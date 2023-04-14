@@ -11,7 +11,8 @@ Vue.component("vue-import-preview", {
 		linkedRecords: {type: Object, default: function() { return {}; }},
 		tableColumns: {type: Array},
 		unknownColumns: {type: Array, default: function() { return[]; }},
-		errors: {type: Array, default: function() { return[]; }}
+		errors: {type: Array, default: function() { return[]; }},
+		warnings: {type: Array, default: function() { return[]; }}
 	},
 	data: function() {
 		return {showUnchanged: false};
@@ -30,6 +31,23 @@ Vue.component("vue-import-preview", {
 		<h2>{{untouchedTitle}}</h2>
 		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{untouchedRecords.length}} {{modelsLabel}}</template></a></div>
 		<vue-import-preview-table v-show="showUnchanged" v-bind:records="untouchedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		</template>
+		<template v-if="warnings.length > 0">
+		<h2>Alertes</h2>
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Ligne</th>
+					<th>Information</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="warn in warnings">
+					<td>{{warn.line}}</td>
+					<td>{{warn.message}}</td>
+				</tr>
+			</tbody>
+		</table>
 		</template>
 		<template v-if="unknownColumns.length > 0 || errors.length > 0">
 		<h2>Erreurs de lecture</h2>

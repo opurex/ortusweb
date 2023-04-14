@@ -448,6 +448,7 @@ function _products_parseCsv(fileContent, callback) {
 	let editedValues = [];
 	let unchangedProducts = [];
 	let errors = [];
+	let warnings = [];
 	storage_open(function(event) {
 		storage_readStores(["products", "categories", "taxes"], function(data) {
 			// Map by reference for easy mapping
@@ -533,14 +534,14 @@ function _products_parseCsv(fileContent, callback) {
 					for (let c = 0; c < categories.length; c++) {
 						if (value.category.toLowerCase() === categories[c].reference.toLowerCase()) {
 							if (value.category !== categories[c].reference) {
-								errors.push({line: i + 2, error: "Le champ catégorie est approximatif"})
+								warnings.push({line: i + 2, message: "La catégorie " + value.category + " a été associée à " + categories[c].label + " (référence " + categories[c].reference + ")"})
 							}
 							categoryId = categories[c].id
 							value.category = categoryId;
 							break;
 						} else if (value.category.toLowerCase() === categories[c].label.toLowerCase()) {
 							if (value.category !== categories[c].label) {
-								errors.push({line: i + 2, error: "Le champ catégorie est approximatif"})
+								warnings.push({line: i + 2, message: "La catégorie " + value.category + " a été associée à " + categories[c].label + " (référence " + categories[c].reference + ")"})
 							}
 							categoryId = categories[c].id
 							value.category = categoryId;
@@ -627,7 +628,7 @@ function _products_parseCsv(fileContent, callback) {
 			callback({newProducts: newProducts, editedProducts: editedProducts,
 					editedValues: editedValues,
 					unchangedProducts: unchangedProducts,
-					unknownColumns: unknownColumns, errors: errors});
+					unknownColumns: unknownColumns, errors: errors, warnings: warnings});
 		});
 	});
 }
