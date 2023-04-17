@@ -45,7 +45,9 @@ The errors can be a linked record being not found. An error object has the follo
 The warnings have the following attributes:
 
 - `line`: the line number, starting from 1 (for the actual csv line 2, line 1 being headers).
-- `message`: the actual warning
+- `field`: the modelDef field name.
+- `warning`: a warning code ("InsensitiveMatch").
+- `message`: the user-readable warning.
 
 The vue-import-preview widget
 -----------------------------

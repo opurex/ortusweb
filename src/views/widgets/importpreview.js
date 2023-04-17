@@ -37,9 +37,9 @@ Vue.component("vue-import-preview", {
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="warn in warnings">
+				<tr v-for="warn in importResult.warnings">
 					<td>{{warn.line}}</td>
-					<td>{{warn.message}}</td>
+					<td>{{warningMessage(warn)}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -78,6 +78,11 @@ Vue.component("vue-import-preview", {
 	errorMessage: function(err) {
 		if (err.error == "RecordNotFound") {
 			return err.column + " : la valeur \"" + err.value + "\" n'a pas pu être retrouvée";
+		}
+	},
+	warningMessage: function(warn) {
+		if (warn.warning == "InsensitiveMatch") {
+			return warn.message;
 		}
 	}
     }
