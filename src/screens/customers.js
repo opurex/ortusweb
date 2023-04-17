@@ -374,12 +374,7 @@ function _customers_parseCsv(fileContent, callback) {
 			storage_close();
 			vue.screen.data.newCustomers = imported.newRecords;
 			vue.screen.data.editedCustomers = imported.editedRecords;
-			callback({newCustomers: imported.newRecords,
-					editedCustomers: imported.editedRecords,
-					editedValues: imported.editedValues,
-					unchangedCustomers: imported.unchangedRecords,
-					unknownColumns: imported.unknownColumns,
-					errors: imported.errors});
+			callback(imported);
 		});
 	});
 }

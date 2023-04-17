@@ -56,9 +56,8 @@ class CsvParser {
 				}
 			}
 		}
-		return {newRecords: newRecords, editedRecords: editedRecords,
-				editedValues: editedValues, unchangedRecords: unchangedRecords,
-				unknownColumns: this.#unknownColumns, errors: this.#errors};
+		return new CsvImportResult(newRecords, editedRecords, editedValues, unchangedRecords,
+				this.#unknownColumns, this.#errors, []);
 	}
 	/** Read the first line to map column headers to fields. */
 	#buildMapping(line) {
@@ -126,5 +125,25 @@ class CsvParser {
 			case "date": return new PTDate(stringVal);
 		}
 		return stringVal;
+	}
+}
+
+/** Structure to hold parsing results. */
+class CsvImportResult {
+	newRecords;
+	editedRecords;
+	editedValues;
+	unchangedRecords;
+	unknownColumns;
+	errors;
+	warnings;
+	constructor(newRecs, editedRecs, editedVals, unchangedRecs, unknownCols, errs, warns) {
+		this.newRecords = newRecs;
+		this.editedRecords = editedRecs;
+		this.editedValues = editedVals;
+		this.unchangedRecords = unchangedRecs;
+		this.unknownColumns = unknownCols;
+		this.errors = errs;
+		this.warnings = warns;
 	}
 }
