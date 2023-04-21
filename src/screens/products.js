@@ -486,19 +486,6 @@ function _products_parseCsv(fileContent, callback) {
 				v = v.replace(" ", "");
 				return parseFloat(v);
 			}
-			function convertScaleType(value) {
-				if (['piece', 'p', 'u', 'unité', '0', '-'].includes(value.toLowerCase())) {
-					return 0;
-				} else if (['kilogramme', 'kg', 'poid', 'poids', '1'].includes(value.toLowerCase())) {
-					return 1;
-				} else if (['litre', 'l', '2'].includes(value.toLowerCase())) {
-					return 2;
-				} else if (['heure', 'h', 'horaire', '3'].includes(value.toLowerCase())) {
-					return 3;
-				} else {
-					// Error
-				}
-			}
 
 			function convertScaleValue(value) {
 				let v = value
@@ -523,7 +510,23 @@ function _products_parseCsv(fileContent, callback) {
 				if ("scaleValue" in value)
 					value.scaleValue = convertScaleValue(value.scaleValue);
 				if ("scaleType" in value)
-					value.scaleType = convertScaleType(value.scaleType);
+					switch (value.toLowerCase()) {
+						case 'kilogramme': case 'kg': case 'poid': case 'poids': case '1':
+							value.scaleValue = 1;
+							break;
+						case 'litre': case 'l': case '2':
+							value.scaleValue = 2;
+							break;
+						case 'heure': case 'h': case 'horaire': case '3':
+							value.scaleValue = 3;
+							break;
+						case 'piece': case 'p': case 'u': case 'unité': case '0': case '-':
+							value.scaleValue = 0
+							break;
+						default:
+							// TODO : throw some error
+							break;
+					}
 				if ("priceBuy" in value)
 					if (value.priceBuy == "")
 						value.priceBuy = null;
