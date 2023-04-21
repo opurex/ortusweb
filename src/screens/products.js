@@ -499,6 +499,18 @@ function _products_parseCsv(fileContent, callback) {
 					// Error
 				}
 			}
+
+			function convertScaleValue(value) {
+				let v = value
+					.trim()
+					.replace(",", ".");
+
+				if (v === "") {
+					return 1.0;
+				} else {
+					return parseFloat(v);
+				}
+			}
 			function convertValues(value) {
 				if ("prepay" in value)
 					value.prepay = convertBool(value.prepay);
@@ -509,7 +521,7 @@ function _products_parseCsv(fileContent, callback) {
 				if ("visible" in value)
 					value.visible = convertBool(value.visible);
 				if ("scaleValue" in value)
-					value.scaleValue = convertNum(value.scaleValue);
+					value.scaleValue = convertScaleValue(value.scaleValue);
 				if ("scaleType" in value)
 					value.scaleType = convertScaleType(value.scaleType);
 				if ("priceBuy" in value)
