@@ -8,7 +8,7 @@ function ztickets_show() {
 		"includeUnusedPayments": false,
 		"includeUnusedTaxes": false,
 		"includeUnusedCategories": false,
-		"table": {reference: "zticket-list", columns: []}
+		"table": {reference: "zticket-list", columns: [], lines: []}
 	}
 	vue.screen.component = "vue-zticket-list";
 }
