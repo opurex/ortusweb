@@ -152,6 +152,8 @@ Vue.component("vue-paymentmode-form", {
 							<td><input type="number" v-model="ret.minAmount" step="0.01" /></td>
 							<td><select v-model="ret.returnMode" required="true">
 								<option disabled value="">Sélectionner</option>
+								<!-- if payment mode doesn't exist yet ... -->
+								<option v-if="!data.paymentMode.id" v-bind:value.int="-1">{{currentModeLabel()}}</option>
 								<option v-for="pm in data.paymentModes" :key="pm.id" v-bind:value="pm.id">{{pm.label}}</option>
 							</select></td>
 							<td><button type="button" class="btn btn-delete" v-on:click="deleteReturn(index)">X</button></td>
@@ -198,5 +200,12 @@ Vue.component("vue-paymentmode-form", {
 		deleteReturn: function(index) {
 			paymentmodes_removeReturn(index);
 		},
+		currentModeLabel: function() {
+			if (this.data.paymentMode.label) {
+				return this.data.paymentMode.label;
+			} else {
+				return "Même moyen de paiement";
+			}
+		}
 	}
 });

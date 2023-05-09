@@ -111,6 +111,12 @@ function paymentmodes_savePaymentMode() {
 	if ("id" in pm) {
 		srvcall_post("api/paymentmode", pm, paymentmodes_saveCallback);
 	} else {
+		// Remove self-referencing payment mode return id before sending to the API
+		pm.returns.forEach(function(ret) {
+			if (ret.returnMode == -1) {
+				delete ret.returnMode;
+			}
+		});
 		srvcall_put("api/paymentmode/" + encodeURIComponent(pm["reference"]), pm, paymentmodes_saveCallback);
 	}
 }
@@ -131,8 +137,15 @@ function paymentmodes_saveCallback(request, status, response) {
 	}
 	let pm = vue.screen.data.paymentMode;
 	if (!("id" in pm)) {
+		// Assign id to payment mode
 		let respPM = JSON.parse(response);
 		pm.id = respPM["id"];
+		// Assign id to self-referencing returns
+		pm.returns.forEach(function(ret) {
+			if (typeof ret.returnMode === "undefined") {
+				ret.returnMode = pm.id;
+			}
+		});
 	}
 	// Send image update requests
 	let calls = [];
