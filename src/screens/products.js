@@ -498,6 +498,23 @@ function _products_parseCsv(fileContent, callback) {
 					return parseFloat(v);
 				}
 			}
+			function convertScaleType(value) {
+				if (typeof value == "number") {
+					return value;
+				}
+				switch (value.toLowerCase()) {
+					case 'kilogramme': case 'kg': case 'poid': case 'poids': case '1':
+						return 1;
+					case 'litre': case 'l': case '2':
+						return 2;
+					case 'heure': case 'h': case 'horaire': case '3':
+						return 3;
+					case 'piece': case 'p': case 'u': case 'unité': case '0': case '-':
+						return 0
+				}
+				// TODO : throw some error
+				return 0;
+			}
 			function convertValues(value) {
 				if ("prepay" in value)
 					value.prepay = convertBool(value.prepay);
@@ -510,23 +527,7 @@ function _products_parseCsv(fileContent, callback) {
 				if ("scaleValue" in value)
 					value.scaleValue = convertScaleValue(value.scaleValue);
 				if ("scaleType" in value)
-					switch (value.toLowerCase()) {
-						case 'kilogramme': case 'kg': case 'poid': case 'poids': case '1':
-							value.scaleValue = 1;
-							break;
-						case 'litre': case 'l': case '2':
-							value.scaleValue = 2;
-							break;
-						case 'heure': case 'h': case 'horaire': case '3':
-							value.scaleValue = 3;
-							break;
-						case 'piece': case 'p': case 'u': case 'unité': case '0': case '-':
-							value.scaleValue = 0
-							break;
-						default:
-							// TODO : throw some error
-							break;
-					}
+					value.scaleType = convertScaleType(value.scaleType);
 				if ("priceBuy" in value)
 					if (value.priceBuy == "")
 						value.priceBuy = null;
