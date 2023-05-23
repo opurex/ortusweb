@@ -245,6 +245,73 @@ Vue.component("vue-table", {
 				this.table.columns[i].visible = !this.table.columns[i].visible;
 			}
 		},
+		loadDefaultColumns: function() {
+			// Set defaultColumns from the table definition
+			for (let i = 0; i < this.table.columns.length; i++) {
+				let col = this.table.columns[i];
+				if ("reference" in col) {
+					this.defaultColumns[col.reference] = col.visible;
+				} else {
+					this.defaultColumns[i.toString()] = col.visible;
+				}
+			}
+			// Read changes from option
+			if (!this.table.reference) {
+				this.restoreDefaultColumns();
+				return;
+			}
+			let optNames = [
+					Option_prefName(this.table.reference + ".defaults"),
+					OPTION_PREFERENCES,
+			];
+			let thiss = this;
+			storage_open(function (event) {
+				storage_get("options", optNames, function (opts) {
+					let columns = thiss.defaultColumns;
+					let linePerPage = null;
+					let tableOpt = opts[optNames[0]];
+					let prefOpt = opts[optNames[1]];
+					if (prefOpt != null) {
+						let optVals = JSON.parse(prefOpt.content);
+						if ("tablePageSize" in optVals) {
+							linePerPage = optVals.tablePageSize;
+							thiss.linePerPageDefault = linePerPage;
+						}
+					}
+					if (tableOpt != null) {
+						let optVals = JSON.parse(tableOpt.content);
+						if ("columns" in optVals) {
+							for (let key in optVals.columns) {
+								if (key in thiss.defaultColumns) {
+									thiss.defaultColumns[key] = optVals.columns[key];
+								}
+							}
+						} else {
+							// Legacy column format
+							for (let key in optVals) {
+								let col = optVals[key];
+								if (key in thiss.defaultColumns) {
+									thiss.defaultColumns[key] = col.visible;
+								} else {
+									let index = parseInt(key);
+									if (index != NaN) {
+										thiss.defaultColumns[key] = col.visible;
+									}
+								}
+							}
+						}
+						// Override general preferences
+						if ("linePerPage" in optVals) {
+							linePerPage = optVals.linePerPage;
+						}
+					}
+					if (linePerPage != null) {
+						thiss.linePerPage = linePerPage;
+					}
+					thiss.restoreDefaultColumns();
+				});
+			});
+		},
 		restoreDefaultColumns: function () {
 			for (let i = 0; i < this.table.columns.length; i++) {
 				let col = this.table.columns[i];
@@ -357,74 +424,16 @@ Vue.component("vue-table", {
 			this.searchTimer = setTimeout(() => {
 				this.runSearch();
 			}, time);
+		},
+		'table.columns': function(newValue, oldValue) {
+			if (oldValue.length == 0) {
+				// Initialization after search with dynamic columns
+				this.loadDefaultColumns();
+			}
 		}
 	},
 	mounted: function () {
-		// Set defaultColumns from the table definition
-		for (let i = 0; i < this.table.columns.length; i++) {
-			let col = this.table.columns[i];
-			if ("reference" in col) {
-				this.defaultColumns[col.reference] = col.visible;
-			} else {
-				this.defaultColumns[i.toString()] = col.visible;
-			}
-		}
-		// Read changes from option
-		if (!this.table.reference) {
-			this.restoreDefaultColumns();
-			return;
-		}
-		let optNames = [
-				Option_prefName(this.table.reference + ".defaults"),
-				OPTION_PREFERENCES,
-		];
-		let thiss = this;
-		storage_open(function (event) {
-			storage_get("options", optNames, function (opts) {
-				let columns = thiss.defaultColumns;
-				let linePerPage = null;
-				let tableOpt = opts[optNames[0]];
-				let prefOpt = opts[optNames[1]];
-				if (prefOpt != null) {
-					let optVals = JSON.parse(prefOpt.content);
-					if ("tablePageSize" in optVals) {
-						linePerPage = optVals.tablePageSize;
-						thiss.linePerPageDefault = linePerPage;
-					}
-				}
-				if (tableOpt != null) {
-					let optVals = JSON.parse(tableOpt.content);
-					if ("columns" in optVals) {
-						for (let key in optVals.columns) {
-							if (key in thiss.defaultColumns) {
-								thiss.defaultColumns[key] = optVals.columns[key];
-							}
-						}
-					} else {
-						// Legacy column format
-						for (let key in optVals) {
-							let col = optVals[key];
-							if (key in thiss.defaultColumns) {
-								thiss.defaultColumns[key] = col.visible;
-							} else {
-								let index = parseInt(key);
-								if (index != NaN) {
-									thiss.defaultColumns[key] = col.visible;
-								}
-							}
-						}
-					}
-					// Override general preferences
-					if ("linePerPage" in optVals) {
-						linePerPage = optVals.linePerPage;
-					}
-				}
-				if (linePerPage != null) {
-					thiss.linePerPage = linePerPage;
-				}
-				thiss.restoreDefaultColumns();
-			});
-		});
+		this.loadDefaultColumns();
 	}
 });
 
