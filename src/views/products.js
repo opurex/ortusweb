@@ -599,6 +599,7 @@ Vue.component("vue-product-import", {
 			showUnchanged: false,
 			unknownColumns: [],
 			errors: [],
+			warnings: [],
 		};
 	},
 	template: `<div class="product-import">
@@ -629,6 +630,23 @@ Vue.component("vue-product-import", {
 		<h2>Produits non modifiés</h2>
 		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{unchangedProducts.length}} produits</template></a></div>
 		<vue-product-import-table v-show="showUnchanged" v-bind:products="unchangedProducts" v-bind:categories="data.categories" v-bind:taxes="data.taxes"></vue-product-import-table>
+		<template v-if="warnings.length > 0">
+		<h2>Alertes</h2>
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Ligne</th>
+					<th>Information</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="warn in warnings">
+					<td>{{warn.line}}</td>
+					<td>{{warn.message}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</template>
 		<h2 v-if="unknownColumns.length > 0 || errors.length > 0">Erreurs de lecture</h2>
 		<table class="table table-bordered table-hover" v-if="unknownColumns.length > 0 || errors.length > 0">
 			<thead>
@@ -666,6 +684,7 @@ Vue.component("vue-product-import", {
 				thiss.unchangedProducts  = data.unchangedProducts;
 				thiss.unknownColumns = data.unknownColumns;
 				thiss.errors = data.errors;
+				thiss.warnings = data.warnings;
 			}
 			reader.onload = function(readerEvent) {
 				let fileContent = readerEvent.target.result;
@@ -686,6 +705,7 @@ Vue.component("vue-product-import", {
 			this.showUnchanged = false;
 			this.unknownColumns = [];
 			this.errors = [];
+			this.warnings = [];
 		},
 	}
 });

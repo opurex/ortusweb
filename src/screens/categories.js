@@ -121,12 +121,7 @@ function _categories_parseCsv(fileContent, callback) {
 			storage_close();
 			vue.screen.data.newCategories = imported.newRecords;
 			vue.screen.data.editedCategories = imported.editedRecords;
-			callback({newCategories: imported.newRecords,
-					editedCategories: imported.editedRecords,
-					editedValues: imported.editedValues,
-					unchangedCategories: imported.unchangedRecords,
-					unknownColumns: imported.unknownColumns,
-					errors: imported.errors});
+			callback(imported);
 		});
 	});
 }

@@ -24,7 +24,7 @@ It uses a `RecordFactory` to create and merge values from the partial data defin
 
 `content` is the csv content as string.
 
-It returns an object with the following keys, that can be passed to a `vue-import-preview` widget:
+It returns an object that can be passed to a `vue-import-preview` widget with the following keys:
 
 - `newRecords`: the array of records to create.
 - `editedRecords`: the array of edited records, with values already modified.
@@ -32,6 +32,7 @@ It returns an object with the following keys, that can be passed to a `vue-impor
 - `unchangedRecords`: the array of records that are present in the csv but are left untouched.
 - `unknownColumns`: the array of column headers that could not be mapped and was ignored.
 - `errors`: the array of errors that happened when reading the csv.
+- `warnings`: the array of warnings that happened when reading the csv.
 
 The errors can be a linked record being not found. An error object has the following attributes :
 
@@ -41,6 +42,12 @@ The errors can be a linked record being not found. An error object has the follo
 - `error`: an error code ("RecordNotFound").
 - `value`: the field value that caused the error.
 
+The warnings have the following attributes:
+
+- `line`: the line number, starting from 1 (for the actual csv line 2, line 1 being headers).
+- `field`: the modelDef field name.
+- `warning`: a warning code ("InsensitiveMatch").
+- `message`: the user-readable warning.
 
 The vue-import-preview widget
 -----------------------------

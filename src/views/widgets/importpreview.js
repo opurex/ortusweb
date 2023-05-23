@@ -2,36 +2,49 @@ Vue.component("vue-import-preview", {
    	props: {
 		newTitle: {type: String},
 		editTitle: {type: String},
-		untouchedTitle: {type: String},
+		unchangedTitle: {type: String},
 		modelsLabel: {type: String},
-		newRecords: {type: Array, default: function() { return[]; }},
-		editedRecords: {type: Array, default: function() { return[]; }},
-		editedValues: {type: Array, default: function() { return[]; }},
-		untouchedRecords: {type: Array, default: function() { return[]; }},
+		importResult: {type: Object, default: function() { return null; }},
 		linkedRecords: {type: Object, default: function() { return {}; }},
 		tableColumns: {type: Array},
-		unknownColumns: {type: Array, default: function() { return[]; }},
-		errors: {type: Array, default: function() { return[]; }}
+		warnings: {type: Array, default: function() { return[]; }}
 	},
 	data: function() {
 		return {showUnchanged: false};
 	},
-	template: `<div class="because">
-		<template v-if="newRecords.length > 0">
+	template: `<div class="because" v-if="importResult != null">
+		<template v-if="importResult.newRecords.length > 0">
 		<h2>{{newTitle}}</h2>
-		<vue-import-preview-table v-bind:records="newRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		<vue-import-preview-table v-bind:records="importResult.newRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
-		<template v-if="editedRecords.length > 0">
+		<template v-if="importResult.editedRecords.length > 0">
 		<h2>{{editTitle}}</h2>
 		<p>Les cases sur fond rouge indiquent les changements.</p>
-		<vue-import-preview-table v-bind:records="editedRecords" v-bind:editedValues="editedValues" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		<vue-import-preview-table v-bind:records="importResult.editedRecords" v-bind:editedValues="importResult.editedValues" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
-		<template v-if="untouchedRecords.length > 0">
-		<h2>{{untouchedTitle}}</h2>
-		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{untouchedRecords.length}} {{modelsLabel}}</template></a></div>
-		<vue-import-preview-table v-show="showUnchanged" v-bind:records="untouchedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		<template v-if="importResult.unchangedRecords.length > 0">
+		<h2>{{unchangedTitle}}</h2>
+		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{importResult.unchangedRecords.length}} {{modelsLabel}}</template></a></div>
+		<vue-import-preview-table v-show="showUnchanged" v-bind:records="importResult.unchangedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
-		<template v-if="unknownColumns.length > 0 || errors.length > 0">
+		<template v-if="importResult.warnings.length > 0">
+		<h2>Alertes</h2>
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Ligne</th>
+					<th>Information</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="warn in importResult.warnings">
+					<td>{{warn.line}}</td>
+					<td>{{warningMessage(warn)}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</template>
+		<template v-if="importResult.unknownColumns.length > 0 || importResult.errors.length > 0">
 		<h2>Erreurs de lecture</h2>
 		<table class="table table-bordered table-hover">
 			<thead>
@@ -41,18 +54,18 @@ Vue.component("vue-import-preview", {
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-if="unknownColumns.length > 0">
+				<tr v-if="importResult.unknownColumns.length > 0">
 					<td>1</td>
-					<td>Les colonnes suivantes ont été ignorées : <template v-for="col in unknownColumns">{{col}} </template>.</td>
+					<td>Les colonnes suivantes ont été ignorées : <template v-for="col in importResult.unknownColumns">{{col}} </template>.</td>
 				<tr>
-				<tr v-for="err in errors">
+				<tr v-for="err in importResult.errors">
 					<td>{{err.line}}</td>
 					<td>{{errorMessage(err)}}</td>
 				</tr>
 			</tbody>
 		</table>
 		</template>
-		<template v-if="newRecords.length > 0 || editedRecords.length > 0">
+		<template v-if="importResult.newRecords.length > 0 || importResult.editedRecords.length > 0">
 		<div>
 			<a class="btn btn-edit" v-on:click="save">Enregister les modifications</a>
 		</div>
@@ -65,6 +78,11 @@ Vue.component("vue-import-preview", {
 	errorMessage: function(err) {
 		if (err.error == "RecordNotFound") {
 			return err.column + " : la valeur \"" + err.value + "\" n'a pas pu être retrouvée";
+		}
+	},
+	warningMessage: function(warn) {
+		if (warn.warning == "InsensitiveMatch") {
+			return warn.message;
 		}
 	}
     }

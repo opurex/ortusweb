@@ -303,18 +303,12 @@ Vue.component("vue-customer-import", {
 	data: function() {
 		return {
 			csv: null,
-			newCustomers: [],
-			editedCustomers: [],
-			editedValues: [],
-			unchangedCustomers: [],
 			linkedRecords: {
 				discountProfile: this.data.discountProfiles,
 				tariffArea: this.data.tariffAreas,
 				tax: this.data.taxes,
 			},
-			showUnchanged: false,
-			unknownColumns: [],
-			errors: [],
+			importResult: null,
 			tableColumns: [
 				{field: "dispName", label: "Nom affiché"},
 				{field: "card", label: "Carte"},
@@ -360,16 +354,11 @@ Vue.component("vue-customer-import", {
 		</nav>
 	</header>
 	<div class="box-body">
-		<vue-import-preview newTitle="Nouvelles fiches" editTitle="Fiches modifiées" untouchedTitle="Fiches non modifiées" modelsLabel="fiches client"
-			v-bind:newRecords="newCustomers"
-			v-bind:editedRecords="editedCustomers"
-			v-bind:editedValues="editedValues"
-			v-bind:untouchedRecords="unchangedCustomers"
+		<vue-import-preview newTitle="Nouvelles fiches" editTitle="Fiches modifiées" unchangedTitle="Fiches non modifiées" modelsLabel="fiches client"
+			v-bind:importResult="importResult"
 			v-bind:allRecords="data.customers"
 			v-bind:linkedRecords="linkedRecords"
 			v-bind:tableColumns="tableColumns"
-			v-bind:unknownColumns="unknownColumns"
-			v-bind:errors="errors"
 			v-on:save="saveChanges" />
 	</div>
 </section>
@@ -380,16 +369,11 @@ Vue.component("vue-customer-import", {
 			let thiss = this;
 			let reader = new FileReader();
 			let callback = function(data) {
-				thiss.newCustomers = data.newCustomers;
-				thiss.editedCustomers = data.editedCustomers;
-				thiss.editedValues = data.editedValues;
-				thiss.unchangedCustomers  = data.unchangedCustomers;
-				thiss.unknownColumns = data.unknownColumns;
-				thiss.errors = data.errors;
+				thiss.importResult = data;
 			}
 			reader.onload = function(readerEvent) {
 				let fileContent = readerEvent.target.result;
-				let data = _customers_parseCsv(fileContent, callback);
+				_customers_parseCsv(fileContent, callback);
 			};
 			reader.readAsText(event.target.files[0]);
 		},
@@ -399,13 +383,7 @@ Vue.component("vue-customer-import", {
 		reset: function() {
 			this.csv = null;
 			this.$refs.csvRef.value = "";
-			this.newCustomers = [];
-			this.editedCustomers = [];
-			this.editedValues = [];
-			this.unchangedCustomers = [];
-			this.showUnchanged = false;
-			this.unknownColumns = [];
-			this.errors = [];
+			this.importResult = null;
 		},
 	}
 });

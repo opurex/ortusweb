@@ -448,6 +448,7 @@ function _products_parseCsv(fileContent, callback) {
 	let editedValues = [];
 	let unchangedProducts = [];
 	let errors = [];
+	let warnings = [];
 	storage_open(function(event) {
 		storage_readStores(["products", "categories", "taxes"], function(data) {
 			// Map by reference for easy mapping
@@ -561,13 +562,25 @@ function _products_parseCsv(fileContent, callback) {
 					}
 				}
 				if ("category" in value) {
-					if (value.category in categoryByRef) {
-						categoryId = categoryByRef[value.category].id
-						value.category = categoryId;
-					} else if (value.category in categoryByLabel) {
-						categoryId = categoryByLabel[value.category].id
-						value.category = categoryId;
-					} else {
+					for (let c = 0; c < categories.length; c++) {
+						if (value.category.toLowerCase() === categories[c].reference.toLowerCase()) {
+							if (value.category !== categories[c].reference) {
+								warnings.push({line: i + 2, message: "La catégorie " + value.category + " a été associée à " + categories[c].label + " (référence " + categories[c].reference + ")"})
+							}
+							categoryId = categories[c].id
+							value.category = categoryId;
+							break;
+						} else if (value.category.toLowerCase() === categories[c].label.toLowerCase()) {
+							if (value.category !== categories[c].label) {
+								warnings.push({line: i + 2, message: "La catégorie " + value.category + " a été associée à " + categories[c].label + " (référence " + categories[c].reference + ")"})
+							}
+							categoryId = categories[c].id
+							value.category = categoryId;
+							break;
+						}
+					}
+
+					if (categoryId == null) {
 						errors.push({line: i + 2, error: "Le champ catégorie n'est pas renseigné ou invalide."});
 						continue;
 					}
@@ -646,7 +659,7 @@ function _products_parseCsv(fileContent, callback) {
 			callback({newProducts: newProducts, editedProducts: editedProducts,
 					editedValues: editedValues,
 					unchangedProducts: unchangedProducts,
-					unknownColumns: unknownColumns, errors: errors});
+					unknownColumns: unknownColumns, errors: errors, warnings: warnings});
 		});
 	});
 }

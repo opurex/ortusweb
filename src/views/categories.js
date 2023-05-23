@@ -187,16 +187,10 @@ Vue.component("vue-category-import", {
 	data: function() {
 		return {
 			csv: null,
-			newCategories: [],
-			editedCategories: [],
-			editedValues: [],
-			unchangedCategories: [],
 			linkedRecords: {
 				category: this.data.categories,
 			},
-			showUnchanged: false,
-			unknownColumns: [],
-			errors: [],
+			importResult: null,
 			tableColumns: [
 				{field: "reference", label: "Référence"},
 				{field: "label", label: "Désignation"},
@@ -225,15 +219,10 @@ Vue.component("vue-category-import", {
 		</nav>
 	</header>
 	<div class="box-body">
-		<vue-import-preview newTitle="Nouvelles catégories" editTitle="Catégories modifiées" untouchedTitle="Catégories non modifiées" modelsLabel="catégories"
-			v-bind:newRecords="newCategories"
-			v-bind:editedRecords="editedCategories"
-			v-bind:editedValues="editedValues"
-			v-bind:untouchedRecords="unchangedCategories"
+		<vue-import-preview newTitle="Nouvelles catégories" editTitle="Catégories modifiées" unchangedTitle="Catégories non modifiées" modelsLabel="catégories"
+			v-bind:importResult="importResult"
 			v-bind:linkedRecords="linkedRecords"
 			v-bind:tableColumns="tableColumns"
-			v-bind:unknownColumns="unknownColumns"
-			v-bind:errors="errors"
 			v-on:save="saveChanges" />
 	</div>
 </section>
@@ -244,16 +233,11 @@ Vue.component("vue-category-import", {
 			let thiss = this;
 			let reader = new FileReader();
 			let callback = function(data) {
-				thiss.newCategories = data.newCategories;
-				thiss.editedCategories = data.editedCategories;
-				thiss.editedValues = data.editedValues;
-				thiss.unchangedCategories  = data.unchangedCategories;
-				thiss.unknownColumns = data.unknownColumns;
-				thiss.errors = data.errors;
+				thiss.importResult = data;
 			}
 			reader.onload = function(readerEvent) {
 				let fileContent = readerEvent.target.result;
-				let data = _categories_parseCsv(fileContent, callback);
+				_categories_parseCsv(fileContent, callback);
 			};
 			reader.readAsText(event.target.files[0]);
 		},
@@ -263,13 +247,7 @@ Vue.component("vue-category-import", {
 		reset: function() {
 			this.csv = null;
 			this.$refs.csvRef.value = "";
-			this.newCategories = [];
-			this.editedCategories = [];
-			this.editedValues = [];
-			this.unchangedCategories = [];
-			this.showUnchanged = false;
-			this.unknownColumns = [];
-			this.errors = [];
+			this.importResult = null;
 		},
 	}
 });

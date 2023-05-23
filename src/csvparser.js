@@ -6,6 +6,7 @@ class CsvParser {
 	#columnMapping;
 	#unknownColumns;
 	#errors;
+	#warnings;
 	/**
 	 * Create a parser.
 	 * @param recordDef A record definition object.
@@ -34,6 +35,7 @@ class CsvParser {
 		let editedValues = [];
 		let unchangedRecords = [];
 		this.#errors = [];
+		this.#warnings = [];
 		let recFacto = new RecordFactory(this.#recordDef);
 		for (let i = 0; i < rawData.length; i++) {
 			let lineVals = this.#readLine(i, rawData[i]);
@@ -56,9 +58,8 @@ class CsvParser {
 				}
 			}
 		}
-		return {newRecords: newRecords, editedRecords: editedRecords,
-				editedValues: editedValues, unchangedRecords: unchangedRecords,
-				unknownColumns: this.#unknownColumns, errors: this.#errors};
+		return new CsvImportResult(newRecords, editedRecords, editedValues, unchangedRecords,
+				this.#unknownColumns, this.#errors, this.#warnings);
 	}
 	/** Read the first line to map column headers to fields. */
 	#buildMapping(line) {
@@ -96,9 +97,21 @@ class CsvParser {
 				let lookupFields = linkRec.modelDef.lookupFields;
 				let linkedRecord; // undefined, not null
 				lookupFields.every(field => {
-					linkedRecord = linkRec.records.find(r => r[field] == this.#convertStrVal(value, linkRec.modelDef.fields[field].type));
+					let convertedVal = this.#convertStrVal(value, linkRec.modelDef.fields[field].type);
+					linkedRecord = linkRec.records.find(r => this.#equalsIgnoreCase(r[field], convertedVal, linkRec.modelDef.fields[field].type));
 					if (typeof linkedRecord != "undefined") {
-						return false;
+						// Add warning for case insensitive match
+						if (convertedVal != linkedRecord[field]) {
+							let linkedRecordLabel = linkedRecord[field];
+							if ("label" in linkedRecord) {
+								linkedRecordLabel = linkedRecord.label;
+							}
+							let message = (linkedRecordLabel != linkedRecord[field]) ?
+									value + " a été associé à " + linkedRecordLabel + " (" + linkedRecord[field] + ")" :
+									value + " a été associé à " + linkedRecordLabel;
+							this.#warnings.push({line: lineNum + 2, field: field, warning: "InsensitiveMatch", message: message});
+						}
+						return false; // lookupFields.every break
 					}
 					return true;
 				});
@@ -126,5 +139,35 @@ class CsvParser {
 			case "date": return new PTDate(stringVal);
 		}
 		return stringVal;
+	}
+	#equalsIgnoreCase(val1, val2, type) {
+		switch (type) {
+			case "string": return val1.toLowerCase() == val2.toLowerCase();
+			case "date": (val1 === null && val2 === null) || (val1.equals(val2));
+			case "boolean":
+			case "number":
+			default:
+				return val1 == val2;
+		}
+	}
+}
+
+/** Structure to hold parsing results. */
+class CsvImportResult {
+	newRecords;
+	editedRecords;
+	editedValues;
+	unchangedRecords;
+	unknownColumns;
+	errors;
+	warnings;
+	constructor(newRecs, editedRecs, editedVals, unchangedRecs, unknownCols, errs, warns) {
+		this.newRecords = newRecs;
+		this.editedRecords = editedRecs;
+		this.editedValues = editedVals;
+		this.unchangedRecords = unchangedRecs;
+		this.unknownColumns = unknownCols;
+		this.errors = errs;
+		this.warnings = warns;
 	}
 }
