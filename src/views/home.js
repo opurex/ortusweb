@@ -16,7 +16,7 @@ Vue.component("vue-home", {
 			<li><a href="https://framateam.org/pasteque" target="_blank">Les salons de clavardage de l'association Pastèque</a></li>
 		</ul>
 		<p style="font-size:small;margin-bottom:0px;">Les fontes de caractères Open Dyslexic et Atkinson Hyperlegible sont distribuées sous licence SIL, voir les licences pour <a href="res/fonts/SIL Open Font License.txt" target="_blank">Open Dyslexic</a> et <a href="res/fonts/Atkinson Hyperlegible Font License.txt" target="_blank">Atkinson Hyberlegible</a></p>
-		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.18</p> 
+		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.19</p>
 	</article>
 </section>
 <aside class="box box-tiny">
