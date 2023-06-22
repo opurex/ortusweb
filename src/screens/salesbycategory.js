@@ -14,6 +14,7 @@ function salesbycategory_show() {
 			"reference": "salesByCategory-list",
 			"title": null,
 			"columns": [],
+			"lines": [],
 		},
 	}
 	vue.screen.component = "vue-salesbycategory";

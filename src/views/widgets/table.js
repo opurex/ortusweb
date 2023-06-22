@@ -14,20 +14,29 @@ Vue.component("vue-table", {
 			searchResults: [],
 			linePerPage: 250,
 			linePerPageDefault: 250,
+			/** 0-based page index. Displayed as currentPage + 1 */
 			currentPage: 0,
 		};
 	},
 	computed: {
 		pageCount: function() {
+			if (this.linePerPage == -1) {
+				this.currentPage = 0;
+				return 1;
+			}
 			let lineCount = this.table.lines.length;
 			if (this.useSearch) {
 				lineCount = this.searchResults.length;
+			}
+			if (lineCount == 0) {
+				this.currentPage = 0;
+				return 1;
 			}
 			let pages = Math.floor(lineCount / this.linePerPage);
 			if (lineCount % this.linePerPage > 0) {
 				pages++;
 			}
-			if (pages > 0 && this.currentPage >= pages) {
+			if (this.currentPage >= pages) {
 				this.currentPage = pages - 1;
 			}
 			return pages;

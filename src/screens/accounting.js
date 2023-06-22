@@ -25,14 +25,17 @@ function accounting_showZ() {
 					paymentModes: {},
 					extra: {},
 				},
-				"table": {reference: "accounting-z-list", columns: [
-					{reference: "date", label: "Date", visible: true, help: "La date d'ouverture de la session."},
-					{reference: "account", label: "Compte", visible: true, help: "Le numéro de compte de la ligne"},
-					{reference: "label", label: "Libellé", visible: true, help: "Libellé de la ligne"},
-					{reference: "debit", label: "Débit", visible: true, export_as_number: true},
-					{reference: "credit", label: "Crédit", visible: true, export_as_number: true},
-					{reference: "reference", label: "Pièce", visible: true, help: "Le nom de la pièce de référence de l'écriture"},
-				]}
+				"table": {reference: "accounting-z-list",
+					columns: [
+						{reference: "date", label: "Date", visible: true, help: "La date d'ouverture de la session."},
+						{reference: "account", label: "Compte", visible: true, help: "Le numéro de compte de la ligne"},
+						{reference: "label", label: "Libellé", visible: true, help: "Libellé de la ligne"},
+						{reference: "debit", label: "Débit", visible: true, export_as_number: true},
+						{reference: "credit", label: "Crédit", visible: true, export_as_number: true},
+						{reference: "reference", label: "Pièce", visible: true, help: "Le nom de la pièce de référence de l'écriture"},
+					],
+					lines: [],
+				}
 			}
 			vue.screen.component = "vue-accounting-z";
 			storage_close();

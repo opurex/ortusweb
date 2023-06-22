@@ -62,6 +62,7 @@ function salesdetails_show() {
 						{reference: "finalTaxedPrice", label: "Total TTC", export_as_number: true, visible: true, help: "Le montant TTC de la ligne après réductions."},
 						{reference: "margin", label: "Marge HT", export_as_number: true, visible: false, help: "La marge indicative de la ligne. La marge est calculée à partir du prix d'achat actuel qui peut être différent de celui lors de la vente du produit."},
 					],
+					"lines": [],
 				},
 			}
 			vue.screen.component = "vue-salesdetails";

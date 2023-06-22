@@ -46,6 +46,7 @@ function tickets_show() {
 						{reference: "user", label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
 						{reference: "operation", label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
 					],
+					"lines": [],
 				},
 			}
 			vue.screen.component = "vue-tickets-list";

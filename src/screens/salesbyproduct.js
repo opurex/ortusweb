@@ -14,8 +14,8 @@ function salesbyproduct_show() {
 		"table": {
 			"reference": "salesByProduct-list",
 			"title": null,
-			"columns": [
-			],
+			"columns": [],
+			"lines": [],
 		},
 	}
 	vue.screen.component = "vue-salesbyproduct";

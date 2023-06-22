@@ -69,6 +69,7 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 				{reference: "line-finalPrice", label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."},
 				{reference: "line-finalTaxedPrice", label: "TTC", visible: false, help: "Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket."},
 			],
+			lines: [],
 		},
 		"customerHistoryTickets": {
 			"reference": "customer-ticket-list",
@@ -84,6 +85,7 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 				{reference: "user", label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
 				{reference: "operation", label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
 			],
+			lines: [],
 		},
 	}
 	vue.screen.component = "vue-customer-form";
