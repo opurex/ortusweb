@@ -5,9 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
-## [8.19] - 2023-05-25
+## [8.20] - 2023-06-22
 
-### Added
+### Fixed
+- Table pagination when displaying all lines
+- Quickfix about uninitialized table lines
+
+
+## [8.19] - 2023-05-25
 
 ### Changed
 - Record linking is case insensitive with a warning when importing from csv (affects categories and customers)
