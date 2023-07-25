@@ -34,36 +34,30 @@ function salesdetails_show() {
 				"catById": catById,
 				"custById": custById,
 				"paymentModes": data["paymentmodes"],
-				"table": {
-					"reference": "salesDetail-list",
-					"title": null,
-					"columns": [
-						{reference: "cashRegister", label: "Caisse", visible: false, help: "Le nom de la caisse."},
-						{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
-						{reference: "number", label: "Ticket", export_as_number: true, visible: false, help: "Le numéro du ticket de la caisse."},
-						{reference: "date", label: "Date", visible: false, help: "La date de réalisation de la vente."},
-						{reference: "semaine", label: "Semaine", export_as_number: true, visible: false, help: "Le numero de la semaine dans l'année."},
-						{reference: "mois", label: "Mois", visible: false, help: "Le numéro du mois."},
-						{reference: "customer", label: "Client", visible: false, help: "Le compte client associé."},
-						{reference: "line", label: "Ligne", export_as_number: true, visible: false, help: "Le numéro de ligne du ticket."},
-						{reference: "articleLine", label: "Ligne-article", export_as_number: true, visible: false, help: "Le numéro de l'article du ticket. Diffère de la ligne uniquement pour les compositions. Le contenu de la composition partage le même numéro de ligne-article avec la composition elle-même."},
-						{reference: "category", label: "Catégorie", visible: true, help: "La catégorie à laquelle le produit est rattaché, si disponible."},
-						{reference: "reference", label: "Référence", visible: true, help: "La référence du produit, si disponible."},
-						{reference: "label", label: "Désignation", visible: true, help: "La désignation du produit telle qu'imprimée sur le ticket au moment de la vente."},
-						{reference: "tax", label: "TVA", visible: true, help: "Le taux de TVA appliqué."},
-						{reference: "priceBuy", label: "Prix d'achat HT", export_as_number: true, visible: false, help: "Le prix d'achat actuel du produit si disponible. Ce montant n'est pas historisé et ne correspond pas forcément au prix d'achat au moment de la vente."},
-						{reference: "unitPriceSell", label: "Prix unitaire HT", export_as_number: true, visible: false, help: "Le prix de vente unitaire hors taxes."},
-						{reference: "unitPriceSellVat", label: "Prix unitaire TTC", export_as_number: true, visible: false, help: "Le prix de vente unitaire TTC."},
-						{reference: "quantity", label: "Quantité", export_as_number: true, visible: true, help: "La quantité vendue."},
-						{reference: "priceSell", label: "Sous-total HT", export_as_number: true, visible: false, help: "Le montant hors taxes de la ligne avant application des réductions."},
-						{reference: "priceSellVat", label: "Sous-total TTC", export_as_number: true, visible: false, help: "Le montant TTC de la ligne avant application des réductions."},
-						{reference: "discountRate", label: "Remise", export_as_number: true, visible: true, help: "Le taux de réduction appliqué à la ligne."},
-						{reference: "finalPrice", label: "Total HT", export_as_number: true, visible: true, help: "Le montant hors taxes de la ligne après réduction."},
-						{reference: "finalTaxedPrice", label: "Total TTC", export_as_number: true, visible: true, help: "Le montant TTC de la ligne après réductions."},
-						{reference: "margin", label: "Marge HT", export_as_number: true, visible: false, help: "La marge indicative de la ligne. La marge est calculée à partir du prix d'achat actuel qui peut être différent de celui lors de la vente du produit."},
-					],
-					"lines": [],
-				},
+				"table": new Table().reference("salesDetail-list")
+					.column(new TableCol().reference("cashRegister").label("Caisse").visible(false).help("Le nom de la caisse."))
+					.column(new TableCol().reference("paymentmodes").label("Encaissement").visible(true).help("Les modes de paiement utilisés à l'encaissement."))
+					.column(new TableCol().reference("number").label("Ticket").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro du ticket de la caisse."))
+					.column(new TableCol().reference("date").type(TABLECOL_TYPE.DATETIME).label("Date").visible(false).help("La date de réalisation de la vente."))
+					.column(new TableCol().reference("semaine").label("Semaine").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numero de la semaine dans l'année."))
+					.column(new TableCol().reference("mois").label("Mois").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro du mois."))
+					.column(new TableCol().reference("customer").label("Client").visible(false).help("Le compte client associé."))
+					.column(new TableCol().reference("line").label("Ligne").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de ligne du ticket."))
+					.column(new TableCol().reference("articleLine").label("Ligne-article").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de l'article du ticket. Diffère de la ligne uniquement pour les compositions. Le contenu de la composition partage le même numéro de ligne-article avec la composition elle-même."))
+					.column(new TableCol().reference("category").label("Catégorie").visible(true).searchable(true).help("La catégorie à laquelle le produit est rattaché, si disponible."))
+					.column(new TableCol().reference("reference").label("Référence").visible(true).searchable(true).help("La référence du produit, si disponible."))
+					.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("La désignation du produit telle qu'imprimée sur le ticket au moment de la vente."))
+					.column(new TableCol().reference("tax").label("TVA").type(TABLECOL_TYPE.PERCENT).visible(true).help("Le taux de TVA appliqué."))
+					.column(new TableCol().reference("priceBuy").label("Prix d'achat HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le prix d'achat actuel du produit si disponible. Ce montant n'est pas historisé et ne correspond pas forcément au prix d'achat au moment de la vente."))
+					.column(new TableCol().reference("unitPriceSell").label("Prix unitaire HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le prix de vente unitaire hors taxes."))
+					.column(new TableCol().reference("unitPriceSellVat").label("Prix unitaire TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le prix de vente unitaire TTC."))
+					.column(new TableCol().reference("quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).visible(true).help("La quantité vendue."))
+					.column(new TableCol().reference("priceSell").label("Sous-total HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le montant hors taxes de la ligne avant application des réductions."))
+					.column(new TableCol().reference("priceSellVat").label("Sous-total TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant TTC de la ligne avant application des réductions."))
+					.column(new TableCol().reference("discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(true).help("Le taux de réduction appliqué à la ligne."))
+					.column(new TableCol().reference("finalPrice").label("Total HT").type(TABLECOL_TYPE.NUMBER5).visible(true).help("Le montant hors taxes de la ligne après réduction."))
+					.column(new TableCol().reference("finalTaxedPrice").label("Total TTC").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant TTC de la ligne après réductions."))
+					.column(new TableCol().reference("margin").label("Marge HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("La marge indicative de la ligne. La marge est calculée à partir du prix d'achat actuel qui peut être différent de celui lors de la vente du produit."))
 			}
 			vue.screen.component = "vue-salesdetails";
 		});
@@ -176,7 +170,7 @@ function _salesdetails_render(tickets) {
 				let prd = vue.screen.data.prdById[tktLine.product];
 				category = vue.screen.data.catById[prd.category].label;
 				reference = prd.reference;
-				priceBuy = prd.priceBuy.toLocaleString();
+				priceBuy = prd.priceBuy;
 				if (prd.composition) {
 					inCompo = true;
 				}
@@ -192,12 +186,12 @@ function _salesdetails_render(tickets) {
 			}
 			if (priceBuy != "") {
 				let prd = vue.screen.data.prdById[tktLine.product];
-				margin = (finalPrice - (tktLine.quantity * prd.priceBuy)).toLocaleString();
+				margin = finalPrice - (tktLine.quantity * prd.priceBuy);
 			}
 			lines.push([vue.screen.data.crById[ticket.cashRegister].label,
 				method,
 				ticket.number,
-				tools_dateTimeToString(date),
+				date,
 				week,
 				month,
 				customer,
@@ -206,23 +200,23 @@ function _salesdetails_render(tickets) {
 				category,
 				reference,
 				tktLine.productLabel,
-				(tktLine.taxRate * 100).toLocaleString(),
+				tktLine.taxRate,
 				priceBuy,
-				unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
-				taxedUnitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-				tktLine.quantity.toLocaleString(),
-				price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
-				taxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-				(tktLine.discountRate * 100).toLocaleString(),
-				finalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }),
-				finalTaxedPrice.toLocaleString(undefined, { minimumFractionDigits: 2 } ),
+				unitPrice,
+				taxedUnitPrice,
+				tktLine.quantity,
+				price,
+				taxedPrice,
+				tktLine.discountRate,
+				finalPrice,
+				finalTaxedPrice,
 				margin]);
 		}
 	}
-	vue.screen.data.table.title = "Détail des ventes du "
+	vue.screen.data.table.title("Détail des ventes du "
 			+ tools_dateToString(vue.screen.data.start)
 			+ " au "
-			+ tools_dateToString(vue.screen.data.stop);
-	Vue.set(vue.screen.data.table, "lines", lines);
+			+ tools_dateToString(vue.screen.data.stop));
+	vue.screen.data.table.resetContent(lines);
 	gui_hideLoading();
 }

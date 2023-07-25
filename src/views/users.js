@@ -1,5 +1,15 @@
 Vue.component("vue-user-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			userTable: new Table().reference("user-list")
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false))
+				.column(new TableCol().reference("name").label("Nom"))
+				.column(new TableCol().reference("role").label("Rôle"))
+				.column(new TableCol().reference("card").label("Carte"))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false))
+		};
+	},
 	template: `<div class="user-list">
 <section class="box box-medium">
 	<header>
@@ -16,28 +26,7 @@ Vue.component("vue-user-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<col />
-			<col style="width:15%; min-width: 5em;" />
-			<col style="width:15%; min-width: 5em;" />
-			<col style="width:15%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Nom</th>
-					<th>Rôle</th>
-					<th>Carte</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="user in data.users">
-					<td><img class="thumbnail thumbnail-text" v-bind:src="imageSrc(user)" />{{user.name}}</td>
-					<td>{{data.roles[user.role].name}}</td>
-					<td>{{user.card}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(user)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="userTable"></vue-table>
 	</article>
 </section>
 </div>`,
@@ -45,12 +34,17 @@ Vue.component("vue-user-list", {
 		imageSrc: function(user) {
 			return srvcall_imageUrl("user", user);
 		},
-		roleName: function(user) {
-			return this.data.roles[user.role].name;
-		},
 		editUrl: function(user) {
 			return "?p=user&id=" + user.id;
 		},
+	},
+	mounted: function() {
+		this.data.users.forEach(u => {
+			this.userTable.line([
+				this.imageSrc(u), u.name, this.data.roles[u.role].name, u.card,
+				"<nav><a class=\"btn btn-edit\" href=\"" + this.editUrl(u) + "\">Modifier</a></nav>"
+			]);
+		});
 	}
 });
 

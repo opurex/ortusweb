@@ -6,31 +6,26 @@ Vue.component("vue-product-list", {
 			sorting: this.data.sort,
 			filterVisible: this.data.filterVisible,
 			sortedProducts: [], // in data instead of computed because asychronous
-			productsTable: {
-				reference: "product-list",
-				columns: [
-					{reference: "image", label: "Image", export: false, visible: true, help: "L'image du bouton du produit. Ce champ ne peut être exporté."},
-					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque produit. Elle permet la modification lors de l'import de produits."},
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
-					{reference: "category", label: "Catégorie", visible: false, help: "La désignation de la catégorie à laquelle est rattachée le produit."},
-					{reference: "barcode", label: "Code barre", visible: false, help: "Le code barre faculcatif du produit. Le code barre peut être une série de caractères arbitraires pour une saisie manuelle."},
-					{reference: "prepay", label: "Recharge pré-payement", visible: false, help: "L'achat de se produit augmente le solde client du même montant. Les produits pré-payés ne rentrent pas dans le chiffre d'affaire et permettent également dee rembourser des dettes client."},
-					{reference: "scale", label: "Vente au poids", visible: false, help: "Si actif, la quantité peut être non unitaire et sera demandée lors de l'ajout à une commande."},
-					{reference: "scaleType", label: "Poids/Volume", visible: false, help: "Indique l'unité pour la contenance."},
-					{reference: "scaleValue", label: "Contenance", export_as_number: true, visible: false, help: "Indique la contenance dans le produit. Pour un bocal de 200g par exemple, la contenance sera 0,2. Ce champ permet de calculer le prix au litre ou au kilogramme."},
-					{reference: "priceBuy", label: "Prix d'achat HT", export_as_number: true, visible: false, help: "Le prix d'achat hors taxes. Ce champ facultatif permet de calculer la marge. Il n'est pas historisé."},
-					{reference: "priceSell", label: "Prix de vente HT", export_as_number: true, visible: false, help: "Le prix de vente unitaire hors taxes du produit."},
-					{reference: "priceSellVat", label: "Prix de vente TTC", export_as_number: true, visible: true, help: "Le prix de vente unitaire TTC du produit."},
-					{reference: "margin", label: "Marge", export_as_number: true, visible: false, help: "La marge hors taxe indicative. Si le prix d'achat n'est pas renseigné, la marge correspond au prix de vente hors taxes."},
-					{reference: "tax", label: "TVA", visible: false, help: "Le taux de TVA associé."},
-					{reference: "discountEnabled", label: "Remise automatique", visible: false, help: "Indique si une remise doit être automatiquement assignée lors de l'ajout du produit à une commande."},
-					{reference: "discountRate", label: "Taux de remise", visible: false, help: "Le taux de remise à appliquer automatiquement lorsque l'option Remise automatique est activée."},
-					{reference: "dispOrder", label: "Ordre", export_as_number: true, visible: false, help: "L'ordre d'affichage du produit dans sa catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouveaux produits. Par exemple 10, 20, 30…"},
-					{reference: "visible", label: "En vente", visible: false, help: "Indique si le produit est actuellement en vente ou non. Lorsque le produit n'est pas en vente, il n'apparaîtra pas sur les caisses."},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			productsTable: new Table().reference("product-list")
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du bouton du produit. Ce champ ne peut être exporté."))
+				.column(new TableCol().reference("reference").label("Référence").searchable(true).visible(false).help("La référence doit être unique pour chaque produit. Elle permet la modification lors de l'import de produits."))
+				.column(new TableCol().reference("label").label("Désignation").searchable(true).visible(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
+				.column(new TableCol().reference("category").label("Catégorie").visible(false).help("La désignation de la catégorie à laquelle est rattachée le produit."))
+				.column(new TableCol().reference("barcode").label("Code barre").searchable(true).visible(false).help("Le code barre faculcatif du produit. Le code barre peut être une série de caractères arbitraires pour une saisie manuelle."))
+				.column(new TableCol().reference("prepay").label("Recharge pré-payement").type(TABLECOL_TYPE.BOOL).visible(false).help("L'achat de se produit augmente le solde client du même montant. Les produits pré-payés ne rentrent pas dans le chiffre d'affaire et permettent également dee rembourser des dettes client."))
+				.column(new TableCol().reference("scale").label("Vente au poids").type(TABLECOL_TYPE.BOOL).visible(false).help("Si actif, la quantité peut être non unitaire et sera demandée lors de l'ajout à une commande."))
+				.column(new TableCol().reference("scaleType").label("Poids/Volume").visible(false).help("Indique l'unité pour la contenance."))
+				.column(new TableCol().reference("scaleValue").label("Contenance").type(TABLECOL_TYPE.NUMBER).visible(false).help("Indique la contenance dans le produit. Pour un bocal de 200g par exemple, la contenance sera 0,2. Ce champ permet de calculer le prix au litre ou au kilogramme."))
+				.column(new TableCol().reference("priceBuy").label("Prix d'achat HT").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le prix d'achat hors taxes. Ce champ facultatif permet de calculer la marge. Il n'est pas historisé."))
+				.column(new TableCol().reference("priceSell").label("Prix de vente HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le prix de vente unitaire hors taxes du produit."))
+				.column(new TableCol().reference("priceSellVat").label("Prix de vente TTC").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le prix de vente unitaire TTC du produit."))
+				.column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).visible(false).help("La marge hors taxe indicative. Si le prix d'achat n'est pas renseigné, la marge correspond au prix de vente hors taxes."))
+				.column(new TableCol().reference("tax").label("TVA").visible(false).help("Le taux de TVA associé."))
+				.column(new TableCol().reference("discountEnabled").label("Remise automatique").type(TABLECOL_TYPE.BOOL).visible(false).help("Indique si une remise doit être automatiquement assignée lors de l'ajout du produit à une commande."))
+				.column(new TableCol().reference("discountRate").label("Taux de remise").type(TABLECOL_TYPE.PERCENT).visible(false).help("Le taux de remise à appliquer automatiquement lorsque l'option Remise automatique est activée."))
+				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage du produit dans sa catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouveaux produits. Par exemple 10, 20, 30…"))
+				.column(new TableCol().reference("visible").label("En vente").type(TABLECOL_TYPE.BOOL).visible(false).help("Indique si le produit est actuellement en vente ou non. Lorsque le produit n'est pas en vente, il n'apparaîtra pas sur les caisses."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="product-list">
@@ -130,59 +125,53 @@ Vue.component("vue-product-list", {
 						break;
 				}
 				let line = [
-					{type: "thumbnail", src: this.imageSrc(prd)},
+					this.imageSrc(prd),
 					prd.reference, prd.label, cat, prd.barcode,
-					{type: "bool", value: prd.prepay}, {type: "bool", value: prd.scaled},
+					prd.prepay, prd.scaled,
 					scaleType, prd.scaleValue,
-					(prd.priceBuy != null) ? prd.priceBuy.toLocaleString() : "-",
-					(prd.priceSell != null) ? prd.priceSell.toLocaleString() : "-",
-					prd.taxedPrice.toLocaleString(),
-					(prd.priceBuy != null && prd.priceSell != null) ? (prd.priceSell - prd.priceBuy).toLocaleString() : "?",
-					tax, {type: "bool", value: prd.discountEnabled},
-					(prd.discountRate * 100).toLocaleString() + "%",
-					prd.dispOrder, {type: "bool", value: prd.visible},
-					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Modifier</a></div>"},
+					(prd.priceBuy != null) ? prd.priceBuy : "-",
+					(prd.priceSell != null) ? prd.priceSell : "-",
+					prd.taxedPrice,
+					(prd.priceBuy != null && prd.priceSell != null) ? (prd.priceSell - prd.priceBuy) : "?",
+					tax, prd.discountEnabled,
+					prd.discountRate,
+					prd.dispOrder, prd.visible,
+					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Modifier</a></div>",
 				];
 				lines.push(line);
 			}
 			switch (this.sorting) {
 				case "dispOrder":
 					lines = lines.sort(tools_sort(16, 1));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("dispOrder", "reference"));
 					break;
 				case "label":
 					lines = lines.sort(tools_sort(2));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("label"));
 					break;
 				case "reference":
 					lines = lines.sort(tools_sort(1));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("reference"));
 					break;
 				case "priceSell":
 					lines = lines.sort(tools_sort(10));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("priceSell"));
 					break;
 				case "priceSellVat":
 					lines = lines.sort(tools_sort(11));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("priceSellVat"));
 					break;
 				case "priceBuy":
 					lines = lines.sort(tools_sort(9));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("priceBuy"));
 					break;
 				case "margin":
 					lines = lines.sort(tools_sort(12));
-					this.productsTable.lines = lines;
 					this.sortedProducts = products.sort(tools_sort("margin"));
 					break;
 
 			}
+			this.productsTable.resetContent(lines);
 		},
 		loadProducts: function() {
 			let thiss = this;

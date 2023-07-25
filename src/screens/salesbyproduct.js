@@ -11,12 +11,7 @@ function salesbyproduct_show() {
 		"includeZero": true,
 		"separateCashRegisters": false,
 		"separateTaxes": false,
-		"table": {
-			"reference": "salesByProduct-list",
-			"title": null,
-			"columns": [],
-			"lines": [],
-		},
+		"table": new Table().reference("salesByProduct-list")
 	}
 	vue.screen.component = "vue-salesbyproduct";
 }
@@ -295,31 +290,31 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 			prd = stats[i].products[j];
 			let img = null;
 			if (prd.hasImage) {
-				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken()};
+				img = login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken();
 			} else {
-				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
+				img = login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken();
 			}
 			if (!separateByCR) {
 				let qty = _salesbyproduct_data.products[prd.id].qty;
 				let price = _salesbyproduct_data.products[prd.id].price;
-				let line = [img, "", cat, prd.reference, prd.label, qty.toLocaleString(), price.toLocaleString()];
+				let line = [img, "", cat, prd.reference, prd.label, qty, price];
 				if (prd.priceBuy > 0) {
-					line.push((prd.priceBuy * qty).toLocaleString());
-					line.push((price - prd.priceBuy * qty).toLocaleString());
+					line.push(prd.priceBuy * qty);
+					line.push(price - prd.priceBuy * qty);
 					_salesbyproduct_data.total.priceBuy += prd.priceBuy * qty;
 					_salesbyproduct_data.total.margin += price - prd.priceBuy * qty;
 				} else {
 					line.push("");
 					line.push("");
 				}
-				line.push(_salesbyproduct_data.products[prd.id].priceTax.toLocaleString());
+				line.push(_salesbyproduct_data.products[prd.id].priceTax);
 				if (separateByTax) {
 					for (let k = 0; k < taxes.length; k++) {
 						let taxDetail = _salesbyproduct_data.products[prd.id].taxDetails[taxes[k].id];
 						if (taxDetail.base != 0.0) {
-							line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-							line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-							line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+							line.push(taxDetail.base);
+							line.push(taxDetail.amount);
+							line.push(taxDetail.base + taxDetail.amount);
 						} else {
 							line.push("");
 							line.push("");
@@ -334,24 +329,24 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 					if (cr.id in _salesbyproduct_data.products[prd.id]) {
 						let qty = _salesbyproduct_data.products[prd.id][cr.id].qty;
 						let price = _salesbyproduct_data.products[prd.id][cr.id].price;
-						let line = [img, cr.label, cat, prd.reference, prd.label, qty, price.toLocaleString()];
+						let line = [img, cr.label, cat, prd.reference, prd.label, qty, price];
 						if (prd.priceBuy > 0) {
-							line.push((prd.priceBuy * qty).toLocaleString());
-							line.push((price - prd.priceBuy * qty).toLocaleString());
+							line.push(prd.priceBuy * qty);
+							line.push(price - prd.priceBuy * qty);
 							_salesbyproduct_data.total.priceBuy += prd.priceBuy * qty;
 							_salesbyproduct_data.total.margin += price - prd.priceBuy * qty;
 						} else {
 							line.push("");
 							line.push("");
 						}
-						line.push(_salesbyproduct_data.products[prd.id][cr.id].priceTax.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+						line.push(_salesbyproduct_data.products[prd.id][cr.id].priceTax);
 						if (separateByTax) {
 							for (let l = 0; l < taxes.length; l++) {
 								let taxDetail = _salesbyproduct_data.products[prd.id][cr.id].taxDetails[taxes[l].id];
 								if (taxDetail.base != 0.0) {
-									line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-									line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-									line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+									line.push(taxDetail.base);
+									line.push(taxDetail.amount);
+									line.push(taxDetail.base + taxDetail.amount);
 								} else {
 									line.push("");
 									line.push("");
@@ -368,17 +363,17 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 	for (let i = 0; i < customProductLabels.length; i++) {
 		let productLabel = customProductLabels[i];
 		if (!separateByCR) {
-			let qty = _salesbyproduct_data.customProducts[productLabel].qty.toLocaleString();
-			let price = _salesbyproduct_data.customProducts[productLabel].price.toLocaleString();
-			let priceTax = _salesbyproduct_data.customProducts[productLabel].priceTax.toLocaleString();
+			let qty = _salesbyproduct_data.customProducts[productLabel].qty;
+			let price = _salesbyproduct_data.customProducts[productLabel].price;
+			let priceTax = _salesbyproduct_data.customProducts[productLabel].priceTax;
 			let line = ["", "", "", "", productLabel, qty, price, "", "", priceTax];
 			if (separateByTax) {
 				for (let l = 0; l < taxes.length; l++) {
 					let taxDetail = _salesbyproduct_data.customProducts[productLabel].taxDetails[taxes[l].id];
 					if (taxDetail.base != 0.0) {
-						line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-						line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-						line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+						line.push(taxDetail.base);
+						line.push(taxDetail.amount);
+						line.push(taxDetail.base + taxDetail.amount);
 					} else {
 						line.push("");
 						line.push("");
@@ -392,16 +387,16 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				let cr = cashRegisters[k];
 				if (cr.id in _salesbyproduct_data.customProducts[productLabel]) {
 					let qty = _salesbyproduct_data.customProducts[productLabel][cr.id].qty;
-					let price = _salesbyproduct_data.customProducts[productLabel][cr.id].price.toLocaleString();
-					let priceTax = _salesbyproduct_data.customProducts[productLabel][cr.id].priceTax.toLocaleString();
+					let price = _salesbyproduct_data.customProducts[productLabel][cr.id].price;
+					let priceTax = _salesbyproduct_data.customProducts[productLabel][cr.id].priceTax;
 					let line = ["", "", "", "", productLabel, qty, price, "", "", priceTax];
 					if (separateByTax) {
 						for (let l = 0; l < taxes.length; l++) {
 							let taxDetail = _salesbyproduct_data.customProducts[productLabel][cr.id].taxDetails[taxes[l].id];
 							if (taxDetail.base != 0.0) {
-								line.push(taxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-								line.push(taxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-								line.push((taxDetail.base + taxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+								line.push(taxDetail.base);
+								line.push(taxDetail.amount);
+								line.push(taxDetail.base + taxDetail.amount);
 							} else {
 								line.push("");
 								line.push("");
@@ -424,55 +419,57 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 		}
 		return default_val;
 	};
-	vue.screen.data.table.title = "Ventes par produits du "
+	vue.screen.data.table.title("Ventes par produits du "
 			+ tools_dateToString(vue.screen.data.start)
 			+ " au "
-			+ tools_dateToString(vue.screen.data.stop);
-	vue.screen.data.table.columns = [
-		{reference: "image", label: "Image", visible: oldColumnVisible("Image", oldColumns, true), export: false, help: "L'image du produit. Ce champ ne peut être exporté."},
-		{reference: "cashRegister", label: "Caisse", visible: oldColumnVisible("Caisse", oldColumns, false), help: "La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."},
-		{reference: "category", label: "Catégorie", visible: oldColumnVisible("Catégorie", oldColumns, true), help: "La catégorie actuelle du produit."},
-		{reference: "reference", label: "Reference", visible: oldColumnVisible("Reference", oldColumns, false), help: "La référence du produit."},
-		{reference: "label", label: "Désignation", visible: oldColumnVisible("Désignation", oldColumns, true), help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
-		{reference: "quantity", label: "Quantité", export_as_number: true, visible: oldColumnVisible("Quantité", oldColumns, true), help: "La quantité de produit vendue sur la période.", class: "z-oddcol"},
-		{reference: "priceSell", label: "Vente HT", export_as_number: true, visible: oldColumnVisible("Vente HT", oldColumns, false), help: "Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.", class: "z-oddcol"},
-		{reference: "priceBuy", label: "Prix d'achat", export_as_number: true, visible: oldColumnVisible("Prix d'achat", oldColumns, false), help: "Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.", class: "z-oddcol"},
-		{reference: "margin", label: "Marge", export_as_number: true, visible: oldColumnVisible("Marge", oldColumns, false), help: "La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.", class: "z-oddcol"},
-		{reference: "priceSellVat", label: "Vente TTC", export_as_number: true, visible: oldColumnVisible("Vente TTC", oldColumns, false), help: "Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.", class: "z-oddcol"},
-	];
-	vue.screen.data.table.footer = [
+			+ tools_dateToString(vue.screen.data.stop));
+	vue.screen.data.table.reset();
+	vue.screen.data.table
+		.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).visible(oldColumnVisible("Image", oldColumns, true)).exportable(false).help("L'image du produit. Ce champ ne peut être exporté."))
+		.column(new TableCol().reference("cashRegister").label("Caisse").visible(oldColumnVisible("Caisse", oldColumns, false)).help("La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."))
+		.column(new TableCol().reference("category").label("Catégorie").visible(oldColumnVisible("Catégorie", oldColumns, true)).searchable(true).help("La catégorie actuelle du produit."))
+		.column(new TableCol().reference("reference").label("Reference").visible(oldColumnVisible("Reference", oldColumns, false)).searchable(true).help("La référence du produit."))
+		.column(new TableCol().reference("label").label("Désignation").visible(oldColumnVisible("Désignation", oldColumns, true)).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
+		.column(new TableCol().reference("quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).visible(oldColumnVisible("Quantité", oldColumns, true)).help("La quantité de produit vendue sur la période.").class("z-oddcol"))
+		.column(new TableCol().reference("priceSell").label("Vente HT").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible("Vente HT", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.").class("z-oddcol"))
+		.column(new TableCol().reference("priceBuy").label("Prix d'achat").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible("Prix d'achat", oldColumns, false)).help("Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.").class("z-oddcol"))
+		.column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible("Marge", oldColumns, false)).help("La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.").class("z-oddcol"))
+		.column(new TableCol().reference("priceSellVat").label("Vente TTC").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Vente TTC", oldColumns, false)).help("Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.").class("z-oddcol"));
+	vue.screen.data.table.footer([
 		"", "", "", "", "Total",
 		_salesbyproduct_data.total.qty.toLocaleString(),
 		_salesbyproduct_data.total.price.toLocaleString(),
 		_salesbyproduct_data.total.priceBuy.toLocaleString(),
 		_salesbyproduct_data.total.margin.toLocaleString(),
 		_salesbyproduct_data.total.priceTax.toLocaleString(),
-	];
+	]);
 	if (separateByTax) {
 		for (let i = 0; i < taxes.length; i++) {
 			let tax = taxes[i];
-			let col = {reference: "tax-" + i + "-base", label: tax.label + " base", visible: oldColumnVisible(tax.label + " base", oldColumns, false), help: "Le montant de chiffre d'affaire hors taxe associé au taux de TVA."};
+			let col = new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA.");
 			if (i % 2 != 0) {
-				col.class = "z-oddcol";
+				col.class("z-oddcol");
 			}
-			vue.screen.data.table.columns.push(col);
-			col = {reference: "tax-" + i + "-amount", label: tax.label + " TVA", visible: oldColumnVisible(tax.label + " TVA", oldColumns, false), help: "Le montant de TVA collectée associé au taux de TVA."};
+			vue.screen.data.table.column(col);
+			col = new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).help("Le montant de TVA collectée associé au taux de TVA.");
 			if (i % 2 != 0) {
-				col.class = "z-oddcol";
+				col.class("z-oddcol");
 			}
-			vue.screen.data.table.columns.push(col);
-			col = {reference: "tax-" + i + "-total", label: tax.label + " TTC", visible: oldColumnVisible(tax.label + " TTC", oldColumns, false), help: "Le montant TTC associé au taux de TVA."};
+			vue.screen.data.table.column(col);
+			col = new TableCol().reference("tax-" + i + "-total").label(tax.label + " TTC").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(tax.label + " TTC", oldColumns, false)).help("Le montant TTC associé au taux de TVA.");
 			if (i % 2 != 0) {
-				col.class = "z-oddcol";
+				col.class("z-oddcol");
 			}
-			vue.screen.data.table.columns.push(col);
+			vue.screen.data.table.column(col);
 			let totalTaxDetail = _salesbyproduct_data.total.taxDetails[tax.id]
 			vue.screen.data.table.footer.push(totalTaxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 			vue.screen.data.table.footer.push(totalTaxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 			vue.screen.data.table.footer.push((totalTaxDetail.base + totalTaxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 		}
 	}
-	Vue.set(vue.screen.data.table, "lines", lines);
+	lines.forEach(l => {
+		vue.screen.data.table.line(l);
+	});
 	vue.$refs.screenComponent.$refs.salesTable.restoreDefaultColumns();
 	gui_hideLoading();
 }

@@ -1,5 +1,12 @@
 Vue.component("vue-role-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			rolesTable: new Table().reference("role-list")
+				.column(new TableCol().reference("name").label("Nom"))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false))
+		};
+	},
 	template: `<div class="role-list">
 <section class="box box-medium">
 	<header>
@@ -16,21 +23,7 @@ Vue.component("vue-role-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<col />
-			<col style="width:15%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Nom</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="role in data.roles">
-					<td>{{role.name}}</td>
-					<td><a class="btn btn-edit" v-bind:href="editUrl(role)">Modifier</a></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="rolesTable"></vue-table>
 	</article>
 </section>
 </div>`,
@@ -38,6 +31,11 @@ Vue.component("vue-role-list", {
 		editUrl: function(role) {
 			return "?p=role&id=" + role.id;
 		},
+	},
+	mounted: function() {
+		this.data.roles.forEach(r => {
+			this.rolesTable.line([r.name, "<a class=\"btn btn-edit\" href=\"" + this.editUrl(r) + "\">Modifier</a>"]);
+		});
 	}
 });
 

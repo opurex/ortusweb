@@ -25,17 +25,13 @@ function accounting_showZ() {
 					paymentModes: {},
 					extra: {},
 				},
-				"table": {reference: "accounting-z-list",
-					columns: [
-						{reference: "date", label: "Date", visible: true, help: "La date d'ouverture de la session."},
-						{reference: "account", label: "Compte", visible: true, help: "Le numéro de compte de la ligne"},
-						{reference: "label", label: "Libellé", visible: true, help: "Libellé de la ligne"},
-						{reference: "debit", label: "Débit", visible: true, export_as_number: true},
-						{reference: "credit", label: "Crédit", visible: true, export_as_number: true},
-						{reference: "reference", label: "Pièce", visible: true, help: "Le nom de la pièce de référence de l'écriture"},
-					],
-					lines: [],
-				}
+				"table": new Table().reference("accounting-z-list")
+					.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATE).visible(true).help("La date d'ouverture de la session."))
+					.column(new TableCol().reference("account").label("Compte").visible(true).help("Le numéro de compte de la ligne"))
+					.column(new TableCol().reference("label").label("Libellé").visible(true).help("Libellé de la ligne"))
+					.column(new TableCol().reference("debit").label("Débit").visible(true).type(TABLECOL_TYPE.NUMBER2))
+					.column(new TableCol().reference("credit").label("Crédit").visible(true).type(TABLECOL_TYPE.NUMBER2))
+					.column(new TableCol().reference("reference").label("Pièce").visible(true).help("Le nom de la pièce de référence de l'écriture"))
 			}
 			vue.screen.component = "vue-accounting-z";
 			storage_close();
@@ -97,7 +93,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 	zTickets.forEach(function(z) {
 		let totalDebit = 0.0;
 		let totalCredit = 0.0;
-		var date = tools_dateToString(new Date(z.openDate * 1000));
+		var date = new Date(z.openDate * 1000);
 		let cashRegister = "";
 		if (z.cashRegister in cashRegistersById) {
 			cashRegister = cashRegistersById[z.cashRegister].label;
@@ -127,7 +123,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 				debitSales = -tax.base;
 				totalDebit += -tax.base;
 			}
-			lines.push([date, accountSales, labelSales, debitSales.toLocaleString(), creditSales.toLocaleString(), ref]);
+			lines.push([date, accountSales, labelSales, debitSales, creditSales, ref]);
 			if (tax.amount != 0.0) {
 			let accountTax = vue.screen.data.accounts.taxes?.[tax.tax];
 				if (!accountTax) {
@@ -149,7 +145,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 					debitTax = -tax.amount;
 					totalDebit += -tax.amount;
 				}
-				lines.push([date, accountTax, labelTax, debitTax.toLocaleString(), creditTax.toLocaleString(), ref]);
+				lines.push([date, accountTax, labelTax, debitTax, creditTax, ref]);
 			}
 		});
 		z.payments.forEach(function(pmt) {
@@ -178,7 +174,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 				credit = -pmt.amount;
 				totalCredit += -pmt.amount;
 			}
-			lines.push([date, account, label, debit.toLocaleString(), credit.toLocaleString(), ref]);
+			lines.push([date, account, label, debit, credit, ref]);
 		});
 		z.custBalances.forEach(function(cust) {
 			let account = vue.screen.data.accounts.customers?.[cust.customer];
@@ -201,7 +197,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 				debit = -cust.balance;
 				totalDebit += -cust.balance;
 			}
-			lines.push([date, account, label, debit.toLocaleString(), credit.toLocaleString(), ref]);
+			lines.push([date, account, label, debit, credit, ref]);
 		});
 		let closeError = 0.0;
 		if (z.closeCash != null && z.expectedCash != null) {
@@ -230,7 +226,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 				credit = -closeError;
 				totalCredit += -closeError;
 			}
-			lines.push([date, account, label, debit.toLocaleString(), credit.toLocaleString(), ref]);
+			lines.push([date, account, label, debit, credit, ref]);
 		}
 		let unbalance = totalDebit - totalCredit;
 		if (Math.abs(unbalance) > 0.005) {
@@ -260,10 +256,10 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 				}
 				debit = -unbalance;
 			}
-			lines.push([date, account, label, debit.toLocaleString(), credit.toLocaleString(), ref]);
+			lines.push([date, account, label, debit, credit, ref]);
 		}
 	});
-	Vue.set(vue.screen.data.table, "lines", lines);
+	vue.screen.data.table.resetContent(lines);
 	gui_hideLoading();
 }
 

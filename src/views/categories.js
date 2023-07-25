@@ -2,18 +2,13 @@ Vue.component("vue-category-list", {
 	props: ["data"],
 	data: function() {
 		return {
-			categoriesTable: {
-				reference: "category-list",
-				columns: [
-					{reference: "image", label: "Image", export: false, visible: true, help: "L'image du bouton de la catégorie. Ce champ ne peut être exporté."},
-					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque catégorie. Elle permet la modification lors de l'import des catégories."},
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la catégorie tel qu'affiché sur les boutons de la caisse."},
-					{reference: "parent", label: "Parent", visible: false, help: "La catégorie dans laquelle se trouve cette catégorie. Vide si elle n'est pas une sous-catégorie."},
-					{reference: "dispOrder", label: "Ordre", export_as_number: true, visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			categoriesTable: new Table().reference("category-list")
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du bouton de la catégorie. Ce champ ne peut être exporté."))
+				.column(new TableCol().reference("reference").label("Référence").visible(false).searchable(true).help("La référence doit être unique pour chaque catégorie. Elle permet la modification lors de l'import des catégories."))
+				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom de la catégorie tel qu'affiché sur les boutons de la caisse."))
+				.column(new TableCol().reference("parent").label("Parent").visible(false).help("La catégorie dans laquelle se trouve cette catégorie. Vide si elle n'est pas une sous-catégorie."))
+				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true)),
 			categoryTree: {null: []},
 		};
 	},
@@ -63,10 +58,10 @@ Vue.component("vue-category-list", {
 			for (let i = 0; i < this.data.categories.length; i++) {
 				let cat = this.data.categories[i];
 				let line = [
-					{type: "thumbnail", src: this.imageSrc(cat)},
+					this.imageSrc(cat),
 					cat.reference, cat.label, cat.parentLabel,
 					cat.dispOrder,
-					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Modifier</a></div>"},
+					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cat) + "\">Modifier</a></div>",
 				];
 				lines.push(line);
 			}
@@ -78,7 +73,7 @@ Vue.component("vue-category-list", {
 					lines = lines.sort(tools_sort(2));
 					break;
 			}
-			Vue.set(this.categoriesTable, "lines", lines);
+			this.categoriesTable.resetContent(lines);
 		},
 		sortTree: function(event) {
 			switch (this.data.sort) {
@@ -100,10 +95,10 @@ Vue.component("vue-category-list", {
 					let cat = categories[i];
 					let pad = "   ".repeat(depth);
 					let line = [
-						{type: "thumbnail", src: thiss.imageSrc(cat)},
+						thiss.imageSrc(cat),
 						pad + cat.reference, pad + cat.label, cat.parentLabel,
 						cat.dispOrder,
-						{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(cat) + "\">Modifier</a></div>"},
+						"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(cat) + "\">Modifier</a></div>",
 					];
 					sortedLines.push(line);
 					if (cat.id in thiss.categoryTree) {
@@ -112,7 +107,10 @@ Vue.component("vue-category-list", {
 				}
 			}
 			recursivePush(this.categoryTree[0], 0);
-			Vue.set(this.categoriesTable, "lines", sortedLines);
+			this.categoriesTable.resetContent();
+			sortedLines.forEach(l => {
+				this.categoriesTable.line(l);
+			});
 		},
 		sort: function() {
 			if (this.data.tree) {

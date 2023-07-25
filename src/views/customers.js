@@ -7,36 +7,31 @@ Vue.component("vue-customer-list", {
 			dpLabels: {},
 			filterVisible: this.data.filterVisible,
 			customers: [], // in data instead of computed because asychronous
-			customersTable: {
-				reference: "customer-list",
-				columns: [
-					{reference: "image", label: "Image", export: false, visible: true, help: "L'image de profil du client. Ce champ ne peut être exporté."},
-					{reference: "dispName", label: "Nom affiché", visible: true, help: "Le nom du client tel qu'affiché ou imprimé", searchable: true},
-					{reference: "card", label: "Carte", visible: false, help: "Le numéro ou nom de carte.", searchable: true},
-					{reference: "balance", label: "Solde", export_as_number: true, visible: true, help: "Le solde du compte client. Positif lorsque le compte pré-payé est chargé, négatif lorsque le compte a des dettes."},
-					{reference: "maxDebt", label: "Dette max", export_as_number: true, visible: false, help: "Le montant de dette maximal autorisé pour ce compte."},
-					{reference: "notes", label: "Note", visible: false, help: "Les notes de la fiche client."},
-					{reference: "expireDate", label: "Date d'expiration", visible: false, help: "La date d'expiration du compte client."},
-					{reference: "visible", label: "Actif", visible: false, help: "Indique si le compte client peut être utilisé ou non."},
-					{reference: "discountProfile", label: "Profil de remise", help: "Le profil de remise automatiquement associé.", visible: false},
-					{reference: "tariffArea", label: "Zone tarifaire", help: "La zone tarifaire automatiquement associée.", visible: false},
-					{reference: "tax", label: "TVA", help: "Le taux de TVA automatiquement associé.", visible: false},
-					{reference: "firstName", label: "Prénom", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "lastName", label: "Nom", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "email", label: "Courriel", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "phone1", label: "Téléphone", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "phone2", label: "Téléphone 2", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "fax", label: "Fax", help: "Information de contact.", visible: false},
-					{reference: "addr1", label: "Adresse", help: "Information de contact.", visible: false},
-					{reference: "addr2", label: "Adresse 2", help: "Information de contact.", visible: false},
-					{reference: "zipCode", label: "Code postal", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "city", label: "Ville", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "region", label: "Région", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "country", label: "Pays", help: "Information de contact.", visible: false, searchable: true},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			customersTable: new Table().reference("customer-list")
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image de profil du client. Ce champ ne peut être exporté."))
+				.column(new TableCol().reference("dispName").label("Nom affiché").visible(true).searchable(true).help("Le nom du client tel qu'affiché ou imprimé"))
+				.column(new TableCol().reference("card").label("Carte").visible(false).searchable(true).help("Le numéro ou nom de carte."))
+				.column(new TableCol().reference("balance").label("Solde").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le solde du compte client. Positif lorsque le compte pré-payé est chargé, négatif lorsque le compte a des dettes."))
+				.column(new TableCol().reference("maxDebt").label("Dette max").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant de dette maximal autorisé pour ce compte."))
+				.column(new TableCol().reference("notes").label("Note").visible(false).help("Les notes de la fiche client."))
+				.column(new TableCol().reference("expireDate").label("Date d'expiration").type(TABLECOL_TYPE.DATE).visible(false).help("La date d'expiration du compte client."))
+				.column(new TableCol().reference("visible").label("Actif").type(TABLECOL_TYPE.BOOL).visible(false).help("Indique si le compte client peut être utilisé ou non."))
+				.column(new TableCol().reference("discountProfile").label("Profil de remise").visible(false).help("Le profil de remise automatiquement associé."))
+				.column(new TableCol().reference("tariffArea").label("Zone tarifaire").visible(false).help("La zone tarifaire automatiquement associée."))
+				.column(new TableCol().reference("tax").label("TVA").visible(false).help("Le taux de TVA automatiquement associé."))
+				.column(new TableCol().reference("firstName").label("Prénom").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("lastName").label("Nom").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("email").label("Courriel").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("phone1").label("Téléphone").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("phone2").label("Téléphone 2").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("fax").label("Fax").visible(false).help("Information de contact."))
+				.column(new TableCol().reference("addr1").label("Adresse").visible(false).help("Information de contact."))
+				.column(new TableCol().reference("addr2").label("Adresse 2").visible(false).help("Information de contact."))
+				.column(new TableCol().reference("zipCode").label("Code postal").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("city").label("Ville").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("region").label("Région").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("country").label("Pays").visible(false).searchable(true).help("Information de contact."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true)),
 		};
 	},
 	template: `<div class="customer-list">
@@ -84,7 +79,7 @@ Vue.component("vue-customer-list", {
 		},
 		assign: function(customers) {
 			this.customers = customers;
-			this.customersTable.lines = [];
+			this.customersTable.resetContent();
 			for (let i = 0; i < this.customers.length; i++) {
 				let cust = this.customers[i];
 				if (!((this.filterVisible == "all") || (this.filterVisible == "visible" && cust.visible) || (this.filterVisible == "invisible" && !cust.visible))) {
@@ -100,17 +95,17 @@ Vue.component("vue-customer-list", {
 					cust.taxLabel = this.taxLabels[cust.tax] :
 					cust.taxLabel = "";
 				let line = [
-					{type: "thumbnail", src: this.imageSrc(cust)},
-					cust.dispName, cust.card, cust.balance.toLocaleString(), cust.maxDebt,
-					cust.note, tools_dateToString(cust.expireDate),
-					{type: "bool", value: cust.visible},
+					this.imageSrc(cust),
+					cust.dispName, cust.card, cust.balance, cust.maxDebt,
+					cust.note, cust.expireDate,
+					cust.visible,
 					cust.dpLabel, cust.taLabel, cust.taxLabel, cust.firstName,
 					cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
 					cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
 					cust.country,
-					{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"},
+					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"
 				];
-				this.customersTable.lines.push(line);
+				this.customersTable.line(line);
 			}
 		},
 		loadCustomers: function() {

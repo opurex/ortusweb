@@ -2,22 +2,17 @@ Vue.component("vue-currency-list", {
 	props: ["data"],
 	data: function() {
 		return {
-			currenciesTable: {
-				reference: "currency-list",
-				columns: [
-					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque devise. Elle permet la modification lors de l'import."},
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la devise tel qu'affiché sur les boutons de la caisse."},
-					{reference: "main", label: "Principale", visible: false, help: "Si cette devise est la devise par défaut, devise de référence pour les montants."},
-					{reference: "rate", label: "Taux", visible: true, help: "Taux de change vers la devise principale."},
-					{reference: "symbol", label: "Symbole", visible: false, help: "Le symbole monétaire de la devise."},
-					{reference: "decimalSeparator", label: "Sep. décimales", visible: false, help: "Le séparateur entre les entiers et les décimales (souvent , ou .)"},
-					{reference: "thousandsSeparator", label: "Sep. milliers", visible: false, help: "Le séparateur entre les milliers (souvent vide ou espace)."},
-					{reference: "format", label: "Format", visible: false, help: "Le format d'affichage des valeurs."},
-					{reference: "visible", label: "Active", visible: true, help: "Si la devise est utilisable ou non."},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			currenciesTable: new Table().reference("currency-list")
+				.column(new TableCol().reference("reference").label("Référence").visible(false).searchable(true).help("La référence doit être unique pour chaque devise. Elle permet la modification lors de l'import."))
+				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom de la devise tel qu'affiché sur les boutons de la caisse."))
+				.column(new TableCol().reference("main").label("Principale").type(TABLECOL_TYPE.BOOL).visible(false).help("Si cette devise est la devise par défaut, devise de référence pour les montants."))
+				.column(new TableCol().reference("rate").label("Taux").type(TABLECOL_TYPE.NUMBER).visible(true).help("Taux de change vers la devise principale."))
+				.column(new TableCol().reference("symbol").label("Symbole").visible(false).searchable(true).help("Le symbole monétaire de la devise."))
+				.column(new TableCol().reference("decimalSeparator").label("Sep. décimales").visible(false).help("Le séparateur entre les entiers et les décimales (souvent , ou .)"))
+				.column(new TableCol().reference("thousandsSeparator").label("Sep. milliers").visible(false).help("Le séparateur entre les milliers (souvent vide ou espace)."))
+				.column(new TableCol().reference("format").label("Format").visible(false).help("Le format d'affichage des valeurs."))
+				.column(new TableCol().reference("visible").label("Active").type(TABLECOL_TYPE.BOOL).visible(true).help("Si la devise est utilisable ou non."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="currency-list">
@@ -50,12 +45,12 @@ Vue.component("vue-currency-list", {
 			let curr = this.data.currencies[i];
 			let line = [
 				curr.reference, curr.label,
-				{type: "bool", value: curr.main}, curr.rate.toLocaleString(),
+				curr.main, curr.rate,
 				curr.symbol, curr.decimalSeparator, curr.thousandsSeparator,
-				curr.format, {type: "bool", value: curr.visible},
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(curr) + "\">Modifier</a></div>"},
+				curr.format, curr.visible,
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(curr) + "\">Modifier</a></div>",
 			];
-			this.currenciesTable.lines.push(line);
+			this.currenciesTable.line(line);
 		}
 	}
 });

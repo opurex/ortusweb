@@ -2,15 +2,10 @@ Vue.component("vue-tax-list", {
 	props: ["data"],
 	data: function() {
 		return {
-			taxesTable: {
-				reference: "tax-list",
-				columns: [
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la taxe."},
-					{reference: "rate", label: "Taux", visible: false, help: "Le taux appliqué."},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			taxesTable: new Table().reference("tax-list")
+				.column(new TableCol().reference("label").label("Désignation").visible(true).help("Le nom de la taxe."))
+				.column(new TableCol().reference("rate").label("Taux").type(TABLECOL_TYPE.PERCENT).visible(false).help("Le taux appliqué."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="tax-list">
@@ -43,10 +38,10 @@ Vue.component("vue-tax-list", {
 			let tax = this.data.taxes[i];
 			let line = [
 				tax.label,
-				(tax.rate * 100).toLocaleString() + " %",
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(tax) + "\">Modifier</a></div>"},
+				tax.rate,
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(tax) + "\">Modifier</a></div>"
 			];
-			this.taxesTable.lines.push(line);
+			this.taxesTable.line(line);
 		}
 	}
 });

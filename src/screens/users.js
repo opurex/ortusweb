@@ -1,7 +1,6 @@
 function users_show() {
 	gui_showLoading();
 	vue.screen.data = {users: [], roles: []};
-	vue.screen.component = "vue-user-list"
 	storage_open(function(event) {
 		storage_readStores(["users", "roles"], function(data) {
 			let rolesByIds = {};
@@ -10,6 +9,7 @@ function users_show() {
 			}
 			vue.screen.data.roles = rolesByIds;
 			vue.screen.data.users = data["users"];
+			vue.screen.component = "vue-user-list"
 			gui_hideLoading();
 			storage_close();
 		});

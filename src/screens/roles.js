@@ -1,10 +1,10 @@
 function roles_show() {
 	gui_showLoading();
-	vue.screen.data = {roles: []};
-	vue.screen.component = "vue-role-list"
+
 	storage_open(function(event) {
 		storage_readStore("roles", function(roles) {
-			vue.screen.data.roles = roles;
+			vue.screen.data = {roles: roles};
+			vue.screen.component = "vue-role-list"
 			gui_hideLoading();
 			storage_close();
 		});

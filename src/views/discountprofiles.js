@@ -2,15 +2,10 @@ Vue.component("vue-discountprofile-list", {
 	props: ["data"],
 	data: function() {
 		return {
-			dpTable: {
-				reference: "discountProfile-list",
-				columns: [
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom du profil de remise tel qu'affiché sur les boutons de la caisse."},
-					{reference: "rate", label: "Remise", visible: true, help: "La remise appliquée."},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			dpTable: new Table().reference("discountProfile-list")
+				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom du profil de remise tel qu'affiché sur les boutons de la caisse."))
+				.column(new TableCol().reference("rate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(true).help("La remise appliquée."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="discountprofile-list">
@@ -34,24 +29,19 @@ Vue.component("vue-discountprofile-list", {
 </section>
 </div>`,
 	methods: {
-		percent: function(rate) {
-			return (rate * 100).toLocaleString() + " %";
-		},
 		editUrl: function(profile) {
 			return "?p=discountprofile&id=" + profile.id;
 		},
 	},
 	mounted: function() {
-		let lines = [];
 		let thiss = this;
 		this.data.discountProfiles.forEach(function(dp) {
 			let line = [
-				dp.label, (dp.rate * 100).toLocaleString() + "%",
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(dp) + "\">Modifier</a></div>"},
+				dp.label, dp.rate,
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(dp) + "\">Modifier</a></div>"
 			];
-			lines.push(line);
+			thiss.dpTable.line(line);
 		})
-		Vue.set(this.dpTable, "lines", lines);
 	},
 });
 

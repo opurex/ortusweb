@@ -108,6 +108,11 @@ var tools_stringToNumber = function(stringNumber) {
 	return stringNumber.replace(/\s/g, '')
 }
 
+var tools_stringToBool = function(strValue) {
+	let lower = strValue.toLowerCase();
+	return strValue == "1" || lower == "oui" || lower == "o" || lower == "t" || lower == "true";
+}
+
 Date.prototype.getWeek = function () {
 	var date = new Date(this.getTime());
 	date.setHours(0, 0, 0, 0);

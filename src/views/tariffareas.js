@@ -2,17 +2,12 @@ Vue.component("vue-tariffarea-list", {
 	props: ["data"],
 	data: function() {
 		return {
-			areasTable: {
-				reference: "tariffarea-list",
-				columns: [
-					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque zone. Elle permet la modification lors de l'import."},
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom de la zone tel qu'affiché sur les boutons de la caisse."},
-					{reference: "dispOrder", label: "Ordre", export_as_number: true, visible: false, help: "L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"},
-					{reference: "tariff", label: "Tarifs", export_as_number: true, visible: false, help: "Le nombre de tarifs définis dans cette zone."},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			areasTable: new Table().reference("tariffarea-list")
+				.column(new TableCol().reference("reference").label("Référence").visible(false).searchable(true).help("La référence doit être unique pour chaque zone. Elle permet la modification lors de l'import."))
+				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom de la zone tel qu'affiché sur les boutons de la caisse."))
+				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"))
+				.column(new TableCol().reference("tariff").label("Tarifs").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le nombre de tarifs définis dans cette zone."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="tariffarea-list">
@@ -52,10 +47,10 @@ Vue.component("vue-tariffarea-list", {
 		sort: function(event) {
 			switch (this.data.sort) {
 				case "dispOrder":
-					Vue.set(this.areasTable, "lines", this.areasTable.lines.sort(tools_sort(2, 0)));
+					this.areasTable.sort(tools_sort(2, 0));
 					break;
 				case "label":
-					Vue.set(this.areasTable, "lines", this.areasTable.lines.sort(tools_sort(1)));
+					this.areasTable.sort(tools_sort(1));
 					break;
 			}
 		},
@@ -66,9 +61,9 @@ Vue.component("vue-tariffarea-list", {
 			let line = [
 				area.reference, area.label, area.dispOrder,
 				area.prices.length,
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(area) + "\">Modifier</a></div>"},
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(area) + "\">Modifier</a></div>",
 			];
-			this.areasTable.lines.push(line);
+			this.areasTable.line(line);
 		}
 		this.sort();
 	}

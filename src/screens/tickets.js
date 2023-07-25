@@ -31,24 +31,18 @@ function tickets_show() {
 				"users": data["users"],
 				"customers": data["customers"],
 				"cashRegisterId": cr,
-				"table": {
-					"reference": "ticket-list",
-					"title": null,
-					"columns": [
-						{reference: "cashRegster", label: "Caisse", visible: false, help: "Le nom de la caisse."},
-						{reference: "sequence", label: "Séquence", export_as_number: true, visible: false, help: "Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."},
-						{reference: "number", label: "Numéro", export_as_number: true, visible: true, help: "Le numéro du ticket de la caisse."},
-						{reference: "date", label: "Date", visible: true, help: "La date de réalisation de la vente."},
-						{reference: "customer", label: "Client", visible: false, help: "Le compte client associé au ticket."},
-						{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
-						{reference: "finalTaxedPrice", label: "Montant", export_as_number: true, visible: true, help: "Le montant TTC du ticket."},
-						{reference: "overPerceived", label: "Trop perçu", export_as_number: true, visible: false, help: "Le montant trop perçu pour les modes de paiement sans rendu-monnaie."},
-						{reference: "user", label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
-						{reference: "operation", label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
-					],
-					"lines": [],
-				},
-			}
+				"table": new Table().reference("ticket-list")
+					.column(new TableCol().reference("cashRegster").label("Caisse").visible(false).help("Le nom de la caisse."))
+					.column(new TableCol().reference("sequence").label("Séquence").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."))
+					.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).help("Le numéro du ticket de la caisse."))
+					.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
+					.column(new TableCol().reference("customer").label("Client").visible(false).help("Le compte client associé au ticket."))
+					.column(new TableCol().reference("paymentmodes").label("Encaissement").visible(true).help("Les modes de paiement utilisés à l'encaissement."))
+					.column(new TableCol().reference("finalTaxedPrice").label("Montant").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant TTC du ticket."))
+					.column(new TableCol().reference("overPerceived").label("Trop perçu").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."))
+					.column(new TableCol().reference("user").label("Opérateur").visible(false).help("Le nom du compte utilisateur qui a réalisé la vente."))
+					.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).visible(true).exportable(false).help("Sélectionner le ticket. Ce champ n'est jamais exporté."))
+			};
 			vue.screen.component = "vue-tickets-list";
 		});
 	});
@@ -162,13 +156,12 @@ function _tickets_dataRetreived() {
 				break;
 			}
 		}
-		lines.push([cr, tkt.sequence, tkt.number, tools_dateTimeToString(date), customer, pmModesStr,
-			tkt.finalTaxedPrice.toLocaleString(), overPerceived.toLocaleString(), user,
-			{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"}]);
+		lines.push([cr, tkt.sequence, tkt.number, date, customer, pmModesStr,
+			tkt.finalTaxedPrice, overPerceived, user,
+			"<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"]);
 		total += tkt.finalTaxedPrice;
 	}
-	Vue.set(vue.screen.data.table, "lines", lines);
-	vue.screen.data.table.footer = ["", "", "", "", "", "Total", total.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""];
+	vue.screen.data.table.resetContent(lines, ["", "", "", "", "", "Total", total.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""]);
 	if (vue.screen.data.tickets.length > 0) {
 		_tickets_selectTicket(vue.screen.data.tickets[0]);
 	} else {

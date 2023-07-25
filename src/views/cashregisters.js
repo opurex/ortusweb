@@ -1,5 +1,13 @@
 Vue.component("vue-cashregister-list", {
 	props: ["data"],
+	data: function() {
+		return {
+			crTable: new Table().reference("cashregisters-list")
+				.column(new TableCol().reference("reference").label("Référence"))
+				.column(new TableCol().reference("label").label("Désignation"))
+				.column(new TableCol().exportable(false).label("Opération").type(TABLECOL_TYPE.HTML))
+		}
+	},
 	template: `<div class="cashregister-list">
 <section class="box box-medium">
 	<header>
@@ -16,25 +24,7 @@ Vue.component("vue-cashregister-list", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<table>
-			<col />
-			<col />
-			<col style="width:10%; min-width: 5em;" />
-			<thead>
-				<tr>
-					<th>Référence</th>
-					<th>Désignation</th>
-					<th>Opération</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="cashRegister in data.cashRegisters">
-					<td>{{cashRegister.reference}}</td>
-					<td>{{cashRegister.label}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(cashRegister)">Modifier</a></nav></td>
-				</tr>
-			</tbody>
-		</table>
+		<vue-table v-bind:table="crTable" />
 	</article>
 </section>
 </div>`,
@@ -42,6 +32,12 @@ Vue.component("vue-cashregister-list", {
 		editUrl: function(cr) {
 			return "?p=cashregister&id=" + cr.id;
 		},
+	},
+	mounted: function() {
+		for (let i = 0; i < this.data.cashRegisters.length; i++) {
+			let cr = this.data.cashRegisters[i];
+			this.crTable.line([cr.reference, cr.label, "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cr) + "\">Modifier</a></div>"]);
+		}
 	}
 });
 

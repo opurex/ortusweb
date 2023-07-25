@@ -51,42 +51,31 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 		"start": start,
 		"stop": stop,
 		"tickets": [],
-		"customerHistory": {
-			reference: "customer-history-list",
-			columns: [
-				{reference: "image", label: "Image", export: false, visible: true, help: "L'image du produit. Ce champ ne peut être exporté."},
-				{reference: "date", label: "Date", visible: true, help: "La date d'achat." },
-				{reference: "ticket", label: "Ticket", visible: false, help: "Le numéro du ticket correspondant." },
-				{reference: "payments", label: "Paiement", visible: false, help: "Le mode de paiement associé au ticket. Il est commun à toutes les lignes d'un même ticket et ne correspond pas au paiement de la ligne."},
-				{reference: "discountRate", label: "Remise du ticket", visible: false, help: "Le taux de remise appliqué à tout le ticket. La remise n'est pas prise en compte dans les champs HT et TTC."},
-				{reference: "line-reference", label: "Reference", visible: false, help: "La référence du produit."},
-				{reference: "line-label", label: "Désignation", visible: true, help: "Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."},
-				{reference: "line-unitPrice", label: "PU HT", visible: false, help: "Le prix unitaire hors taxes avant remise."},
-				{reference: "line-unitTaxedPrice", label: "PU TTC", visible: false, help: "Le prix unitaire TTC avant remise."},
-				{reference: "line-taxRate", label: "TVA", visible: false, help: "Le taux de TVA appliqué."},
-				{reference: "line-quantity", label: "Quantité", visible: true, help: "La quantité de produit."},
-				{reference: "line-discountRate", label: "Remise", visible: false, help: "Le taux de remise accordé, inclus dans les champs HT et TTC."},
-				{reference: "line-finalPrice", label: "HT", visible: false, help: "Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."},
-				{reference: "line-finalTaxedPrice", label: "TTC", visible: false, help: "Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket."},
-			],
-			lines: [],
-		},
-		"customerHistoryTickets": {
-			"reference": "customer-ticket-list",
-			"title": null,
-			"columns": [
-				{reference: "cashRegister", label: "Caisse", visible: false, help: "Le nom de la caisse."},
-				{reference: "sequence", label: "Séquence", export_as_number: true, visible: false, help: "Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."},
-				{reference: "number", label: "Numéro", export_as_number: true, visible: true, help: "Le numéro du ticket de la caisse."},
-				{reference: "date", label: "Date", visible: true, help: "La date de réalisation de la vente."},
-				{reference: "paymentmodes", label: "Encaissement", visible: true, help: "Les modes de paiement utilisés à l'encaissement."},
-				{reference: "finalTaxedPrice", label: "Montant", export_as_number: true, visible: true, help: "Le montant TTC du ticket."},
-				{reference: "overPerceived", label: "Trop perçu", export_as_number: true, visible: false, help: "Le montant trop perçu pour les modes de paiement sans rendu-monnaie."},
-				{reference: "user", label: "Opérateur", visible: false, help: "Le nom du compte utilisateur qui a réalisé la vente."},
-				{reference: "operation", label: "Opération", visible: true, export: false, help: "Sélectionner le ticket. Ce champ n'est jamais exporté."},
-			],
-			lines: [],
-		},
+		"customerHistory": new Table().reference("customer-history-list")
+			.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du produit. Ce champ ne peut être exporté."))
+			.column(new TableCol().reference("date").label("Date").visible(true).help("La date d'achat.")) // type = String for date range
+			.column(new TableCol().reference("ticket").label("Ticket").visible(false).searchable(true).help("Le numéro du ticket correspondant."))
+			.column(new TableCol().reference("payments").label("Paiement").visible(false).help("Le mode de paiement associé au ticket. Il est commun à toutes les lignes d'un même ticket et ne correspond pas au paiement de la ligne."))
+			.column(new TableCol().reference("discountRate").label("Remise du ticket").visible(false).help("Le taux de remise appliqué à tout le ticket. La remise n'est pas prise en compte dans les champs HT et TTC."))
+			.column(new TableCol().reference("line-reference").label("Reference").visible(false).searchable(true).help("La référence du produit."))
+			.column(new TableCol().reference("line-label").label("Désignation").visible(true).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
+			.column(new TableCol().reference("line-unitPrice").label("PU HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le prix unitaire hors taxes avant remise."))
+			.column(new TableCol().reference("line-unitTaxedPrice").label("PU TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le prix unitaire TTC avant remise."))
+			.column(new TableCol().reference("line-taxRate").label("TVA").type(TABLECOL_TYPE.PERCENT).visible(false).help("Le taux de TVA appliqué."))
+			.column(new TableCol().reference("line-quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).visible(true).help("La quantité de produit."))
+			.column(new TableCol().reference("line-discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(false).help("Le taux de remise accordé, inclus dans les champs HT et TTC."))
+			.column(new TableCol().reference("line-finalPrice").label("HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."))
+			.column(new TableCol().reference("line-finalTaxedPrice").label("TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket.")),
+		"customerHistoryTickets": new Table().reference("customer-ticket-list")
+			.column(new TableCol().reference("cashRegister").label("Caisse").visible(false).help("Le nom de la caisse."))
+			.column(new TableCol().reference("sequence").label("Séquence").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."))
+			.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).searchable(true).help("Le numéro du ticket de la caisse."))
+			.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
+			.column(new TableCol().reference("paymentmodes").label("Encaissement").visible(true).searchable(true).help("Les modes de paiement utilisés à l'encaissement."))
+			.column(new TableCol().reference("finalTaxedPrice").label("Montant").type(TABLECOL_TYPE.NUMBER2).visible(true).searchable(true).help("Le montant TTC du ticket."))
+			.column(new TableCol().reference("overPerceived").label("Trop perçu").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."))
+			.column(new TableCol().reference("user").label("Opérateur").visible(false).searchable(true).help("Le nom du compte utilisateur qui a réalisé la vente."))
+			.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true).help("Sélectionner le ticket. Ce champ n'est jamais exporté."))
 	}
 	vue.screen.component = "vue-customer-form";
 }
@@ -218,9 +207,9 @@ function _customers_showHistory(tickets, products) {
 				break;
 			}
 		}
-		tktLines.push([cr.label, tkt.sequence, tkt.number, tools_dateTimeToString(tktDate), payments,
-			tkt.finalTaxedPrice.toLocaleString(), overPerceived.toLocaleString(), user,
-			{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"}]);
+		tktLines.push([cr.label, tkt.sequence, tkt.number, tktDate, payments,
+			tkt.finalTaxedPrice, overPerceived, user,
+			"<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"]);
 		for (let j = 0; j < tkt.lines.length; j++) {
 			let line = tkt.lines[j];
 			// Set product data if any
@@ -232,13 +221,13 @@ function _customers_showHistory(tickets, products) {
 			let ref = "";
 			if (prd != null) {
 				if (prd.hasImage) {
-					img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken()};
+					img = login_getHostUrl() + "/api/image/product/" + prd.id + "?Token=" + login_getToken();
 				} else {
-					img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
+					img = login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken();
 				}
 				ref = prd.reference;
 			} else {
-				img = {"type": "thumbnail", "src": login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken()};
+				img = login_getHostUrl() + "/api/image/product/default?Token=" + login_getToken();
 			}
 			// Compute prices
 			let finalTaxedPrice = line.finalTaxedPrice;
@@ -302,21 +291,11 @@ function _customers_showHistory(tickets, products) {
 		} else {
 			line[1] = tools_dateTimeToString(line[1]);
 		}
-		line[4] = (line[4] * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%";
-		line[7] = line[7].toLocaleString(undefined, {maximumFractionDigits: 2});
-		line[8] = line[8].toLocaleString(undefined, {maximumFractionDigits: 2});
-		line[9] = (line[9] * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%";
-		line[10] = line[10].toLocaleString(undefined, {maximumFractionDigits: 2});
-		line[11] = line[11].toLocaleString(undefined, {maximumFractionDigits: 2});
-		line[12] = line[12].toLocaleString(undefined, {maximumFractionDigits: 2});
-		line[13] = line[13].toLocaleString(undefined, {maximumFractionDigits: 2});
 	}
-	vue.screen.data.customerHistory.title = "Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop),
-	Vue.set(vue.screen.data.customerHistory, "lines", lines);
-	Vue.set(vue.screen.data.customerHistory, "footer", ["", "", "", "", "", "", "", "", "", "", "", "Totaux", total.toLocaleString(), taxedTotal.toLocaleString()]);
-	vue.screen.data.customerHistoryTickets.title = "Historique des tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop);
-	Vue.set(vue.screen.data.customerHistoryTickets, "lines", tktLines);
-	vue.screen.data.customerHistoryTickets.footer = ["", "", "", "", "Total", tktsTotal.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""];
+	vue.screen.data.customerHistory.title("Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
+	vue.screen.data.customerHistory.resetContent(lines, ["", "", "", "", "", "", "", "", "", "", "", "Total", total.toLocaleString(), taxedTotal.toLocaleString()]);
+	vue.screen.data.customerHistoryTickets.title("Historique des tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
+	vue.screen.data.customerHistoryTickets.resetContent(tktLines, ["", "", "", "", "Total", tktsTotal.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""]);
 	if (vue.screen.data.tickets.length > 0) {
 		_tickets_selectTicket(vue.screen.data.tickets[0]);
 	} else {

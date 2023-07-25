@@ -449,6 +449,13 @@ table tfoot tr,
 table tfoot tr .z-oddcol {
 	background-color: #ddd;
 }
+table td.numeric {
+	font-variant-numeric: tabular-nums;
+	text-align: end;
+}
+table td.datetime {
+	font-variant-numeric: tabular-nums;
+}
 .ticket {
 	border: 1px solid #000;
 	padding: 1ex;

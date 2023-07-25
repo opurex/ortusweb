@@ -2,20 +2,14 @@ Vue.component("vue-paymentmode-list", {
 	props: ["data"],
 	data: function() {
 		return {
-			paymentModesTable: {
-				reference: "paymentmode-list",
-				columns: [
-					{reference: "image", label: "Image", export: false, visible: true, help: "L'image du bouton du mode de paiement. Ce champ ne peut être exporté."},
-					{reference: "reference", label: "Référence", visible: false, help: "La référence doit être unique pour chaque mode de paiement."},
-					{reference: "label", label: "Désignation", visible: true, help: "Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."},
-
-					{reference: "visible", label: "Actif", visible: true, help: "Si le mode de paiement peut être encaissé ou non."},
-					{reference: "roles", label: "Rôles", visible: true, help: "Les rôles autorisés à encaisser avec ce mode de paiement."},
-					{reference: "dispOrder", label: "Ordre", export_as_number: true, visible: false, help: "L'ordre d'affichage."},
-					{reference: "operation", label: "Opération", export: false, visible: true},
-				],
-				lines: []
-			},
+			paymentModesTable: new Table().reference("paymentmode-list")
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du bouton du mode de paiement. Ce champ ne peut être exporté."))
+				.column(new TableCol().reference("reference").label("Référence").visible(false).help("La référence doit être unique pour chaque mode de paiement."))
+				.column(new TableCol().reference("label").label("Désignation").visible(true).help("Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."))
+				.column(new TableCol().reference("visible").label("Actif").type(TABLECOL_TYPE.BOOL).visible(true).help("Si le mode de paiement peut être encaissé ou non."))
+				.column(new TableCol().reference("roles").label("Rôles").visible(true).help("Les rôles autorisés à encaisser avec ce mode de paiement."))
+				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="paymentmode-list">
@@ -55,13 +49,13 @@ Vue.component("vue-paymentmode-list", {
 		let thiss = this;
 		this.data.paymentModes.forEach(pm => {
 			let line = [
-				{type: "thumbnail", src: thiss.imageSrc(pm)},
+				thiss.imageSrc(pm),
 				pm.reference, pm.label,
-				{type: "bool", value: pm.visible},
+				pm.visible,
 				pm.roles.join(", "), pm.dispOrder,
-				{type: "html", value: "<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(pm) + "\">Modifier</a></div>"},
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(pm) + "\">Modifier</a></div>",
 			];
-			this.paymentModesTable.lines.push(line);
+			this.paymentModesTable.line(line);
 		});
 	},
 });

@@ -1,5 +1,435 @@
+/** Type constants for column types. */
+const TABLECOL_TYPE = {
+	STRING: "string",
+	/** Number without fixing precision. */
+	NUMBER: "number",
+	/** Number with fixed 2 decimals. */
+	NUMBER2: "number2",
+	/** Number with fixed 5 decimals. */
+	NUMBER5: "number5",
+	BOOL: "bool",
+	/** Date without time. */
+	DATE: "date",
+	/** Date and time. */
+	DATETIME: "datetime",
+	/** Time without date. */
+	TIME: "time",
+	THUMBNAIL: "thumb",
+	HTML: "html",
+
+}
+
+/**
+ * Table definition for the vue-table component.
+ */
+class Table
+{
+	#mRef;
+	#mTitle;
+	#mColumns;
+	#mLines;
+	#mFooter;
+	#mExportable;
+	#mReady;
+
+	/** Chainable empty constructor. */
+	constructor() {
+		this.mRef = null;
+		this.mTitle = null;
+		this.mColumns = [];
+		this.mLines = [];
+		this.mFooter = [];
+		this.mExportable = true;
+		this.mReady = false;
+	}
+	/**
+         * getter/setter.
+         * @param ref When defined, set the reference and return the instance for chaining.
+         * When not set, get the reference.
+         * @return `This` for the setter, reference for the getter.
+         */
+	reference(ref) {
+		if (arguments.length == 0) {
+			return this.mRef;
+		}
+		this.mRef = ref;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param t When defined, set the title and return the instance for chaining.
+         * When not set, get the title.
+         * @return `This` for the setter, title for the getter.
+         */
+	title(t) {
+		if (arguments.length == 0) {
+			return this.mTitle;
+		}
+		this.mTitle = t;
+		return this;
+	}
+	/**
+	 * getter/adder
+	 * @param c The index of the column to get or a new column to add.
+	 * @return `This` when used to add a column, the column when used
+	 * as a getter.
+	 */
+	column(c) {
+		if (typeof c == "number") {
+			return this.mColumns[c];
+		}
+		this.mColumns.push(c);
+		return this;
+	}
+	/**
+	 * Get all columns.
+	 */
+	columns() {
+		return this.mColumns;
+	}
+	/**
+	 * Get the number of columns.
+	 */
+	columnLength() {
+		return this.mColumns.length;
+	}
+	/**
+	 * getter/adder
+	 * @param l The index of the line to get or a new line to add.
+	 * Adding a line will the the table as ready.
+	 * Use raw data when adding lines, the values will be formated
+	 * according to the type of the column.
+	 * @return `This` when used to add a line, the line when used
+	 * as a getter.
+	 */
+	line(l) {
+		if (typeof l == "number") {
+			return this.mLines[l];
+		}
+		this.mLines.push(l);
+		this.mReady = true;
+	}
+	/**
+	 * Indicate that the table is ready, without adding any line.
+	 */
+	noResult() {
+		this.mReady = true;
+	}
+	/**
+	 * Get the number of lines.
+	 */
+	lineLength() {
+		return this.mLines.length;
+	}
+	/**
+	 * Get all lines.
+	 */
+	lines() {
+		return this.mLines;
+	}
+	/** Sort lines in place */
+	sort(sortFunction) {
+		this.mLines.sort(sortFunction);
+	}
+	/**
+	 * Reset the table and optionaly set new content.
+	 * Remove all lines and footer, keep the references.
+	 * When used without argements, the table is not ready anymore.
+	 * @param lines The new table content.
+	 * @param footer The new table footer.
+	 */
+	resetContent(lines, footer) {
+		this.mLines.splice(0);
+		this.mFooter.splice(0);
+		if (arguments.length == 0) {
+			this.mReady = false;
+		} else {
+			this.mLines.push(...lines);
+			if (arguments.length > 1) {
+				this.mFooter.push(...footer);
+			}
+			this.mReady = true;
+		}
+	}
+	/**
+	 * getter/setter. Setter keeps the reference.
+	 * @param f When defined, set the footer and return the instance for chaining.
+         * When not set, get the footer.
+	 * Use display values when setting the footer, they are not affected
+	 * by the type of the column.
+         * @return `This` for the setter, footer for the getter.
+         */
+	footer(f) {
+		if (arguments.length == 0) {
+			return this.mFooter;
+		}
+		this.mFooter.splice(0);
+		this.mFooter.push(...f);
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param e When defined, set exportable and return the instance for chaining.
+         * When not set, check if exportable.
+         * @return `This` for the setter, exportable for the getter.
+         */
+	exportable(e) {
+		if (arguments.length == 0) {
+			return this.mExportable;
+		}
+		this.mExportable = e;
+		return this;
+	}
+	/**
+	 * Check if the table is ready and can be displayed.
+	 */
+	ready() {
+		return this.mReady;
+	}
+	/**
+	 * Remove all lines, footer and columns, set ready to false.
+	 * Use this to update the columns without breaking object reference
+	 * and reactivity.
+	 */
+	reset() {
+		this.mReady = false;
+		this.mFooter.splice(0);
+		this.mLines.splice(0);
+		this.mColumns.splice(0);
+	}
+	/**
+	 * Export the visible columns to a csv file.
+	 * @param withExcelBom Whether to add Byte Order Mask for Excel or not.
+	 * @return The csv content as a binary string.
+	 */
+	getCsv(withExcelBom) {
+		let csvData = [];
+		// Create the header
+		csvData.push([]);
+		for (let i = 0; i < this.columnLength(); i++) {
+			let col = this.column(i);
+			if (col.isVisible && col.exportable() !== false) {
+				csvData[0].push(col.label());
+			}
+		}
+		// Add lines
+		for (let i = 0; i < this.lineLength(); i++) {
+			csvData.push([]);
+			let line = this.line(i);
+			for (let j = 0; j < this.line(i).length; j++) {
+				let col = this.column(j);
+				if (col.isVisible && col.exportable()) {
+					csvData[i + 1].push(col.formatCsv(line[j]));
+				}
+			}
+		}
+		if (this.footer().length > 0) {
+			let line = [];
+			for (let i = 0; i < this.footer().length; i++) {
+				let col = this.column(i);
+				if (col.isVisible && col.exportable()) {
+					line.push(this.footer()[i]);
+				}
+			}
+			csvData.push(line);
+		}
+		// Generate csv (with some utf-8 tweak)
+		let encodedData = new CSV(csvData).encode();
+		encodedData = encodeURIComponent(encodedData).replace(/%([0-9A-F]{2})/g,
+			function toSolidBytes(match, p1) {
+				return String.fromCharCode('0x' + p1);
+			});
+		if (withExcelBom) {
+			encodedData = String.fromCharCode(0xef, 0xbb, 0xbf) + encodedData;
+		}
+		return encodedData;
+	}
+}
+
+/**
+ * Table column definition for the vue-table component.
+ */
+class TableCol
+{
+	#mRef;
+	#mLabel;
+	#mHelp;
+	#mType;
+	#mClass;
+	#mExportable;
+	#mSearchable;
+	#mVisible;
+	/** Visibility status. As a read/write property for VueJS. */
+	isVisible;
+
+	/** Chainable empty constructor. */
+	constructor() {
+		this.mRef = null;
+		this.mLabel = "";
+		this.mHelp = "";
+		this.mType = TABLECOL_TYPE.STRING;
+		this.mExportable = true;
+		this.mSearchable = false;
+		this.mVisible = true;
+		this.mClass = "";
+		this.isVisible = true;
+	}
+	/**
+         * getter/setter.
+         * @param ref When defined, set the reference and return the instance for chaining.
+         * When not set, get the reference.
+         * @return `This` for the setter, reference for the getter.
+         */
+	reference(ref) {
+		if (arguments.length == 0) {
+			return this.mRef;
+		}
+		this.mRef = ref;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param lbl When defined, set the label and return the instance for chaining.
+         * When not set, get the label.
+         * @return `This` for the setter, label for the getter.
+         */
+	label(lbl) {
+		if (arguments.length == 0) {
+			return this.mLabel;
+		}
+		this.mLabel = lbl;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param h When defined, set the help text and return the instance for chaining.
+         * When not set, get the help text.
+         * @return `This` for the setter, help for the getter.
+         */
+	help(h) {
+		if (arguments.length == 0) {
+			return this.mHelp;
+		}
+		this.mHelp = h;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param t When defined, set the type and return the instance for chaining.
+         * When not set, get the type. See TABLECOL_TYPE constants.
+         * @return `This` for the setter, type for the getter.
+         */
+	type(t) {
+		if (arguments.length == 0) {
+			return this.mType;
+		}
+		this.mType = t;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param e When defined, set exportable and return the instance for chaining.
+         * When not set, check if exportable.
+         * @return `This` for the setter, exportable for the getter.
+         */
+	exportable(e) {
+		if (arguments.length == 0) {
+			return this.mExportable;
+		}
+		this.mExportable = e;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param s When defined, set searchable and return the instance for chaining.
+         * When not set, check if searchable.
+         * @return `This` for the setter, searchable for the getter.
+         */
+	searchable(s) {
+		if (arguments.length == 0) {
+			return this.mSearchable;
+		}
+		this.mSearchable = s;
+		return this;
+	}
+	/**
+         * getter/setter.
+	 * For the actual visibility state, see `visible`.
+         * @param v When defined, set the default visibility and return the instance for chaining.
+         * When not set, get the default visibility.
+         * @return `This` for the setter, default visibility for the getter.
+         */
+	visible(v) {
+		if (arguments.length == 0) {
+			return this.mVisible;
+		}
+		this.mVisible = v;
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param c When defined, set the css class and return the instance for chaining.
+         * When not set, get the css class.
+         * @return `This` for the setter, css class for the getter.
+         */
+	class(c) {
+		if (arguments.length == 0) {
+			return this.mClass;
+		}
+		this.mClass = c;
+		return this;
+	}
+	/** Return true when type is NUMBER*. */
+	isNumber() {
+		return this.mType == TABLECOL_TYPE.NUMBER
+				|| this.mType == TABLECOL_TYPE.NUMBER2
+				|| this.mType == TABLECOL_TYPE.NUMBER5;
+	}
+	isDateOrTime() {
+		return this.mType == TABLECOL_TYPE.DATE
+				|| this.mType == TABLECOL_TYPE.DATETIME
+				|| this.mType == TABLECOL_TYPE.TIME;
+	}
+	/** Format value for csv export. */
+	formatCsv(value) {
+		switch (this.mType) {
+			case TABLECOL_TYPE.BOOL:
+				return value ? "1" : "0";
+			case TABLECOL_TYPE.NUMBER:
+				return tools_stringToNumber(value.toLocaleString());
+			case TABLECOL_TYPE.NUMBER2:
+				return tools_stringToNumber(value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+			case TABLECOL_TYPE.NUMBER5:
+				return tools_stringToNumber(value.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5}));
+			case TABLECOL_TYPE.PERCENT:
+				return (value * 100).toLocaleString() + "%"
+			case TABLECOL_TYPE.DATE:
+				return tools_dateToString(value);
+			case TABLECOL_TYPE.DATETIME:
+				return tools_dateTimeToString(value);
+			case TABLECOL_TYPE.TIME:
+				return tools_timeToString(value);
+			default:
+				return value;
+		}
+	}
+}
+
 Vue.component("vue-table", {
-	props: ["table", "noexport", "nofilter"],
+	props: {
+		table: {
+			type: Table,
+			required: true
+		},
+		exportable: {
+			type: Boolean,
+			default: true
+		},
+		filterable: {
+			type: Boolean,
+			default: true
+		}
+	},
 	data: function () {
 		return {
 			showHelp: false,
@@ -16,6 +446,11 @@ Vue.component("vue-table", {
 			linePerPageDefault: 250,
 			/** 0-based page index. Displayed as currentPage + 1 */
 			currentPage: 0,
+			// Global
+			"TABLECOL_TYPE": TABLECOL_TYPE,
+			"tools_dateToString": tools_dateToString,
+			"tools_dateTimeToString": tools_dateTimeToString,
+			"tools_timeToString": tools_timeToString
 		};
 	},
 	computed: {
@@ -24,7 +459,7 @@ Vue.component("vue-table", {
 				this.currentPage = 0;
 				return 1;
 			}
-			let lineCount = this.table.lines.length;
+			let lineCount = this.table.lineLength();
 			if (this.useSearch) {
 				lineCount = this.searchResults.length;
 			}
@@ -42,8 +477,8 @@ Vue.component("vue-table", {
 			return pages;
 		},
 		searchable: function() {
-			for (let column of this.table.columns) {
-				if ("searchable" in column && column.searchable) {
+			for (let column of this.table.columns()) {
+				if (column.searchable()) {
 					return true;
 				}
 			}
@@ -51,7 +486,7 @@ Vue.component("vue-table", {
 		}
 	},
 		template: `<div class="table">
-	<div class="filters noprint" v-if="table.columns.length > 0 && (!nofilter || !noexport)">
+	<div class="filters noprint" v-if="table.columnLength() > 0 && (filterable || exportable)">
 		<h3>Afficher/masquer des colonnes</h3>
 		<ul class="filter-actions">
 			<li>
@@ -76,14 +511,14 @@ Vue.component("vue-table", {
 			</button></li>
 			<li><button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></li>
 		</ul>
-		<ul class="filter-columns" v-if="!nofilter" v-bind:class="{'expand-help': showHelp}">
-			<li v-for="(col, index) in table.columns">
-				<input v-model="col.visible" v-bind:id="'filter-column-' + index" type="checkbox" />
-				<label v-bind:for="'filter-column-' + index">{{col.label}}</label>
-				<p class="help" v-if="showHelp">{{col.help}}</p>
+		<ul class="filter-columns" v-if="filterable" v-bind:class="{'expand-help': showHelp}">
+			<li v-for="(col, index) in table.columns()">
+				<input v-model="col.isVisible" v-bind:id="'filter-column-' + index" type="checkbox" />
+				<label v-bind:for="'filter-column-' + index">{{col.label()}}</label>
+				<p class="help" v-if="showHelp">{{col.help()}}</p>
 			</li>
 		</ul>
-		<ul class="filter-defaults" v-if="table.reference">
+		<ul class="filter-defaults" v-if="table.reference()">
 			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultColumns">
 			<img src="res/img/column_restore_params.png" alt="" style="height: 26px; padding-right: 5px;" />
 			<span style="float: right; margin-top: 5px;">Restaurer l'affichage par défaut</span>
@@ -93,12 +528,12 @@ Vue.component("vue-table", {
 			<span style="float: right; margin-top: 5px;">Enregistrer comme affichage par défaut</span>
 			</button></li>
 		</ul>
-		<div v-if="table.lines && !noexport">
+		<div v-if="table.ready() && table.exportable()">
 			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter le tableau</a>
 			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter le tableau (Excel)</a>
 		</div>
 	</div>
-	<h2 v-if="table.title">{{table.title}}</h2>
+	<h2 v-if="table.title()">{{table.title()}}</h2>
 	<nav class="table-pagination">
 		<div class="form-group">
 			<label for="pageNum">Page</label>
@@ -122,35 +557,44 @@ Vue.component("vue-table", {
 		</div>
 		<vue-input-text id="search" label="Rechercher" v-model="searchString" v-if="searchable" />
 	</nav>
-	<table class="table table-bordered table-hover" v-if="table.lines">
+	<table class="table table-bordered table-hover" v-if="table.ready()">
 		<thead>
 			<tr>
-				<template v-for="(col, index) in table.columns">
-				<th v-show="col.visible" v-bind:class="col.class">{{col.label}}</th>
+				<template v-for="(col, index) in table.columns()">
+				<th v-show="col.isVisible" v-bind:class="col.class()">{{col.label()}}</th>
 				</template>
 			</tr>
 		</thead>
 		<tbody>
-			<template v-for="(line,index) in table.lines">
+			<template v-for="(line,index) in table.lines()">
 			<tr v-if="visibleLine(index)">
-				<template v-for="(cell, index2) in line">
-				<td v-show="table.columns[index2].visible" v-bind:class="table.columns[index2].class">
-					<template v-if="cell.type == 'thumbnail'">
-					<img class="img img-thumbnail thumbnail" v-bind:src="cell.src" />
-					</template>
-					<template v-else-if="cell.type == 'bool'">
-					<input type="checkbox" disabled="1" v-bind:checked="cell.value" />
-					</template>
-					<template v-else-if="cell.type == 'html'"><span v-html="cell.value"></span></template>
-					<template v-else>{{cell}}</template>
-				</td>
+				<template v-for="(value, colIndex) in line">
+
+					<td v-if="table.column(colIndex).isVisible" v-bind:class="[table.column(colIndex).class(), {numeric: table.column(colIndex).isNumber(), datetime: table.column(colIndex).isDateOrTime()}]">
+						<template v-if="table.column(colIndex).type() == TABLECOL_TYPE.THUMBNAIL">
+							<img class="img img-thumbnail thumbnail" v-bind:src="value" />
+						</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.BOOL">
+							<input type="checkbox" disabled="1" v-bind:checked="value" />
+						</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.NUMBER5">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5}) }}</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.NUMBER2">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.NUMBER">{{ value.toLocaleString() }}</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.PERCENT">{{ (value * 100).toLocaleString() + "%" }}</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.HTML"><span v-html="value"></span></template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.DATE">{{ tools_dateToString(value) }}</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.DATETIME">{{ tools_dateTimeToString(value) }}</template>
+						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.TIME">{{ tools_timeToString(value) }}</template>
+						<template v-else>{{value}}</template>
+					</td>
+
 				</template>
 			</tr>
 			</template>
 		</tbody>
-		<tfoot v-if="table.footer">
+		<tfoot v-if="table.footer().length > 0">
 			<tr>
-				<th v-for="(col, index) in table.footer" v-show="table.columns[index].visible" v-bind:class="table.columns[index].class">{{col}}</th>
+				<th v-for="(val, index) in table.footer()" v-show="table.column(index).isVisible" v-bind:class="table.column(index).class()">{{val}}</th>
 			</tr>
 		</tfoot>
 	</table>
@@ -180,54 +624,9 @@ Vue.component("vue-table", {
 `,
 	methods: {
 		exportCsv: function (withExcelBom) {
-			// Get data, exclude hidden columns
-			let csvData = [];
-			csvData.push([]);
-			for (let i = 0; i < this.table.columns.length; i++) {
-				let col = this.table.columns[i];
-				if (col.visible && col.export !== false) {
-					csvData[0].push(col.label);
-				}
-			}
-
-			for (let i = 0; i < this.table.lines.length; i++) {
-				csvData.push([]);
-				for (let j = 0; j < this.table.lines[i].length; j++) {
-					if (this.table.columns[j].visible && this.table.columns[j].export !== false) {
-						if (this.table.lines[i][j].type && this.table.lines[i][j].type == "bool") {
-							csvData[i + 1].push(this.table.lines[i][j].value ? "1" : "0");
-						} else if (this.table.columns[j].export_as_number && this.table.columns[j].export_as_number !== false && typeof this.table.lines[i][j] !== "number") {
-							csvData[i + 1].push(tools_stringToNumber(this.table.lines[i][j]));
-						} else {
-							csvData[i + 1].push(this.table.lines[i][j]);
-						}
-					}
-				}
-			}
-			if ("footer" in this.table) {
-				let line = [];
-				for (let i = 0; i < this.table.footer.length; i++) {
-					if (this.table.columns[i].visible && this.table.columns[i].export !== false) {
-			if (this.table.columns[i].export_as_number && this.table.columns[i].export_as_number !== false && typeof this.table.footer[i] !== "number") {
-				line.push(tools_stringToNumber(this.table.footer[i]));
-			} else {
-							line.push(this.table.footer[i]);
-			}
-					}
-				}
-				csvData.push(line);
-			}
-			// Generate csv (with some utf-8 tweak)
-			let encodedData = new CSV(csvData).encode();
-			encodedData = encodeURIComponent(encodedData).replace(/%([0-9A-F]{2})/g,
-				function toSolidBytes(match, p1) {
-					return String.fromCharCode('0x' + p1);
-				});
-			if (withExcelBom) {
-				encodedData = String.fromCharCode(0xef, 0xbb, 0xbf) + encodedData;
-			}
+			let csv = this.table.getCsv(withExcelBom);
 			// Set href for download
-			let href = "data:text/csv;base64," + btoa(encodedData);
+			let href = "data:text/csv;base64," + btoa(csv);
 			window.open(href, "csvexport");
 		},
 		exportCsvOther: function () {
@@ -240,37 +639,37 @@ Vue.component("vue-table", {
 			this.showHelp = !this.showHelp;
 		},
 		checkAllColumns: function () {
-			for (let i = 0; i < this.table.columns.length; i++) {
-				this.table.columns[i].visible = true;
+			for (let i = 0; i < this.table.columnLength(); i++) {
+				this.table.column(i).isVisible = true;
 			}
 		},
 		uncheckAllColumns: function () {
-			for (let i = 0; i < this.table.columns.length; i++) {
-				this.table.columns[i].visible = false;
+			for (let i = 0; i < this.table.columnLength(); i++) {
+				this.table.column(i).isVisible = false;
 			}
 		},
 		invertCheckedColumns: function () {
-			for (let i = 0; i < this.table.columns.length; i++) {
-				this.table.columns[i].visible = !this.table.columns[i].visible;
+			for (let i = 0; i < this.table.columnLength(); i++) {
+				this.table.column(i).isVisible = !this.table.column(i).isVisible;
 			}
 		},
 		loadDefaultColumns: function() {
 			// Set defaultColumns from the table definition
-			for (let i = 0; i < this.table.columns.length; i++) {
-				let col = this.table.columns[i];
-				if ("reference" in col) {
-					this.defaultColumns[col.reference] = col.visible;
+			for (let i = 0; i < this.table.columnLength(); i++) {
+				let col = this.table.column(i);
+				if (col.reference() != null) {
+					this.defaultColumns[col.reference()] = col.visible();
 				} else {
-					this.defaultColumns[i.toString()] = col.visible;
+					this.defaultColumns[i.toString()] = col.visible();
 				}
 			}
 			// Read changes from option
-			if (!this.table.reference) {
+			if (!this.table.reference()) {
 				this.restoreDefaultColumns();
 				return;
 			}
 			let optNames = [
-					Option_prefName(this.table.reference + ".defaults"),
+					Option_prefName(this.table.reference() + ".defaults"),
 					OPTION_PREFERENCES,
 			];
 			let thiss = this;
@@ -322,29 +721,29 @@ Vue.component("vue-table", {
 			});
 		},
 		restoreDefaultColumns: function () {
-			for (let i = 0; i < this.table.columns.length; i++) {
-				let col = this.table.columns[i];
+			for (let i = 0; i < this.table.columnLength(); i++) {
+				let col = this.table.column(i);
 				let key = i;
-				if ("reference" in col) {
-					key = col.reference;
+				if (col.reference()) {
+					key = col.reference();
 				}
 				if (key in this.defaultColumns) {
-					col.visible = this.defaultColumns[key];
+					col.isVisible = this.defaultColumns[key];
 				}
 			}
 		},
 		saveDefaultColumns: function () {
 			// Read current column visibility and set local default
-			let optName = Option_prefName(this.table.reference + ".defaults")
+			let optName = Option_prefName(this.table.reference() + ".defaults")
 			let option = {"columns": {}};
-			for (let i = 0; i < this.table.columns.length; i++) {
-				let col = this.table.columns[i];
-				if ('reference' in col) {
-					option.columns[col.reference] = col.visible;
-					this.defaultColumns[col.reference] = col.visible;
+			for (let i = 0; i < this.table.columnLength(); i++) {
+				let col = this.table.column(i);
+				if (col.reference()) {
+					option.columns[col.reference()] = col.isVisible;
+					this.defaultColumns[col.reference()] = col.isVisible;
 				} else {
-					option.columns[i.toString()] = col.visible;
-					this.defaultColumns[i.toString()] = col.visible;
+					option.columns[i.toString()] = col.isVisible;
+					this.defaultColumns[i.toString()] = col.isVisible;
 				}
 			}
 			if (this.linePerPage != this.linePerPageDefault) {
@@ -393,11 +792,11 @@ Vue.component("vue-table", {
 		runSearch: function() {
 			this.searchResults = [];
 			let lowVal = this.searchString.toLowerCase();
-			for (let i = 0; i < this.table.lines.length; i++) {
-				for (let j = 0; j < this.table.columns.length; j++) {
-					let col = this.table.columns[j];
-					if (col.visible && ("searchable" in col) && col.searchable) {
-						if (this.table.lines[i][j].toLowerCase().includes(lowVal)) {
+			for (let i = 0; i < this.table.lineLength(); i++) {
+				for (let j = 0; j < this.table.columnLength(); j++) {
+					let col = this.table.column(j);
+					if (col.visible && (col.searchable())) {
+						if (this.table.line(i)[j].toLowerCase().includes(lowVal)) {
 							this.searchResults.push(i);
 							continue;
 						}
@@ -445,4 +844,3 @@ Vue.component("vue-table", {
 		this.loadDefaultColumns();
 	}
 });
-

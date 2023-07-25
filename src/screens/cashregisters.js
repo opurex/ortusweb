@@ -4,9 +4,9 @@ function cashregisters_show() {
 		let crStore = appData.db.transaction(["cashRegisters"], "readonly").objectStore("cashRegisters");
 		let crs = [];
 		vue.screen.data = {cashRegisters: []};
-		vue.screen.component = "vue-cashregister-list"
 		storage_readStore("cashRegisters", function(cashRegisters) {
 			vue.screen.data.cashRegisters = cashRegisters;
+			vue.screen.component = "vue-cashregister-list"
 			storage_close();
 			gui_hideLoading();
 		});
