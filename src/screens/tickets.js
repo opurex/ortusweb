@@ -256,7 +256,7 @@ _tickets_selectTicket = function(ticket) {
 		}
 		let pm = {};
 		pm.label = pmLabel;
-		pm.amount = Math.abs(tktpm.amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
+		pm.amount = tktpm.amount.toLocaleString(undefined, { minimumFractionDigits: 2 });
 		tkt.payments.push(pm);
 	}
 	Vue.set(vue.screen.data, "selectedTicket", tkt);

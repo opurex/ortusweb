@@ -51,34 +51,28 @@ Servi par : {{ticket.user}}
 <template v-if="ticket.customer">Client :    {{ticket.customer}}</template>
 
 
-Article      Prix          Total
+Article     P.U.   Qté Total/TVA
 --------------------------------
 <template v-for="line in ticket.lines">
 {{line.label}}
-{{padBefore(line.price, 17)}}{{padBefore("x" + line.quantity, 5)}}{{padBefore(line.taxedPrice, 10)}}
-<template v-if="line.discountRate">
-* Remise {{padBefore(line.discountRate, 5)}} {{padBefore(line.discountAmount, 17)}}
-</template>
-</template>
-<template v-if="ticket.discountRate">
+{{padBefore(line.price, 16)}}{{padBefore("x" + line.quantity, 6)}}{{padBefore(line.taxedPrice, 8)}} {{getTaxCode(line)}}<template v-if="line.discountRate">
+* Remise {{padBefore(line.discountRate, 5)}} {{padBefore(line.discountAmount, 17)}}</template></template>
+<template v-if="ticket.discountRate">--------------------------------
 Total avant remise {{padBefore(ticket.taxedPrice,13)}}
-Remise {{ticket.discountRate}} {{padBefore(ticket.discountAmount, 21)}}
+Remise {{ticket.discountRate}} {{padBefore(ticket.discountAmount, 21)}}</template>
+
+TVA               Base   Montant
+<template v-for="tax,i in ticket.taxes">{{padAfter(taxToCode(i) + ". " + tax.label, 12)}}{{padBefore(tax.base, 10)}}{{padBefore(tax.amount,10)}}
 </template>
-
-
-TVA          Base        Montant
---------------------------------
-<template v-for="tax in ticket.taxes">
-{{padAfter(tax.label, 10)}}{{padBefore(tax.base, 7)}}{{padBefore(tax.amount,15)}}
-</template>
-
-
 Sous-total {{padBefore(ticket.finalPrice, 21)}}
-Total      {{padBefore(ticket.finalTaxedPrice, 21)}}
-Dont TVA   {{padBefore(ticket.taxSum, 21)}}
+TVA        {{padBefore(ticket.taxSum, 21)}}
+
+<div style="font-weight: bold; transform: scale(1.0, 2.0);">Total      {{padBefore(ticket.finalTaxedPrice, 21)}}</div>
+
 
 <template v-for="pm in ticket.payments"><template v-if="pm.label.length> 20">{{pm.label}}
-{{padBefore(pm.amount, 32)}}</template><template v-else>{{padAfter(pm.label, 20)}}{{padBefore(pm.amount, 12)}}</template>
+{{padBefore(pm.amount, 32)}}</template><template v-else>{{padAfter(pm.label, 20)}}{{padBefore(pm.amount, 12)}}
+</template>
 </template>
 </pre>
 </div>
@@ -97,6 +91,46 @@ Dont TVA   {{padBefore(ticket.taxSum, 21)}}
 				pad += " ";
 			}
 			return txt + pad;
-		}
+		},
+		taxToCode: function(i) {
+			switch (i) {
+				case 0: return "a";
+				case 1: return "b";
+				case 2: return "c";
+				case 3: return "d";
+				case 4: return "e";
+				case 5: return "f";
+				case 6: return "g";
+				case 7: return "h";
+				case 8: return "i";
+				case 9: return "j";
+				case 10: return "k";
+				case 11: return "l";
+				case 12: return "m";
+				case 13: return "n";
+				case 14: return "o";
+				case 15: return "p";
+				case 16: return "q";
+				case 17: return "r";
+				case 18: return "s";
+				case 19: return "t";
+				case 20: return "u";
+				case 21: return "v";
+				case 22: return "w";
+				case 23: return "x";
+				case 24: return "y";
+				case 25: return "z";
+				default: return "?";
+			}
+		},
+		getTaxCode: function(line) {
+			let taxId = line.tax;
+			for (let i = 0; i < this.ticket.taxes.length; i++) {
+				if (this.ticket.taxes[i].tax == taxId) {
+					return this.taxToCode(i);
+				}
+			}
+			return "?";
+		},
 	}
 });
