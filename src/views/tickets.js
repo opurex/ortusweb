@@ -33,7 +33,7 @@ Vue.component("vue-tickets-list", {
 			</form>
 		</nav>
 	</header>
-	<article class="box-body" id="report-content" style="display:flex;flex-direction:row;align-items:center;justify-content:space-around">
+	<article class="box-body" id="report-content" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:space-around">
 		<vue-table v-bind:table="data.table" ref="ticketTable"></vue-table>
 		<vue-tickets-content v-if="data.selectedTicket" v-bind:ticket="data.selectedTicket"></vue-tickets-content>
 	</article>
