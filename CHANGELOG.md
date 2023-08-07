@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.21] - 2023-08-07
+
+### Added
+- All tables are now exportable
+
+### Changed
+- Use table definitions for column formatting
+- Ticket format is closer to the one from Pastèque Desktop
+
+### Fixed
+- Ticket stays on screen with a long ticket list and is scrollable
+- Show tax codes on ticket lines
+- Quantities in customer's history are not truncated to 2 decimals anymore
+
+
 ## [8.20] - 2023-06-22
 
 ### Fixed
