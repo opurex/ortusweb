@@ -353,7 +353,7 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 	let oldColumnVisible = function(label, old, default_val) {
 		for (let i = 0; i < old.length; i++) {
 			if (old[i].label == label) {
-				return old[i].visible;
+				return old[i].isVisible;
 			}
 		}
 		return default_val;
@@ -432,7 +432,10 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		}
 		vue.screen.data.table.line(line);
 	}
-	vue.$refs.screenComponent.$refs.zTable.restoreDefaultColumns();
+	if (renderZs.length == 0) {
+		vue.screen.data.table.noResult();
+	}
+	vue.$refs.screenComponent.$refs.zTable.restoreDefaultPreferences();
 	gui_hideLoading();
 }
 

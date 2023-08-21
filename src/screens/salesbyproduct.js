@@ -462,15 +462,15 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 			}
 			vue.screen.data.table.column(col);
 			let totalTaxDetail = _salesbyproduct_data.total.taxDetails[tax.id]
-			vue.screen.data.table.footer.push(totalTaxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-			vue.screen.data.table.footer.push(totalTaxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-			vue.screen.data.table.footer.push((totalTaxDetail.base + totalTaxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer(totalTaxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer(totalTaxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
+			vue.screen.data.table.footer((totalTaxDetail.base + totalTaxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 		}
 	}
 	lines.forEach(l => {
 		vue.screen.data.table.line(l);
 	});
-	vue.$refs.screenComponent.$refs.salesTable.restoreDefaultColumns();
+	vue.$refs.screenComponent.$refs.salesTable.restoreDefaultPreferences();
 	gui_hideLoading();
 }
 

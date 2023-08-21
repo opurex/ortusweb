@@ -30,17 +30,27 @@ class Table
 	#mLines;
 	#mFooter;
 	#mExportable;
-	#mReady;
+	/** Reactive property for VueJS, do not manipulate it by hand. */
+	ready;
+	/** Reactive proxy for VueJS, do not manipulate it by hand. */
+	vuelines;
+	/** Reactive proxy for VueJS, do not manipulate it by hand. */
+	vuecolumns;
+	/** Reactive proxy for VueJS, do not manipulate it by hand. */
+	vuefooter;
 
 	/** Chainable empty constructor. */
 	constructor() {
-		this.mRef = null;
-		this.mTitle = null;
-		this.mColumns = [];
-		this.mLines = [];
-		this.mFooter = [];
-		this.mExportable = true;
-		this.mReady = false;
+		this.#mRef = null;
+		this.#mTitle = null;
+		this.#mColumns = [];
+		this.#mLines = [];
+		this.#mFooter = [];
+		this.#mExportable = true;
+		this.ready = false;
+		this.vuelines = this.#mLines;
+		this.vuecolumns = this.#mColumns;
+		this.vuefooter = this.#mFooter;
 	}
 	/**
          * getter/setter.
@@ -50,9 +60,9 @@ class Table
          */
 	reference(ref) {
 		if (arguments.length == 0) {
-			return this.mRef;
+			return this.#mRef;
 		}
-		this.mRef = ref;
+		this.#mRef = ref;
 		return this;
 	}
 	/**
@@ -63,35 +73,40 @@ class Table
          */
 	title(t) {
 		if (arguments.length == 0) {
-			return this.mTitle;
+			return this.#mTitle;
 		}
-		this.mTitle = t;
+		this.#mTitle = t;
 		return this;
 	}
 	/**
 	 * getter/adder
 	 * @param c The index of the column to get or a new column to add.
+	 * When the column has no reference set, it sets the column index
+	 * as reference.
 	 * @return `This` when used to add a column, the column when used
 	 * as a getter.
 	 */
 	column(c) {
 		if (typeof c == "number") {
-			return this.mColumns[c];
+			return this.#mColumns[c];
 		}
-		this.mColumns.push(c);
+		if (c.reference() == null) {
+			c.reference(this.#mColumns.length.toString());
+		}
+		this.#mColumns.push(c);
 		return this;
 	}
 	/**
 	 * Get all columns.
 	 */
 	columns() {
-		return this.mColumns;
+		return this.#mColumns;
 	}
 	/**
 	 * Get the number of columns.
 	 */
 	columnLength() {
-		return this.mColumns.length;
+		return this.#mColumns.length;
 	}
 	/**
 	 * getter/adder
@@ -104,32 +119,32 @@ class Table
 	 */
 	line(l) {
 		if (typeof l == "number") {
-			return this.mLines[l];
+			return this.#mLines[l];
 		}
-		this.mLines.push(l);
-		this.mReady = true;
+		this.#mLines.push(l);
+		this.ready = true;
 	}
 	/**
 	 * Indicate that the table is ready, without adding any line.
 	 */
 	noResult() {
-		this.mReady = true;
+		this.ready = true;
 	}
 	/**
 	 * Get the number of lines.
 	 */
 	lineLength() {
-		return this.mLines.length;
+		return this.#mLines.length;
 	}
 	/**
 	 * Get all lines.
 	 */
 	lines() {
-		return this.mLines;
+		return this.#mLines;
 	}
 	/** Sort lines in place */
 	sort(sortFunction) {
-		this.mLines.sort(sortFunction);
+		this.#mLines.sort(sortFunction);
 	}
 	/**
 	 * Reset the table and optionaly set new content.
@@ -139,16 +154,16 @@ class Table
 	 * @param footer The new table footer.
 	 */
 	resetContent(lines, footer) {
-		this.mLines.splice(0);
-		this.mFooter.splice(0);
+		this.#mLines.splice(0);
+		this.#mFooter.splice(0);
 		if (arguments.length == 0) {
-			this.mReady = false;
+			this.ready = false;
 		} else {
-			this.mLines.push(...lines);
+			this.#mLines.push(...lines);
 			if (arguments.length > 1) {
-				this.mFooter.push(...footer);
+				this.#mFooter.push(...footer);
 			}
-			this.mReady = true;
+			this.ready = true;
 		}
 	}
 	/**
@@ -161,10 +176,10 @@ class Table
          */
 	footer(f) {
 		if (arguments.length == 0) {
-			return this.mFooter;
+			return this.#mFooter;
 		}
-		this.mFooter.splice(0);
-		this.mFooter.push(...f);
+		this.#mFooter.splice(0);
+		this.#mFooter.push(...f);
 		return this;
 	}
 	/**
@@ -175,16 +190,10 @@ class Table
          */
 	exportable(e) {
 		if (arguments.length == 0) {
-			return this.mExportable;
+			return this.#mExportable;
 		}
-		this.mExportable = e;
+		this.#mExportable = e;
 		return this;
-	}
-	/**
-	 * Check if the table is ready and can be displayed.
-	 */
-	ready() {
-		return this.mReady;
 	}
 	/**
 	 * Remove all lines, footer and columns, set ready to false.
@@ -192,10 +201,10 @@ class Table
 	 * and reactivity.
 	 */
 	reset() {
-		this.mReady = false;
-		this.mFooter.splice(0);
-		this.mLines.splice(0);
-		this.mColumns.splice(0);
+		this.ready = false;
+		this.#mFooter.splice(0);
+		this.#mLines.splice(0);
+		this.#mColumns.splice(0);
 	}
 	/**
 	 * Export the visible columns to a csv file.
@@ -264,14 +273,14 @@ class TableCol
 
 	/** Chainable empty constructor. */
 	constructor() {
-		this.mRef = null;
-		this.mLabel = "";
-		this.mHelp = "";
-		this.mType = TABLECOL_TYPE.STRING;
-		this.mExportable = true;
-		this.mSearchable = false;
-		this.mVisible = true;
-		this.mClass = "";
+		this.#mRef = null;
+		this.#mLabel = "";
+		this.#mHelp = "";
+		this.#mType = TABLECOL_TYPE.STRING;
+		this.#mExportable = true;
+		this.#mSearchable = false;
+		this.#mVisible = true;
+		this.#mClass = "";
 		this.isVisible = true;
 	}
 	/**
@@ -282,9 +291,9 @@ class TableCol
          */
 	reference(ref) {
 		if (arguments.length == 0) {
-			return this.mRef;
+			return this.#mRef;
 		}
-		this.mRef = ref;
+		this.#mRef = ref;
 		return this;
 	}
 	/**
@@ -295,9 +304,9 @@ class TableCol
          */
 	label(lbl) {
 		if (arguments.length == 0) {
-			return this.mLabel;
+			return this.#mLabel;
 		}
-		this.mLabel = lbl;
+		this.#mLabel = lbl;
 		return this;
 	}
 	/**
@@ -308,9 +317,9 @@ class TableCol
          */
 	help(h) {
 		if (arguments.length == 0) {
-			return this.mHelp;
+			return this.#mHelp;
 		}
-		this.mHelp = h;
+		this.#mHelp = h;
 		return this;
 	}
 	/**
@@ -321,9 +330,9 @@ class TableCol
          */
 	type(t) {
 		if (arguments.length == 0) {
-			return this.mType;
+			return this.#mType;
 		}
-		this.mType = t;
+		this.#mType = t;
 		return this;
 	}
 	/**
@@ -334,9 +343,9 @@ class TableCol
          */
 	exportable(e) {
 		if (arguments.length == 0) {
-			return this.mExportable;
+			return this.#mExportable;
 		}
-		this.mExportable = e;
+		this.#mExportable = e;
 		return this;
 	}
 	/**
@@ -347,23 +356,24 @@ class TableCol
          */
 	searchable(s) {
 		if (arguments.length == 0) {
-			return this.mSearchable;
+			return this.#mSearchable;
 		}
-		this.mSearchable = s;
+		this.#mSearchable = s;
 		return this;
 	}
 	/**
          * getter/setter.
-	 * For the actual visibility state, see `visible`.
+	 * For the actual visibility state, see `isVisible`.
          * @param v When defined, set the default visibility and return the instance for chaining.
          * When not set, get the default visibility.
          * @return `This` for the setter, default visibility for the getter.
          */
 	visible(v) {
 		if (arguments.length == 0) {
-			return this.mVisible;
+			return this.#mVisible;
 		}
-		this.mVisible = v;
+		this.#mVisible = v;
+		this.isVisible = v;
 		return this;
 	}
 	/**
@@ -374,25 +384,25 @@ class TableCol
          */
 	class(c) {
 		if (arguments.length == 0) {
-			return this.mClass;
+			return this.#mClass;
 		}
-		this.mClass = c;
+		this.#mClass = c;
 		return this;
 	}
 	/** Return true when type is NUMBER*. */
 	isNumber() {
-		return this.mType == TABLECOL_TYPE.NUMBER
-				|| this.mType == TABLECOL_TYPE.NUMBER2
-				|| this.mType == TABLECOL_TYPE.NUMBER5;
+		return this.#mType == TABLECOL_TYPE.NUMBER
+				|| this.#mType == TABLECOL_TYPE.NUMBER2
+				|| this.#mType == TABLECOL_TYPE.NUMBER5;
 	}
 	isDateOrTime() {
-		return this.mType == TABLECOL_TYPE.DATE
-				|| this.mType == TABLECOL_TYPE.DATETIME
-				|| this.mType == TABLECOL_TYPE.TIME;
+		return this.#mType == TABLECOL_TYPE.DATE
+				|| this.#mType == TABLECOL_TYPE.DATETIME
+				|| this.#mType == TABLECOL_TYPE.TIME;
 	}
 	/** Format value for csv export. */
 	formatCsv(value) {
-		switch (this.mType) {
+		switch (this.#mType) {
 			case TABLECOL_TYPE.BOOL:
 				return value ? "1" : "0";
 			case TABLECOL_TYPE.NUMBER:
@@ -412,6 +422,101 @@ class TableCol
 			default:
 				return value;
 		}
+	}
+}
+
+/** Custom preferences for Table */
+class TablePrefs
+{
+	/** The default of the defaults. It could be a constant. */
+	static linePerPageSystem = 250;
+	/** The customized default. */
+	static linePerPageSystemCustom = null;
+	/** The table default. */
+	#linePerPage;
+	#columnVisibility;
+
+	/** Empty constructor. */
+	constructor() {
+		this.linePerPage = null;
+		this.#columnVisibility = new Map();
+	}
+
+	/**
+	 * Import preferences from an object generated with export().
+	 * @return `This` for chaining.
+	 */
+	import(object) {
+		if (!"columns" in object) {
+			this.legacyImport(object);
+			return;
+		}
+		for (let key in object.columns) {
+			this.setColumnVisibility(key, object.columns[key]);
+		}
+		if ("linePerPage" in object) {
+			this.linePerPage = object.linePerPage;
+		}
+		return this;
+	}
+
+	/** Old column export format. */
+	#legacyImport(object) {
+		// Legacy column format
+		for (let key in object) {
+			let col = optVals[key];
+			this.setColumnVisibility(key, col.visible);
+		}
+		return this;
+	}
+
+	/** Export the preferences to a jsonable object. */
+	export() {
+		let option = {"columns": {}};
+		this.#columnVisibility.forEach((visible, ref) => {
+			option.columns[ref] = visible;
+		});
+		if (this.linePerPage) {
+			option.linePerPage = this.linePerPage;
+		}
+		return option;
+	}
+
+	setColumnVisibility(ref, visible) {
+		this.#columnVisibility.set(ref, visible);
+	}
+
+	getColumnVisibility(ref) {
+		return this.#columnVisibility.get(ref);
+	}
+
+	setLinePerPage(count) {
+		this.linePerPage = count;
+	}
+
+	/**
+	 * Get the preferred line per page count.
+	 * @return Table preference if set, otherwise system custom default,
+	 * otherwise system default.
+	 */
+	getLinePerPage() {
+		if (this.linePerPage != null) {
+			return this.linePerPage
+		} else if (TablePrefs.linePerPageSystemCustom != null) {
+			return TablePrefs.linePerPageSystemCustom;
+		}
+		return TablePrefs.linePerPageSystem;
+	}
+
+	/**
+	 * Get the preferred default line per page count for all tables.
+	 * @return System custom default if set, otherwise system default.
+	 */
+	static getSystemDefaultLinePerPage() {
+		if (TablePrefs.linePerPageSystemCustom != null) {
+			return TablePrefs.linePerPageSystemCustom;
+		}
+		return TablePrefs.linePerPageSystem;
 	}
 }
 
@@ -442,8 +547,9 @@ Vue.component("vue-table", {
 			searchPending: false,
 			/** List of line indexes matching the search input. */
 			searchResults: [],
-			linePerPage: 250,
-			linePerPageDefault: 250,
+			tablePrefs: new TablePrefs(),
+			/** The actual line per page shown, reactive property. */
+			linePerPage: TablePrefs.linePerPageSystem,
 			/** 0-based page index. Displayed as currentPage + 1 */
 			currentPage: 0,
 			// Global
@@ -486,7 +592,7 @@ Vue.component("vue-table", {
 		}
 	},
 		template: `<div class="table">
-	<div class="filters noprint" v-if="table.columnLength() > 0 && (filterable || exportable)">
+	<div class="filters noprint" v-if="table.vuecolumns.length > 0 && (filterable || exportable)">
 		<h3>Afficher/masquer des colonnes</h3>
 		<ul class="filter-actions">
 			<li>
@@ -512,29 +618,29 @@ Vue.component("vue-table", {
 			<li><button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></li>
 		</ul>
 		<ul class="filter-columns" v-if="filterable" v-bind:class="{'expand-help': showHelp}">
-			<li v-for="(col, index) in table.columns()">
+			<li v-for="(col, index) in table.vuecolumns">
 				<input v-model="col.isVisible" v-bind:id="'filter-column-' + index" type="checkbox" />
 				<label v-bind:for="'filter-column-' + index">{{col.label()}}</label>
 				<p class="help" v-if="showHelp">{{col.help()}}</p>
 			</li>
 		</ul>
 		<ul class="filter-defaults" v-if="table.reference()">
-			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultColumns">
+			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultPreferences">
 			<img src="res/img/column_restore_params.png" alt="" style="height: 26px; padding-right: 5px;" />
 			<span style="float: right; margin-top: 5px;">Restaurer l'affichage par défaut</span>
 			</button></li>
-			<li><button type="button" class="btn btn-misc" v-on:click="saveDefaultColumns">
+			<li><button type="button" class="btn btn-misc" v-on:click="savePreferences">
 			<img src="res/img/column_save_params.png" alt="" style="height: 26px; padding-right: 5px;" />
 			<span style="float: right; margin-top: 5px;">Enregistrer comme affichage par défaut</span>
 			</button></li>
 		</ul>
-		<div v-if="table.ready() && table.exportable()">
+		<div v-if="table.ready && table.exportable()">
 			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter le tableau</a>
 			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter le tableau (Excel)</a>
 		</div>
 	</div>
 	<h2 v-if="table.title()">{{table.title()}}</h2>
-	<nav class="table-pagination">
+	<nav class="table-pagination" v-if="table.ready">
 		<div class="form-group">
 			<label for="pageNum">Page</label>
 			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
@@ -557,34 +663,33 @@ Vue.component("vue-table", {
 		</div>
 		<vue-input-text id="search" label="Rechercher" v-model="searchString" v-if="searchable" />
 	</nav>
-	<table class="table table-bordered table-hover" v-if="table.ready()">
+	<table class="table table-bordered table-hover" v-if="table.ready">
 		<thead>
 			<tr>
-				<template v-for="(col, index) in table.columns()">
+				<template v-for="(col, index) in table.vuecolumns">
 				<th v-show="col.isVisible" v-bind:class="col.class()">{{col.label()}}</th>
 				</template>
 			</tr>
 		</thead>
 		<tbody>
-			<template v-for="(line,index) in table.lines()">
+			<template v-for="(line,index) in table.vuelines">
 			<tr v-if="visibleLine(index)">
 				<template v-for="(value, colIndex) in line">
-
-					<td v-if="table.column(colIndex).isVisible" v-bind:class="[table.column(colIndex).class(), {numeric: table.column(colIndex).isNumber(), datetime: table.column(colIndex).isDateOrTime()}]">
-						<template v-if="table.column(colIndex).type() == TABLECOL_TYPE.THUMBNAIL">
+					<td v-if="table.vuecolumns[colIndex].isVisible" v-bind:class="[table.vuecolumns[colIndex].class(), {numeric: table.vuecolumns[colIndex].isNumber(), datetime: table.vuecolumns[colIndex].isDateOrTime()}]">
+						<template v-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.THUMBNAIL">
 							<img class="img img-thumbnail thumbnail" v-bind:src="value" />
 						</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.BOOL">
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.BOOL">
 							<input type="checkbox" disabled="1" v-bind:checked="value" />
 						</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.NUMBER5">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5}) }}</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.NUMBER2">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.NUMBER">{{ value.toLocaleString() }}</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.PERCENT">{{ (value * 100).toLocaleString() + "%" }}</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.HTML"><span v-html="value"></span></template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.DATE">{{ tools_dateToString(value) }}</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.DATETIME">{{ tools_dateTimeToString(value) }}</template>
-						<template v-else-if="table.column(colIndex).type() == TABLECOL_TYPE.TIME">{{ tools_timeToString(value) }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.NUMBER5">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5}) }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.NUMBER2">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.NUMBER">{{ value.toLocaleString() }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.PERCENT">{{ (value * 100).toLocaleString() + "%" }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.HTML"><span v-html="value"></span></template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.DATE">{{ tools_dateToString(value) }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.DATETIME">{{ tools_dateTimeToString(value) }}</template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.TIME">{{ tools_timeToString(value) }}</template>
 						<template v-else>{{value}}</template>
 					</td>
 
@@ -592,13 +697,13 @@ Vue.component("vue-table", {
 			</tr>
 			</template>
 		</tbody>
-		<tfoot v-if="table.footer().length > 0">
+		<tfoot v-if="table.vuefooter.length > 0">
 			<tr>
-				<th v-for="(val, index) in table.footer()" v-show="table.column(index).isVisible" v-bind:class="table.column(index).class()">{{val}}</th>
+				<th v-for="(val, index) in table.vuefooter" v-show="table.vuecolumns[index].isVisible" v-bind:class="table.vuecolumns[index].class()">{{val}}</th>
 			</tr>
 		</tfoot>
 	</table>
-	<nav class="table-pagination">
+	<nav class="table-pagination" v-if="table.ready">
 		<div class="form-group">
 			<label for="pageNum2">Page</label>
 			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
@@ -623,6 +728,7 @@ Vue.component("vue-table", {
 </div>
 `,
 	methods: {
+		// CSV functions
 		exportCsv: function (withExcelBom) {
 			let csv = this.table.getCsv(withExcelBom);
 			// Set href for download
@@ -635,6 +741,7 @@ Vue.component("vue-table", {
 		exportCsvExcel: function () {
 			this.exportCsv(true);
 		},
+		// Check column buttons functions
 		toggleHelp: function () {
 			this.showHelp = !this.showHelp;
 		},
@@ -653,105 +760,67 @@ Vue.component("vue-table", {
 				this.table.column(i).isVisible = !this.table.column(i).isVisible;
 			}
 		},
-		loadDefaultColumns: function() {
-			// Set defaultColumns from the table definition
-			for (let i = 0; i < this.table.columnLength(); i++) {
-				let col = this.table.column(i);
-				if (col.reference() != null) {
-					this.defaultColumns[col.reference()] = col.visible();
-				} else {
-					this.defaultColumns[i.toString()] = col.visible();
-				}
-			}
-			// Read changes from option
+		// Preferences load/save functions
+		loadPreferences: function() {
+			let loadTablePrefs = true;
 			if (!this.table.reference()) {
-				this.restoreDefaultColumns();
-				return;
+				loadTablePrefs = false;
 			}
-			let optNames = [
-					Option_prefName(this.table.reference() + ".defaults"),
-					OPTION_PREFERENCES,
-			];
+			let optNames = [];
+			optNames.push(OPTION_PREFERENCES);
+			if (loadTablePrefs) {
+				optNames.push(Option_prefName(this.table.reference() + ".defaults"));
+			};
 			let thiss = this;
 			storage_open(function (event) {
 				storage_get("options", optNames, function (opts) {
-					let columns = thiss.defaultColumns;
-					let linePerPage = null;
-					let tableOpt = opts[optNames[0]];
-					let prefOpt = opts[optNames[1]];
+					let prefOpt = opts[optNames[0]];
 					if (prefOpt != null) {
 						let optVals = JSON.parse(prefOpt.content);
 						if ("tablePageSize" in optVals) {
-							linePerPage = optVals.tablePageSize;
-							thiss.linePerPageDefault = linePerPage;
+							TablePrefs.linePerPageSystemCustom = optVals.tablePageSize;
 						}
 					}
-					if (tableOpt != null) {
-						let optVals = JSON.parse(tableOpt.content);
-						if ("columns" in optVals) {
-							for (let key in optVals.columns) {
-								if (key in thiss.defaultColumns) {
-									thiss.defaultColumns[key] = optVals.columns[key];
-								}
-							}
-						} else {
-							// Legacy column format
-							for (let key in optVals) {
-								let col = optVals[key];
-								if (key in thiss.defaultColumns) {
-									thiss.defaultColumns[key] = col.visible;
-								} else {
-									let index = parseInt(key);
-									if (index != NaN) {
-										thiss.defaultColumns[key] = col.visible;
-									}
-								}
-							}
-						}
-						// Override general preferences
-						if ("linePerPage" in optVals) {
-							linePerPage = optVals.linePerPage;
+					if (loadTablePrefs) {
+						let tableOpt = opts[optNames[1]];
+						if (tableOpt != null) {
+							let optVals = JSON.parse(tableOpt.content);
+							thiss.tablePrefs.import(optVals);
 						}
 					}
-					if (linePerPage != null) {
-						thiss.linePerPage = linePerPage;
-					}
-					thiss.restoreDefaultColumns();
+					thiss.linePerPage = thiss.tablePrefs.getLinePerPage();
+					thiss.restoreDefaultPreferences();
 				});
 			});
 		},
-		restoreDefaultColumns: function () {
-			for (let i = 0; i < this.table.columnLength(); i++) {
-				let col = this.table.column(i);
-				let key = i;
-				if (col.reference()) {
-					key = col.reference();
-				}
-				if (key in this.defaultColumns) {
-					col.isVisible = this.defaultColumns[key];
-				}
-			}
-		},
-		saveDefaultColumns: function () {
+		savePreferences: function () {
 			// Read current column visibility and set local default
 			let optName = Option_prefName(this.table.reference() + ".defaults")
 			let option = {"columns": {}};
-			for (let i = 0; i < this.table.columnLength(); i++) {
-				let col = this.table.column(i);
-				if (col.reference()) {
-					option.columns[col.reference()] = col.isVisible;
-					this.defaultColumns[col.reference()] = col.isVisible;
-				} else {
-					option.columns[i.toString()] = col.isVisible;
-					this.defaultColumns[i.toString()] = col.isVisible;
-				}
-			}
-			if (this.linePerPage != this.linePerPageDefault) {
-				option.linePerPage = this.linePerPage;
+			// Set current settings as the new default
+			this.table.columns().forEach(col => {
+				this.tablePrefs.setColumnVisibility(col.reference(), col.isVisible);
+			});
+			if (this.linePerPage != TablePrefs.getSystemDefaultLinePerPage()) {
+				this.tablePrefs.setLinePerPage(this.linePerPage);
+			} else {
+				this.tablePrefs.setLinePerPage(null);
 			}
 			// Save
-			let opt = Option(optName, JSON.stringify(option));
+			let opt = Option(optName, JSON.stringify(this.tablePrefs.export()));
 			table_saveDefaultColumns(opt);
+		},
+		// Visibility functions
+		restoreDefaultPreferences: function () {
+			this.table.columns().forEach(col => {
+				let ref = col.reference();
+				if (this.tablePrefs.getColumnVisibility(ref) != null) {
+					col.isVisible = this.tablePrefs.getColumnVisibility(ref);
+				} else {
+					col.isVisible = col.visible();
+				}
+			});
+			this.linePerPage = this.tablePrefs.getLinePerPage();
 		},
 		visibleLine: function(index) {
 			if (this.linePerPage == -1 && !this.useSearch) {
@@ -769,6 +838,7 @@ Vue.component("vue-table", {
 				return this.linePerPage == -1 || (searchIndex >= start && searchIndex < stop);
 			}
 		},
+		// Pagination
 		movePage: function(delta) {
 			switch (delta) {
 				case -1:
@@ -789,6 +859,7 @@ Vue.component("vue-table", {
 					break;
 			}
 		},
+		// Search
 		runSearch: function() {
 			this.searchResults = [];
 			let lowVal = this.searchString.toLowerCase();
@@ -832,15 +903,9 @@ Vue.component("vue-table", {
 			this.searchTimer = setTimeout(() => {
 				this.runSearch();
 			}, time);
-		},
-		'table.columns': function(newValue, oldValue) {
-			if (oldValue.length == 0) {
-				// Initialization after search with dynamic columns
-				this.loadDefaultColumns();
-			}
 		}
 	},
 	mounted: function () {
-		this.loadDefaultColumns();
+		this.loadPreferences();
 	}
 });
