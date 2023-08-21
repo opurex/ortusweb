@@ -19,24 +19,7 @@ Vue.component("vue-home", {
 		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.21</p>
 	</article>
 </section>
-<aside class="box box-tiny">
-	<article class="box-body twitter-feed">
-		<a class="twitter-timeline" href="https://twitter.com/pastequepos" data-widget-id="584374065407885312">Tweets de @pastequepos</a>
-	</article>
-</aside>
 </div>
-`,
-	mounted: function() {
-		// The Twitter stuff
-		!function (d, s, id) {
-			var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
-			if (!d.getElementById(id)) {
-				js = d.createElement(s);
-				js.id = id;
-				js.src = p + "://platform.twitter.com/widgets.js";
-				fjs.parentNode.insertBefore(js, fjs);
-			}
-		}(document, "script", "twitter-wjs");
-	}
+`
 });
 
