@@ -516,6 +516,21 @@ function _products_parseCsv(fileContent, callback) {
 				// TODO : throw some error
 				return 0;
 			}
+			function convertRate(value) {
+				if (typeof value == "string") {
+					let percentIndex = value.indexOf("%");
+					if (percentIndex != -1) {
+						return convertNum(value.substring(0, percentIndex)) / 100.0;
+					}
+					value = convertNum(value);
+				}
+				if (typeof value == "number") {
+					if (value > 1.0) {
+						return value / 100.0;
+					}
+					return value;
+				}
+			}
 			function convertValues(value) {
 				if ("prepay" in value)
 					value.prepay = convertBool(value.prepay);
@@ -539,7 +554,7 @@ function _products_parseCsv(fileContent, callback) {
 				if ("taxedPrice" in value)
 					value.taxedPrice = convertNum(value.taxedPrice);
 				if ("discountRate" in value)
-					value.discountRate = convertNum(value.discountRate);
+					value.discountRate = convertRate(value.discountRate);
 				if ("dispOrder" in value)
 					value.dispOrder = parseInt(value.dispOrder);
 				return value;
