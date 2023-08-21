@@ -402,16 +402,21 @@ function customers_saveMultipleCallback(results) {
 			errors.push("Quelque chose cloche dans les données du formulaire. " + request.statusText);
 			continue;
 		}
+		let respCust = JSON.parse(response);
 		if (reqId.substr(0, 4) == "new-") {
 			let num = parseInt(reqId.substr(4));
 			let cust = vue.screen.data.newCustomers[num];
-			let respCust = JSON.parse(response);
+			if (cust.expireDate != null) {
+				cust.expireDate = respCust.expireDate; // stay in sync with the server's format
+			}
 			cust.id = respCust.id;
 			saves.push(cust);
 		} else {
 			let num = parseInt(reqId.substr(5));
 			let cust = vue.screen.data.editedCustomers[num];
-			cust.expireDate = new PTDate(cust.expireDate).toDataString();
+			if (cust.expireDate != null) {
+				cust.expireDate = respCust.expireDate; // stay in sync with the server's format
+			}
 			saves.push(cust);
 		}
 	}

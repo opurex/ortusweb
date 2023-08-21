@@ -40,11 +40,11 @@ class PTDate
 		if (str == "" || str == null) {
 			return new PTDate(null);
 		}
-		if (str.length != 10) {
-			return false;
-		}
 		let parts = str.split("/");
-		if (parts.length != 3 || parts[0].length != 2 || parts[1].length != 2 || parts[2].length != 4) {
+		if (parts.length != 3
+				|| (parts[0].length != 1 && parts[0].length != 2)
+				|| (parts[1].length != 1 && parts[1].length != 2)
+				|| (parts[2].length != 2 && parts[2].length != 4)) {
 			return false;
 		}
 		let date = new PTDate();
