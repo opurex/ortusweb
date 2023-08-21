@@ -13,7 +13,7 @@ Vue.component("vue-home", {
 		<p>Il y a plusieurs sources de documentation :</p>
 		<ul>
 			<li><a href="https://fr.wikibooks.org/wiki/Logiciel_Past%C3%A8que" target="_blank" >Manuel d’installation, de configuration et d’utilisation sur wikibooks</a></li>
-			<li><a href="https://framateam.org/pasteque" target="_blank">Les salons de clavardage de l'association Pastèque</a></li>
+			<li><a href="https://pasteque.org/Contactez-nous" target="_blank">Les contacts de l'association Pastèque</a></li>
 		</ul>
 		<p style="font-size:small;margin-bottom:0px;">Les fontes de caractères Open Dyslexic et Atkinson Hyperlegible sont distribuées sous licence SIL, voir les licences pour <a href="res/fonts/SIL Open Font License.txt" target="_blank">Open Dyslexic</a> et <a href="res/fonts/Atkinson Hyperlegible Font License.txt" target="_blank">Atkinson Hyberlegible</a></p>
 		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.21</p>
