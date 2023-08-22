@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.22] - 2023-08-22
+
+### Removed
+- Link to the dead twitter stuff
+
+### Changed
+- Use table preferences objects
+- Link to the old chatrooms moved to Pasteque.org contact page
+
+### Fixed
+- Importing product discount rate from csv
+- Loosely accept DD/MM/YYYY format from csv
+- Local customer's expire date on csv import
+
+
 ## [8.21] - 2023-08-07
 
 ### Added
