@@ -121,6 +121,20 @@ function _resources_showResources(resources) {
 
 function resources_showResource(resLabel) {
 	gui_showLoading();
+	if (resLabel == "option.customer.customFields") {
+		storage_open(function(event) {
+			storage_get("options", OPTION_CUSTOMER_FIELDS, function(opt) {
+				if (typeof(opt) == "undefined") {
+					opt = new Option(OPTION_CUSTOMER_FIELDS, "");
+				}
+				vue.screen.data = {
+					option: opt
+				};
+				vue.screen.component="vue-customercontact";
+			});
+		});
+		return;
+	}
 	storage_open(function(event) {
 		storage_get("resources", resLabel, function(res) {
 			if (typeof(res) == "undefined") {
@@ -223,5 +237,35 @@ function _resources_saveCommit(res) {
 				_resources_fillCustomData(res);
 			}, appData.localWriteDbError);
 		}
+	}, appData.localWriteDbOpenError);
+}
+
+function resources_saveCustomFields(option) {
+	if (arguments.length == 0) {
+		option = vue.screen.data.option;
+	} else {
+		vue.screen.data.option = option;
+	}
+	srvcall_post("api/option", option, _resources_saveCustomFieldsCallback);
+}
+
+function _resources_saveCustomFieldsCallback(request, status, response) {
+	if (srvcall_callbackCatch(request, status, response, resources_saveCustomFields)) {
+		return;
+	}
+	if (status == 400) {
+		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_hideLoading();
+		return;
+	}
+	_resources_saveCustomFieldsCommit(vue.screen.data.option);
+}
+
+function _resources_saveCustomFieldsCommit(option) {
+	// Update in local database
+	storage_open(function(event) {
+		storage_write("options", option, function(event) {
+			appData.localWriteDbSuccess(event);
+		}, appData.localWriteDbError);
 	}, appData.localWriteDbOpenError);
 }

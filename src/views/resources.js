@@ -13,7 +13,6 @@ Vue.component("vue-resources-list", {
 	<article class="box-body">
 		<table>
 			<col />
-			<col />
 			<col style="width:10%; min-width: 5em;" />
 			<thead>
 				<tr>
@@ -25,6 +24,10 @@ Vue.component("vue-resources-list", {
 				<tr v-for="resource in data.resources">
 					<td>{{resource.dispName}}</td>
 					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(resource)">Modifier</a></nav></td>
+				</tr>
+				<tr>
+					<td>Coordonnées clients</td>
+					<td><nav><a class="btn btn-edit" href="?p=resource&label=option.customer.customFields">Modifier</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
@@ -84,4 +87,79 @@ Vue.component("vue-resource-form", {
 			}
 		}
 	}
+});
+
+Vue.component("vue-customercontact", {
+	props: ["data"],
+	data: function() {
+		return {
+			fields: [
+				{label: "Label.Customer.FirstName", value: "", default: "Nom"},
+				{label: "Label.Customer.LastName", value: "", default: "Prénom"},
+				{label: "Label.Customer.Email", value: "", default: "Email"},
+				{label: "Label.Customer.Phone", value: "", default: "Téléphone"},
+				{label: "Label.Customer.Phone2", value: "", default: "Télphone 2"},
+				{label: "Label.Customer.Fax", value: "", default: "Fax"},
+				{label: "Label.Customer.Addr", value: "", default: "Adresse"},
+				{label: "Label.Customer.Addr2", value: "", default: "Adresse 2"},
+				{label: "Label.Customer.ZipCode", value: "", default: "Code postal"},
+				{label: "Label.Customer.City", value: "", default: "Ville"},
+				{label: "Label.Customer.Region", value: "", default: "Région"},
+				{label: "Label.Customer.Country", value: "", default: "Pays"},
+			]
+		};
+	},
+	template: `<div class="preferences">
+<section class="box box-medium">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=resources">Personnalisation</a></li>
+				<li><h1>Coordonnées comptes clients</h1></li>
+			</ul>
+		</nav>
+	</header>
+	<article class="box-body">
+		<form id="edit-preferences-form" class="form-large" v-on:submit.prevent="save()">
+			<p>Personnalisez les intitulés des champs de coordonnées client pour les réutiliser à d'autres fins.</p>
+			<div class="form-group" v-for="f in fields">
+				<vue-input-text v-bind:id="f.label" v-bind:label="f.default" v-model="f.value" v-bind:placeholder="f.default"></vue-input-text>
+			</div>
+
+			<div class="form-control">
+				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+			</div>
+		</form>
+	</article>
+</section>
+</div>`,
+	methods: {
+		save: function() {
+			let customFields = {};
+			this.fields.forEach(f => {
+				if (f.value != "" && f.value != f.default) {
+					customFields[f.label] = f.value;
+				}
+			});
+			let newOption = new Option(OPTION_CUSTOMER_FIELDS, JSON.stringify(customFields));
+			resources_saveCustomFields(newOption);
+		}
+	},
+	mounted: function() {
+		let optContent = null;
+		try {
+			optContent = JSON.parse(this.data.option.content);
+		} catch (e) {
+			console.warn("Could not parse customer's contact fields customisation", e);
+		}
+		if (optContent == null || (typeof optContent != "object")) {
+			optContent = {};
+		}
+		this.fields.forEach(f => {
+			if (f.label in optContent && optContent[f.label] != null && optContent[f.label] != "") {
+				f.value = optContent[f.label];
+			}
+		});
+	},
 });
