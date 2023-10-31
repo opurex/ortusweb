@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import re
+from pathlib import Path
 
 path = os.path.dirname(os.path.realpath(__file__))
 
@@ -50,7 +51,9 @@ shutil.rmtree(path + "/dist/libs", True)
 shutil.copytree(path + "/res/fonts", path + "/dist/res/fonts")
 shutil.copytree(path + "/res/img", path + "/dist/res/img")
 shutil.copytree(path + "/libs", path + "/dist/libs")
-#os.remove(path + "/dist/libs/vue-dev.js")
+for p in Path(path + "/dist/libs").glob("vue-*.*.*-dev.js"):
+	print(p)
+	p.unlink()
 
 # Create index.html from index_dist.html and packed files
 index_file = open(path + "/index_dist.html", "r")
