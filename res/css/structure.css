@@ -74,7 +74,7 @@ aside.box {
 
 .form-group input[type=checkbox],
 .form-group input[type=radio] {
-	vertical-align: text-bottom;
+	vertical-align: baseline;
 }
 .form-group input:not([type=checkbox]):not([type=radio]),
 .form-group select {

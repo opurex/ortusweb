@@ -102,7 +102,7 @@ body {
 	border-radius: 1em;
 }
 .box header + .box-body {
-	border-radius: 0px 0px 1em 1em;
+	border-radius: 0px 0em 1em 1em;
 }
 
 @media (max-width:22rem) {
@@ -125,23 +125,25 @@ body {
 
 .box header .browser ul {
 	padding: 0;
-	margin: 0;
+	margin: 0 0 0 1ex;
 	justify-content: flex-start;
 }
 
 .box header .browser li {
-	background-color: rgba(255, 255, 255, 0.5);
+	background-color: #eee;
 	margin-right: 0.5em;
 	padding: 0.5em;
 	border-radius: 0.5em 0.5em 0 0;
+	border-bottom: 1px solid #aaa;
 }
 .box header .browser li:last-child {
-	background-color: rgba(255, 255, 255, 1);
+	background-color: #fff;
+	border-bottom: none;
 }
 
 .box header .browser li h1 {
 	font-size: medium;
-	font-weight: normal;
+	font-weight: bold;
 	color: #555;
 	margin: 0;
 }
