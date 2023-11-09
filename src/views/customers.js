@@ -7,6 +7,7 @@ Vue.component("vue-customer-list", {
 			dpLabels: {},
 			filterVisible: this.data.filterVisible,
 			customers: [], // in data instead of computed because asychronous
+			stats: {activeCount: 0, inactiveCount: 0, expiredActiveCount: 0, prepaidTotal: 0.0, debtTotal: 0.0, balanceTotal: 0.0},
 			customersTable: new Table().reference("customer-list")
 				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image de profil du client. Ce champ ne peut être exporté."))
 				.column(new TableCol().reference("dispName").label("Nom affiché").visible(true).searchable(true).help("Le nom du client tel qu'affiché ou imprimé"))
@@ -62,6 +63,15 @@ Vue.component("vue-customer-list", {
 	</header>
 	<article class="box-body">
 		<vue-table v-bind:table="customersTable"></vue-table>
+		<h3>Statistiques</h3>
+		<ul>
+			<li>Comptes clients actifs : {{ stats.activeCount }}</li>
+			<li>Comptes clients inactifs : {{ stats.inactiveCount }}</li>
+			<li>Comptes clients actifs expirés : {{ stats.expiredActiveCount }}</li>
+			<li>Cumul pré-payé : {{ stats.prepaidTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</li>
+			<li>Cumul dette : {{ stats.debtTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</li>
+			<li>Solde total : {{ stats.balanceTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</li>
+		</ul>
 	</article>
 </section>
 </div>
@@ -106,6 +116,21 @@ Vue.component("vue-customer-list", {
 					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"
 				];
 				this.customersTable.line(line);
+				let now = new Date();
+				if (cust.visible) {
+					this.stats.activeCount++;
+					if (cust.expireDate && now > cust.expireDate) {
+						this.stats.expiredActiveCount++;
+					}
+					if (cust.balance > 0.0) {
+						this.stats.prepaidTotal += cust.balance;
+					} else {
+						this.stats.debtTotal -= cust.balance;
+					}
+					this.stats.balanceTotal += cust.balance;
+				} else {
+					this.inactiveCount++;
+				}
 			}
 		},
 		loadCustomers: function() {
