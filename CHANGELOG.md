@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.23] - 2023-11-09
+
+### Added
+- Customize customer’s contact field names
+- Statistics to customer list
+
+### Fixed
+- Remove vuejs-dev from the release bundle
+- Horizontal alignment for checkboxes and radio buttons
+- Increase navigation tabs legibility with solid background color
+- Import customer’s first name and last name from csv
+- Local value for customer’s balance after edition
+
+
 ## [8.22] - 2023-08-22
 
 ### Removed
