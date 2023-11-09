@@ -122,16 +122,15 @@ function _resources_showResources(resources) {
 function resources_showResource(resLabel) {
 	gui_showLoading();
 	if (resLabel == "option.customer.customFields") {
-		storage_open(function(event) {
-			storage_get("options", OPTION_CUSTOMER_FIELDS, function(opt) {
-				if (typeof(opt) == "undefined") {
-					opt = new Option(OPTION_CUSTOMER_FIELDS, "");
-				}
-				vue.screen.data = {
-					option: opt
-				};
-				vue.screen.component="vue-customercontact";
+		CustomerDef.loadCustomizedContactFields(function(contactFields) {
+			let orderedFields = [];
+			CustomerDef.contactFieldList.forEach(f => {
+				orderedFields.push(contactFields[f]);
 			});
+			vue.screen.data = {
+				contactFields: orderedFields
+			};
+			vue.screen.component="vue-customercontact";
 		});
 		return;
 	}

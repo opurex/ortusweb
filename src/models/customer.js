@@ -33,4 +33,48 @@ let CustomerDef = {
 	},
 	refField: "dispName",
 	lookupFields: ["dispName", "email", "phone1", "phone2"],
+
+	// Custom contact field name functions
+	contactFieldList: ["firstName", "lastName", "email", "phone1", "phone2", "fax", "addr1", "addr2", "zipCode", "city", "region", "country"],
+	contactFields: function() {
+		return {
+			firstName: {label: "Label.Customer.FirstName", value: "", default: "Nom"},
+			lastName: {label: "Label.Customer.LastName", value: "", default: "Prénom"},
+			email: {label: "Label.Customer.Email", value: "", default: "Email"},
+			phone1: {label: "Label.Customer.Phone", value: "", default: "Téléphone"},
+			phone2: {label: "Label.Customer.Phone2", value: "", default: "Télphone 2"},
+			fax: {label: "Label.Customer.Fax", value: "", default: "Fax"},
+			addr1: {label: "Label.Customer.Addr", value: "", default: "Adresse"},
+			addr2: {label: "Label.Customer.Addr2", value: "", default: "Adresse 2"},
+			zipCode: {label: "Label.Customer.ZipCode", value: "", default: "Code postal"},
+			city: {label: "Label.Customer.City", value: "", default: "Ville"},
+			region: {label: "Label.Customer.Region", value: "", default: "Région"},
+			country: {label: "Label.Customer.Country", value: "", default: "Pays"},
+		};
+	},
+	loadCustomizedContactFields: function(callback) {
+		storage_open(function(event) {
+			storage_get("options", OPTION_CUSTOMER_FIELDS, function(opt) {
+				let fieldMapping = {};
+				if (typeof(opt) != "undefined") {
+					try {
+						fieldMapping = JSON.parse(opt.content);
+						if (fieldMapping == null || (typeof fieldMapping != "object")) {
+							fieldMapping = {};
+						}
+					} catch (e) {
+						console.warn("Could not parse customer's contact fields customisation", e);
+					}
+				}
+				let contactFields = CustomerDef.contactFields();
+				CustomerDef.contactFieldList.forEach(f => {
+					let labelCode = contactFields[f].label;
+					if (labelCode in fieldMapping && fieldMapping[labelCode] != null && fieldMapping[labelCode] != "") {
+						contactFields[f].value = fieldMapping[labelCode];
+					}
+				});
+				callback(contactFields);
+			});
+		});
+	}
 }

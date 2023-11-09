@@ -8,13 +8,16 @@ function customers_show() {
 }
 
 function _customers_showCustomers(taxes, tariffAreas, discountProfiles) {
-	vue.screen.data = {
-		"filterVisible": "visible",
-		"taxes": taxes,
-		"tariffAreas": tariffAreas,
-		"discountProfiles": discountProfiles,
-	}
-	vue.screen.component = "vue-customer-list";
+	CustomerDef.loadCustomizedContactFields(function(contactFields) {
+		vue.screen.data = {
+			"filterVisible": "visible",
+			"taxes": taxes,
+			"tariffAreas": tariffAreas,
+			"discountProfiles": discountProfiles,
+			"contactFields": contactFields
+		}
+		vue.screen.component = "vue-customer-list";
+	});
 }
 
 function customers_showCustomer(custId) {
@@ -35,7 +38,6 @@ function customers_showCustomer(custId) {
 }
 
 function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles, cashRegisters, paymentModes, users) {
-	gui_hideLoading();
 	let start = new Date(new Date().getTime() - 604800000); // Now minus 7 days
 	let stop = new Date(new Date().getTime() + 86400000); // Now + 1 day
 	vue.screen.data = {
@@ -77,7 +79,11 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 			.column(new TableCol().reference("user").label("Opérateur").visible(false).searchable(true).help("Le nom du compte utilisateur qui a réalisé la vente."))
 			.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true).help("Sélectionner le ticket. Ce champ n'est jamais exporté."))
 	}
-	vue.screen.component = "vue-customer-form";
+	CustomerDef.loadCustomizedContactFields(function(contactFields) {
+		vue.screen.data.contactFields = contactFields;
+		vue.screen.component = "vue-customer-form";
+		gui_hideLoading();
+	});
 }
 
 function customers_saveCustomer() {
@@ -313,8 +319,11 @@ function customers_showImport() {
 				"tariffAreas": data.tariffareas,
 				"taxes": data.taxes,
 			}
-			vue.screen.component = "vue-customer-import";
 			storage_close();
+			CustomerDef.loadCustomizedContactFields(function(contactFields) {
+				vue.screen.data.contactFields = contactFields;
+				vue.screen.component = "vue-customer-import";
+			});
 		});
 	});
 }
@@ -344,6 +353,14 @@ function _customers_parseCsv(fileContent, callback) {
 		region: "region", "région": "region",
 		country: "country", "pays": "country",
 	};
+	CustomerDef.contactFieldList.forEach(f => {
+		if (f in vue.screen.data.contactFields) {
+			let customLabel = vue.screen.data.contactFields[f].value
+			if (customLabel) {
+				columnMappingDef[customLabel.toLowerCase()] = f;
+			}
+		}
+	});
 	storage_open(function(event) {
 		storage_readStores(["customers", "discountprofiles", "tariffareas", "taxes"], function(data) {
 			let parser = new CsvParser(CustomerDef, columnMappingDef, data.customers,

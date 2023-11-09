@@ -133,6 +133,15 @@ Vue.component("vue-customer-list", {
 			let dp = this.data.discountProfiles[i];
 			this.dpLabels[dp.id] = dp.label;
 		}
+		let customContactFields = this.data.contactFields;
+		this.customersTable.columns().forEach(col => {
+			if (col.reference() in customContactFields) {
+				let custom = customContactFields[col.reference()];
+				if (custom.value != "") {
+					col.label(custom.value);
+				}
+			}
+		});
 		this.loadCustomers();
 	},
 	watch: {
@@ -206,18 +215,18 @@ Vue.component("vue-customer-form", {
 			</fieldset>
 			<fieldset>
 				<legend>Coordonnées</legend>
-				<vue-input-text label="Prénom" v-model="data.customer.firstName" id="edit-firstName" />
-				<vue-input-text label="Nom" v-model="data.customer.lastName" id="edit-lastName" />
-				<vue-input-text label="Email" v-model="data.customer.email" id="edit-email" />
-				<vue-input-text label="Téléphone" v-model="data.customer.phone1" id="edit-phone1" />
-				<vue-input-text label="Téléphone 2" v-model="data.customer.phone2" id="edit-phone2" />
-				<vue-input-text label="Fax" v-model="data.customer.fax" id="edit-fax" />
-				<vue-input-text label="Adresse" v-model="data.customer.addr1" id="edit-addr1" />
-				<vue-input-text label="Adresse 2" v-model="data.customer.addr2" id="edit-addr2" />
-				<vue-input-text label="Code Postal" v-model="data.customer.zipCode" id="edit-zipCode" />
-				<vue-input-text label="Ville" v-model="data.customer.city" id="edit-city" />
-				<vue-input-text label="Région" v-model="data.customer.region" id="edit-region" />
-				<vue-input-text label="Pays" v-model="data.customer.country" id="edit-country" />
+				<vue-input-text v-bind:label="contactFieldLabel('firstName')" v-model="data.customer.firstName" id="edit-firstName" />
+				<vue-input-text v-bind:label="contactFieldLabel('lastName')" v-model="data.customer.lastName" id="edit-lastName" />
+				<vue-input-text v-bind:label="contactFieldLabel('email')" v-model="data.customer.email" id="edit-email" />
+				<vue-input-text v-bind:label="contactFieldLabel('phone1')" v-model="data.customer.phone1" id="edit-phone1" />
+				<vue-input-text v-bind:label="contactFieldLabel('phone2')" v-model="data.customer.phone2" id="edit-phone2" />
+				<vue-input-text v-bind:label="contactFieldLabel('fax')" v-model="data.customer.fax" id="edit-fax" />
+				<vue-input-text v-bind:label="contactFieldLabel('addr1')" v-model="data.customer.addr1" id="edit-addr1" />
+				<vue-input-text v-bind:label="contactFieldLabel('addr2')" v-model="data.customer.addr2" id="edit-addr2" />
+				<vue-input-text v-bind:label="contactFieldLabel('zipCode')" v-model="data.customer.zipCode" id="edit-zipCode" />
+				<vue-input-text v-bind:label="contactFieldLabel('city')" v-model="data.customer.city" id="edit-city" />
+				<vue-input-text v-bind:label="contactFieldLabel('region')" v-model="data.customer.region" id="edit-region" />
+				<vue-input-text v-bind:label="contactFieldLabel('country')" v-model="data.customer.country" id="edit-country" />
 			</fieldset>
 
 			<div class="form-control">
@@ -289,6 +298,13 @@ Vue.component("vue-customer-form", {
 			} else {
 				return login_getHostUrl() + "/api/image/customer/default?Token=" + login_getToken();
 			}
+		},
+		contactFieldLabel(reference) {
+			if (this.data.contactFields[reference].value) {
+				return this.data.contactFields[reference].value;
+			} else {
+				return this.data.contactFields[reference].default;
+			}
 		}
 	}
 });
@@ -314,18 +330,18 @@ Vue.component("vue-customer-import", {
 				{field: "discountProfile", label: "Profil de remise", type: "record", modelName: "discountProfile"},
 				{field: "tariffArea", label: "Zone tarifaire", type: "record", modelName: "tariffArea"},
 				{field: "tax", label: "TVA", type: "record", modelName: "tax"},
-				{field: "firstName", label: "Prénom"},
-				{field: "lastName", label: "Nom"},
-				{field: "email", label: "Courriel"},
-				{field: "phone1", label: "Téléphone"},
-				{field: "phone2", label: "Téléphone 2"},
-				{field: "fax", label: "Fax"},
-				{field: "addr1", label: "Adresse"},
-				{field: "addr2", label: "Adresse 2"},
-				{field: "zipCode", label: "Code postal"},
-				{field: "city", label: "Ville"},
-				{field: "region", label: "Région"},
-				{field: "country", label: "Pays"},
+				{field: "firstName", label: this.contactFieldLabel("firstName")},
+				{field: "lastName", label: this.contactFieldLabel("lastName")},
+				{field: "email", label: this.contactFieldLabel("email")},
+				{field: "phone1", label: this.contactFieldLabel("phone1")},
+				{field: "phone2", label: this.contactFieldLabel("phone2")},
+				{field: "fax", label: this.contactFieldLabel("fax")},
+				{field: "addr1", label: this.contactFieldLabel("addr1")},
+				{field: "addr2", label: this.contactFieldLabel("addr2")},
+				{field: "zipCode", label: this.contactFieldLabel("zipCode")},
+				{field: "city", label: this.contactFieldLabel("city")},
+				{field: "region", label: this.contactFieldLabel("region")},
+				{field: "country", label: this.contactFieldLabel("country")},
 			]
 		};
 	},
@@ -380,5 +396,12 @@ Vue.component("vue-customer-import", {
 			this.$refs.csvRef.value = "";
 			this.importResult = null;
 		},
+		contactFieldLabel(reference) {
+			if (this.data.contactFields[reference].value) {
+				return this.data.contactFields[reference].value;
+			} else {
+				return this.data.contactFields[reference].default;
+			}
+		}
 	}
 });

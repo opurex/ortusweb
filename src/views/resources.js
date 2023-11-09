@@ -93,20 +93,7 @@ Vue.component("vue-customercontact", {
 	props: ["data"],
 	data: function() {
 		return {
-			fields: [
-				{label: "Label.Customer.FirstName", value: "", default: "Nom"},
-				{label: "Label.Customer.LastName", value: "", default: "Prénom"},
-				{label: "Label.Customer.Email", value: "", default: "Email"},
-				{label: "Label.Customer.Phone", value: "", default: "Téléphone"},
-				{label: "Label.Customer.Phone2", value: "", default: "Télphone 2"},
-				{label: "Label.Customer.Fax", value: "", default: "Fax"},
-				{label: "Label.Customer.Addr", value: "", default: "Adresse"},
-				{label: "Label.Customer.Addr2", value: "", default: "Adresse 2"},
-				{label: "Label.Customer.ZipCode", value: "", default: "Code postal"},
-				{label: "Label.Customer.City", value: "", default: "Ville"},
-				{label: "Label.Customer.Region", value: "", default: "Région"},
-				{label: "Label.Customer.Country", value: "", default: "Pays"},
-			]
+			fields: []
 		};
 	},
 	template: `<div class="preferences">
@@ -147,19 +134,9 @@ Vue.component("vue-customercontact", {
 		}
 	},
 	mounted: function() {
-		let optContent = null;
-		try {
-			optContent = JSON.parse(this.data.option.content);
-		} catch (e) {
-			console.warn("Could not parse customer's contact fields customisation", e);
-		}
-		if (optContent == null || (typeof optContent != "object")) {
-			optContent = {};
-		}
-		this.fields.forEach(f => {
-			if (f.label in optContent && optContent[f.label] != null && optContent[f.label] != "") {
-				f.value = optContent[f.label];
-			}
+		let thiss = this;
+		this.data.contactFields.forEach(f => {
+			thiss.fields.push(f);
 		});
 	},
 });
