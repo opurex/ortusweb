@@ -304,10 +304,7 @@ Vue.component("vue-customer-form", {
 				<label for="old-balance">Ancien solde</label>
 				<input type="number" id="old-balance" v-model="oldBalance" disabled="true" />
 			</div>
-			<div class="form-group">
-				<label for="edit-balance">Nouveau solde</label>
-				<input type="number" id="edit-balance" v-model="data.customer.balance" step="0.01" />
-			</div>
+			<vue-input-number id="edit-balance" label="Nouveau solde" v-model="data.customer.balance" v-bind:required.boolean="true" v-bind:step.number="0.01" />
 			<div class="form-control">
 				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
 			</div>
