@@ -14,7 +14,7 @@ It uses a `RecordFactory` to create and merge values from the partial data defin
 
 `recordDef` is the model definition of what is imported. It is one of the structure defined in `src/model/` files.
 
-`mappingDef` is an object with accepted headers as keys (column header) and field name as values (as defined in `recordDef`). Headers are case-insensitive. Multiple column headers can be bound to the same field to accept aliases. It shares values with vue-import-preview widget.
+`mappingDef` is an object with accepted headers as keys (column header) and field name as values (as defined in `recordDef`). Headers must be registered in lower case. Multiple column headers can be bound to the same field to accept aliases. It shares values with vue-import-preview widget.
 
 `existingRecords` is the list of already registered records, to detect new ones from edited ones. It is often the result of `storage_readStore`.
 
