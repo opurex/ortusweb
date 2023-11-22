@@ -676,7 +676,8 @@ Vue.component("vue-table", {
 			<tr v-if="visibleLine(index)">
 				<template v-for="(value, colIndex) in line">
 					<td v-if="table.vuecolumns[colIndex].isVisible" v-bind:class="[table.vuecolumns[colIndex].class(), {numeric: table.vuecolumns[colIndex].isNumber(), datetime: table.vuecolumns[colIndex].isDateOrTime()}]">
-						<template v-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.THUMBNAIL">
+						<template v-if="value === undefined || value === null || value === ''"></template>
+						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.THUMBNAIL">
 							<img class="img img-thumbnail thumbnail" v-bind:src="value" />
 						</template>
 						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.BOOL">
