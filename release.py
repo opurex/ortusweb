@@ -52,7 +52,6 @@ shutil.copytree(path + "/res/fonts", path + "/dist/res/fonts")
 shutil.copytree(path + "/res/img", path + "/dist/res/img")
 shutil.copytree(path + "/libs", path + "/dist/libs")
 for p in Path(path + "/dist/libs").glob("vue-*.*.*-dev.js"):
-	print(p)
 	p.unlink()
 
 # Create index.html from index_dist.html and packed files
