@@ -400,6 +400,37 @@ class TableCol
 				|| this.#mType == TABLECOL_TYPE.DATETIME
 				|| this.#mType == TABLECOL_TYPE.TIME;
 	}
+	/**
+	 * Format value to render in a table cell as string.
+	 * This does not format images, html nor booleans.
+	 */
+	formatCell(value) {
+		if (value === undefined || value === null || value === '') {
+			return "";
+		}
+		switch (this.#mType) {
+			case TABLECOL_TYPE.NUMBER5:
+				return (value == 0.0) ? value : value.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5});
+			case TABLECOL_TYPE.NUMBER2:
+				return (value == 0.0) ? value : value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+			case TABLECOL_TYPE.NUMBER:
+				return value.toLocaleString();
+			case TABLECOL_TYPE.PERCENT:
+				return (value * 100).toLocaleString() + "%";
+			case TABLECOL_TYPE.DATE:
+				return tools_dateToString(value);
+			case TABLECOL_TYPE.DATETIME:
+				return tools_dateTimeToString(value);
+			case TABLECOL_TYPE.TIME:
+				return tools_timeToString(value);
+			default:
+				if ((typeof value) == "object" || (typeof value) == "string") {
+					return value.toString();
+				} else {
+					return String(value);
+				}
+		}
+	}
 	/** Format value for csv export. */
 	formatCsv(value) {
 		switch (this.#mType) {
@@ -683,15 +714,8 @@ Vue.component("vue-table", {
 						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.BOOL">
 							<input type="checkbox" disabled="1" v-bind:checked="value" />
 						</template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.NUMBER5">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5}) }}</template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.NUMBER2">{{ value == 0.0 ? value : value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.NUMBER">{{ value.toLocaleString() }}</template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.PERCENT">{{ (value * 100).toLocaleString() + "%" }}</template>
 						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.HTML"><span v-html="value"></span></template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.DATE">{{ tools_dateToString(value) }}</template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.DATETIME">{{ tools_dateTimeToString(value) }}</template>
-						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.TIME">{{ tools_timeToString(value) }}</template>
-						<template v-else>{{value}}</template>
+						<template v-else>{{table.vuecolumns[colIndex].formatCell(value)}}</template>
 					</td>
 
 				</template>
@@ -868,7 +892,8 @@ Vue.component("vue-table", {
 				for (let j = 0; j < this.table.columnLength(); j++) {
 					let col = this.table.column(j);
 					if (col.visible && (col.searchable())) {
-						if (this.table.line(i)[j].toLowerCase().includes(lowVal)) {
+						let val = col.formatCell(this.table.line(i)[j]);
+						if (val.toLowerCase().includes(lowVal)) {
 							this.searchResults.push(i);
 							continue;
 						}
