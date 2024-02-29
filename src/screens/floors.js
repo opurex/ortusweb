@@ -19,6 +19,12 @@ function _floors_showFloors(floors) {
 }
 
 function floors_selectPlace(place) {
+	if (vue.screen.data.selectedPlace != null) {
+		let el = document.getElementById("place" + vue.screen.data.selectedPlace.id);
+		if (el != null) {
+			el.classList.remove("selected");
+		}
+	}
 	vue.screen.data.selectedPlace = place;
 	// TODO: all of this should be magic with Vue, but I haven't found how to update the bind pointer.
 	if (place != null) {
@@ -32,6 +38,10 @@ function floors_selectPlace(place) {
 		el.value = vue.screen.data.selectedPlace.y;
 		el.disabled = false;
 		document.getElementById("place-delete").disabled = false;
+		let elPlace = document.getElementById("place" + place.id);
+		if (elPlace != null) {
+			elPlace.classList.add("selected");
+		}
 	} else {
 		let ids = ["place-label", "place-x", "place-y"]
 		for (let i = 0; i < ids.length; i++) {

@@ -468,5 +468,5 @@ nav.navbar {
 .place {
 	list-style-type: none;
 	margin: 0px 0px 0px -40px;
-	padding: 5px 14px;
+	user-select: none;
 }

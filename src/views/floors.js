@@ -4,6 +4,12 @@ Vue.component("vue-floors-edit", {
 		return {
 			selectedFloorId: null,
 			places: [],
+			DRAG_THRESHOLD: 5, // Move before dragging in pixels
+			dragging: false,
+			clickedPlace: null,
+			clickedPoint: null,
+			maxX: null,
+			maxY: null,
 		};
 	},
 	template: `<div class="floor-map">
@@ -64,9 +70,12 @@ Vue.component("vue-floors-edit", {
 				<legend>Plan de tables</legend>
 				<p>Suggestion de présentation. Veillez à laisser 3 cases entre les tables pour éviter le chevauchement</p>
 				<p>Attention : veillez à ce que les caisse soient fermées avant de modifier le plan de table, au risque de perdre les commandes en cours.</p>
-				<div class="floor-display">
+				<div class="floor-display" id="floor-display" v-on:mousemove="mousemovePlace($event)" v-on:mouseup="mouseupPlace($event)">
 					<ul>
-						<li class="place" style="position:absolute" v-for="place in places" :key="place.id" v-bind:style="{left: place.x, top: place.y}" v-on:click="selectPlace(place, $event)">{{place.label}}</li>
+						<li class="place" style="position:absolute" v-for="place in places" :key="place.id"
+							v-bind:id="'place' + place.id" v-bind:style="{left: place.x, top: place.y}"
+							v-on:click="selectPlace(place, $event)"
+							v-on:mousedown="mousedownPlace(place, $event)">{{place.label}}</li>
 					</ul>
 				</div>
 				<div class="form-control">
@@ -80,6 +89,41 @@ Vue.component("vue-floors-edit", {
 	methods: {
 		selectPlace: function(place, event) {
 			floors_selectPlace(place);
+		},
+		mousedownPlace: function(place, event) {
+			this.clickedPlace = place;
+			this.clickedPoint = {
+				x: event.clientX,
+				y: event.clientY,
+			};
+		},
+		mousemovePlace: function(event) {
+			if (!this.clickedPlace) {
+				return;
+			}
+			if (!this.dragging) {
+				if (Math.abs(event.clientX - this.clickedPoint.x) > this.DRAG_THRESHOLD || Math.abs(event.clientY - this.clickedPoint.y) > this.DRAG_THRESHOLD) {
+					this.dragging = true;
+					this.selectPlace(this.clickedPlace, event);
+				}
+			}
+			if (this.dragging) {
+				let deltaX = event.clientX - this.clickedPoint.x;
+				let deltaY = event.clientY - this.clickedPoint.y;
+				this.clickedPlace.x = Math.max(this.clickedPlace.x += deltaX, 0);
+				this.clickedPlace.x = Math.min(this.clickedPlace.x, this.maxX);
+				this.clickedPlace.y = Math.max(this.clickedPlace.y += deltaY, 0);
+				this.clickedPlace.y = Math.min(this.clickedPlace.y, this.maxY);
+				this.clickedPoint = {
+					x: event.clientX,
+					y: event.clientY,
+				};
+			}
+		},
+		mouseupPlace: function(event) {
+			this.clickedPlace = null;
+			this.clickedPoint = null;
+			this.dragging = false;
 		},
 		addPlace: function() {
 			floors_addPlace();
@@ -122,6 +166,9 @@ Vue.component("vue-floors-edit", {
 	},
 	mounted: function() {
 		this.autoselectFloor();
+		let floorEl = document.getElementById("floor-display");
+		this.maxX = floorEl.getBoundingClientRect().width;
+		this.maxY = floorEl.getBoundingClientRect().height;
 	}
 });
 
