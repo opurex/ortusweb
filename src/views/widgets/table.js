@@ -7,6 +7,7 @@ const TABLECOL_TYPE = {
 	NUMBER2: "number2",
 	/** Number with fixed 5 decimals. */
 	NUMBER5: "number5",
+	PERCENT: "percent",
 	BOOL: "bool",
 	/** Date without time. */
 	DATE: "date",
