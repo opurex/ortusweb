@@ -126,6 +126,8 @@ class CsvParser {
 			case "number":
 			case "date":
 				return this.#convertStrVal(value, field.type);
+			case "rate":
+				return this.#convertRate(value);
 			default:
 				console.error("Unknown column type \"" + field.type + "\" for " + key);
 				return value;
@@ -135,10 +137,28 @@ class CsvParser {
 		switch (type) {
 			case "string": return stringVal;
 			case "boolean": return (stringVal ? true : false);
-			case "number": return parseFloat(stringVal);
+			case "number":
+				let v = stringVal.trim().replace(",", ".");
+				return parseFloat(v);
+			case "rate": return this.#convertRate(stringVal);
 			case "date": return new PTDate(stringVal);
 		}
 		return stringVal;
+	}
+	#convertRate(stringVal) {
+		let value = stringVal;
+		if (typeof value == "string") {
+			let percentIndex = value.indexOf("%");
+			if (percentIndex != -1) {
+				return this.#convertStrVal(value.substring(0, percentIndex), "number") / 100.0;
+			}
+			value = this.#convertStrVal(value, "number");
+			// continue
+		}
+		if (value > 1.0) {
+			return value / 100.0;
+		}
+		return value;
 	}
 	#equalsIgnoreCase(val1, val2, type) {
 		switch (type) {

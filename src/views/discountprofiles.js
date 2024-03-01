@@ -20,6 +20,7 @@ Vue.component("vue-discountprofile-list", {
 		<nav class="navbar">
 			<ul>
 				<li><a class="btn btn-add" href="?p=discountprofile">Ajouter un profil de remise</a></li>
+				<li><a class="btn btn-add" href="?p=discountprofileImport">Importer un fichier</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -69,4 +70,70 @@ Vue.component("vue-discountprofile-form", {
 	</article>
 </section>
 </div>`
+});
+
+Vue.component("vue-discountprofile-import", {
+	props: ["data"],
+	data: function() {
+		return {
+			csv: null,
+			linkedRecords: { },
+			importResult: null,
+			tableColumns: [
+				{field: "label", label: "Désignation"},
+				{field: "rate", label: "Remise", type: "rate"},
+			]
+		};
+	},
+	template: `<div class="discountprofile-import">
+<section class="box box-large">
+	<header>
+		<nav class="browser">
+			<ul>
+				<li><a href="?p=home">Accueil</a></li>
+				<li><a href="?p=discountprofiles">Liste des profils</a></li>
+				<li><h1>Modification des profils de remise par fichier csv</h1></li>
+			</ul>
+		</nav>
+		<nav class="navbar">
+			<ul>
+				<li>
+					<label for="csv-file">Fichier</label>
+					<input ref="csvRef" type="file" accept="text/csv" id="csv-file" name="csv" v-on:change="readCsv" />
+				</li>
+			</ul>
+		</nav>
+	</header>
+	<div class="box-body">
+		<vue-import-preview newTitle="Nouveaux profils" editTitle="Profils modifiés" unchangedTitle="Profils non modifiés" modelsLabel="profils"
+			v-bind:importResult="importResult"
+			v-bind:linkedRecords="linkedRecords"
+			v-bind:tableColumns="tableColumns"
+			v-on:save="saveChanges" />
+	</div>
+</section>
+</div>`,
+	methods: {
+		readCsv: function (event) {
+			let fileName = event.target.files[0].name;
+			let thiss = this;
+			let reader = new FileReader();
+			let callback = function(data) {
+				thiss.importResult = data;
+			}
+			reader.onload = function(readerEvent) {
+				let fileContent = readerEvent.target.result;
+				_discountprofiles_parseCsv(fileContent, callback);
+			};
+			reader.readAsText(event.target.files[0]);
+		},
+		saveChanges: function() {
+			discountprofiles_saveDiscountProfiles();
+		},
+		reset: function() {
+			this.csv = null;
+			this.$refs.csvRef.value = "";
+			this.importResult = null;
+		},
+	}
 });

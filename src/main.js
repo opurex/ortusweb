@@ -134,6 +134,9 @@ function route(screen) {
 	case "discountprofile":
 		discountprofiles_showProfile(_get("id"));
 		break;
+	case "discountprofileImport":
+		discountprofiles_showImport();
+		break;
 	case "cashregisters":
 		cashregisters_show();
 		break;
