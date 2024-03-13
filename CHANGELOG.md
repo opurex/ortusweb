@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.24] - 2024-03-13
+
+### Added
+- Drag'n drop places on floor edit form
+- Cancel deletion on floor edit form
+- Import discount profiles from csv
+
+### Changed
+- Rewrite floor edit form
+
+### Fixed
+- null, empty and undefined values in table cells
+- table search on non-string values
+- Unexpected `enter` shortcut on floor edit form
+
+
 ## [8.23] - 2023-11-09
 
 ### Added

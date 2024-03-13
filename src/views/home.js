@@ -16,7 +16,7 @@ Vue.component("vue-home", {
 			<li><a href="https://pasteque.org/Contactez-nous" target="_blank">Les contacts de l'association Pastèque</a></li>
 		</ul>
 		<p style="font-size:small;margin-bottom:0px;">Les fontes de caractères Open Dyslexic et Atkinson Hyperlegible sont distribuées sous licence SIL, voir les licences pour <a href="res/fonts/SIL Open Font License.txt" target="_blank">Open Dyslexic</a> et <a href="res/fonts/Atkinson Hyperlegible Font License.txt" target="_blank">Atkinson Hyberlegible</a></p>
-		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.23</p>
+		<p style="text-align:right;font-size:small;margin-bottom:0px">Pasteque-jsadmin v8.24</p>
 	</article>
 </section>
 </div>
