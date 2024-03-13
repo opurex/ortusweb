@@ -208,6 +208,7 @@ a.btn {
 	background-color: #777;
 	border-color: #636363;
 	color: white;
+	cursor: not-allowed;
 }
 
 .btn-primary {
@@ -496,7 +497,8 @@ fieldset legend {
 /* Table styles */
 
 .floor-display {
-	margin: auto;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 table, th, td {
@@ -545,7 +547,16 @@ tbody tr:hover .z-oddcol {
 	background-color: #c0e174;
 	color: #333;
 }
-
+.deleted-places {
+	display: flex;
+	padding: 0px;
+}
+.place-list {
+	margin: 1ex;
+	padding: 0.5ex;
+	border: 1px solid #000;
+	background-color: #fff;
+}
 .floor {
 	background-color: lightgray;
 	border: solid 1px black;

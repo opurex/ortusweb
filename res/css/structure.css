@@ -68,7 +68,8 @@ aside.box {
 
 /* Common form */
 
-.form-group {
+.form-group,
+.form-control {
 	margin-bottom: 1em;
 }
 
@@ -467,6 +468,9 @@ nav.navbar {
 }
 .place {
 	list-style-type: none;
-	margin: 0px 0px 0px -40px;
+	margin: -1.5rem 0px 0px -2rem;
 	user-select: none;
+}
+.place-list {
+	list-style-type: none;
 }

@@ -2,7 +2,8 @@ Vue.component("vue-floors-edit", {
 	props: ["data"],
 	data: function() {
 		return {
-			selectedFloorId: null,
+			selectedFloor: null,
+			selectedPlace: null,
 			places: [],
 			DRAG_THRESHOLD: 5, // Move before dragging in pixels
 			dragging: false,
@@ -10,6 +11,10 @@ Vue.component("vue-floors-edit", {
 			clickedPoint: null,
 			maxX: null,
 			maxY: null,
+			deleted: {
+				floors: [],
+				places: [],
+			},
 		};
 	},
 	template: `<div class="floor-map">
@@ -24,71 +29,98 @@ Vue.component("vue-floors-edit", {
 		<nav class="navbar">
 			<ul>
 				<li><button class="btn btn-add" v-on:click="addFloor()">Ajouter une salle</button></li>
-				<li><button class="btn btn-add" v-on:click="addPlace()">Ajouter une table</button></li>
 				<li>
 					<label for="select-floor">Salle</label>
-					<select class="form-control" id="select-floor" v-model="selectedFloorId">
-						<option disabled value="">Please select one</option>
-						<option v-for="floor in data.floors" :key="floor.id" v-bind:value="floor.id">{{floor.label}}</option>
+					<select class="form-control" id="select-floor" v-model="selectedFloor">
+						<option disabled value="">Liste des salles ordonnées</option>
+						<option v-for="floor in sortedFloors" :key="floor.id" v-bind:value="floor">{{floor.label}}</option>
 					</select>
 				</li>
 			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
+		<p class="warning">Attention : veillez à ce que les caisse soient fermées avant de modifier le plan de table, au risque de perdre les commandes en cours au rechargement.</p>
 		<form id="edit-map" class="form-large form-mosaic" onsubmit="return false;">
-			<fieldset class="form-tiny">
-				<legend>Salle</legend>
+			<fieldset class="form-tiny" v-if="selectedPlace">
+				<legend>Table sélectionnée</legend>
 				<div class="form-group">
-					<label for="floor-label">Nom de la salle</label>
-					<input id="floor-label" type="text" onchange="javascript:floors_floorEdit('label');" />
-				</div>
-				<div class="form-group">
-					<label for="floor-dispOrder">Ordre d'affichage</label>
-					<input id="floor-dispOrder" type="number" step="1" onchange="javascript:floors_floorEdit('dispOrder');" />
-				</div>
-			</fieldset>
-			<fieldset class="form-tiny">
-				<legend>Table courante</legend>
-				<div class="form-group">
-					<label for="place-label">Nom de la table sélectionnée</label>
-					<input id="place-label" type="text" onchange="javascript:floors_placeEdit('label');" />
+					<label for="place-label">Nom de la table</label>
+					<input id="place-label" type="text" v-model="selectedPlace.label" />
 				</div>
 				<div class="form-group">
 					<label for="place-x">X</label>
-					<input id="place-x" type="number" step="1" onchange="javascript:floors_placeEdit('x');" />
+					<input id="place-x" type="number" step="1" v-model="selectedPlace.x" />
 				</div>
 				<div class="form-group">
 					<label for="place-y">Y</label>
-					<input id="place-y" type="number" step="1" onchange="javascript:floors_placeEdit('y');" />
+					<input id="place-y" type="number" step="1" v-model="selectedPlace.y" />
 				</div>
 				<div class="form-control">
-					<button id="place-delete" class="btn btn-remove" v-on:click="deletePlace()">Supprimer</button>
+					<button type="button" id="place-delete" class="btn btn-remove" v-on:click="deletePlace()">Supprimer la table</button>
+				</div>
+			</fieldset>
+			<fieldset class="form-tiny" v-else>
+				<legend>Table sélectionnée</legend>
+				<div class="form-group">
+					<label>Nom de la table</label>
+					<input type="text" disabled="true" placeholder="Aucune table sélectionnée">
+				</div>
+				<div class="form-group">
+					<label>Position X (horizontal)</label>
+					<input type="text" disabled="true" placeholder="Aucune table sélectionnée">
+				</div>
+				<div class="form-group">
+					<label>Position Y (vertical)</label>
+					<input type="text" disabled="true" placeholder="Aucune table sélectionnée">
+				</div>
+				<div class="form-control">
+					<button type="button" class="btn btn-remove" disabled="true">Supprimer la table</button>
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Plan de tables</legend>
-				<p>Suggestion de présentation. Veillez à laisser 3 cases entre les tables pour éviter le chevauchement</p>
-				<p>Attention : veillez à ce que les caisse soient fermées avant de modifier le plan de table, au risque de perdre les commandes en cours.</p>
+				<legend>Plan de tables <span style="font-size: x-small; font-style: italic;">(suggestion de présentation)</span></legend>
+				<div class="form-group" v-if="selectedFloor">
+					<label for="floor-label">Nom de la salle</label>
+					<input id="floor-label" type="text" v-model="selectedFloor.label">
+				</div>
+				<div class="form-group" v-if="selectedFloor">
+					<label for="floor-dispOrder">Ordre d'affichage</label>
+					<input id="floor-dispOrder" type="number" step="1" v-model="selectedFloor.dispOrder" />
+				</div>
+				<div class="form-control">
+					<button type="button" class="btn btn-add" v-on:click="addPlace()">Ajouter une table</button>
+					<button type="button" id="floor-delete" class="btn btn-remove" v-bind:disabled="selectedFloor?.id" v-on:click="deleteFloor()" v-bind:title="deleteFloorTitle">Supprimer la salle</button>
+				</div>
 				<div class="floor-display" id="floor-display" v-on:mousemove="mousemovePlace($event)" v-on:mouseup="mouseupPlace($event)">
 					<ul>
 						<li class="place" style="position:absolute" v-for="place in places" :key="place.id"
 							v-bind:id="'place' + place.id" v-bind:style="{left: place.x, top: place.y}"
+							v-bind:class="{ 'selected': selectedPlace == place }"
 							v-on:click="selectPlace(place, $event)"
 							v-on:mousedown="mousedownPlace(place, $event)">{{place.label}}</li>
 					</ul>
 				</div>
-				<div class="form-control">
-					<button class="btn btn-primary btn-send" type="submit" v-on:click="save">Envoyer</button>
-				</div>
 			</fieldset>
+			<fieldset>
+				<legend>Éléments supprimés</legend>
+				<ul class="deleted-places">
+					<li class="place-list" v-for="(place, index) in deleted.places">{{place.label}} <button class="btn btn-misc" type="button" v-on:click="restorePlace(place, index)"><img style="height: 2ex;" src="res/img/cancel.png" alt="Restaurer" title="Restaurer"></button></li>
+				</ul>
+				<ul class="deleted-floors">
+					<li class="floor-list" v-for="(floor, index) in deleted.floors">{{floor.label}} ({{floor.places.length}} tables)<button class="btn btn-misc" type="button" v-on:click="restoreFloor(floor, index)"><img style="height: 2ex;" src="res/img/cancel.png" alt="Restaurer" title="Restaurer"></button></li>
+				</ul>
+			</fieldset>
+			<div class="form-control">
+				<button class="btn btn-primary btn-send" type="button" v-on:click="save">Enregistrer les modifications</button>
+			</div>
 		</form>
 	</article>
 </section>
 </div>`,
 	methods: {
 		selectPlace: function(place, event) {
-			floors_selectPlace(place);
+			this.selectedPlace = place;
 		},
 		mousedownPlace: function(place, event) {
 			this.clickedPlace = place;
@@ -125,26 +157,73 @@ Vue.component("vue-floors-edit", {
 			this.clickedPoint = null;
 			this.dragging = false;
 		},
-		addPlace: function() {
-			floors_addPlace();
+		addPlace: function(newPlace) {
+			if (arguments.length == 0 || newPlace == null) {
+				newPlace = Place_default();
+			}
+			this.selectedFloor.places.push(newPlace);
+			this.selectPlace(newPlace);
 		},
 		deletePlace: function() {
-			floors_deletePlace();
+			this.deleted.places.push(this.selectedPlace);
+			let index = this.selectedFloor.places.findIndex((place) => (place == this.selectedPlace), this);
+			if (index != -1) {
+				this.selectedFloor.places.splice(index, 1);
+			}
+			this.autoselectPlace(this.selectedPlace.x, this.selectedPlace.y);
 		},
-		addFloor: function() {
-			floors_addFloor();
+		restorePlace: function(place, index) {
+			this.addPlace(place);
+			this.deleted.places.splice(index, 1);
+			this.selectPlace(place);
 		},
-		autoselectPlace() {
-			if (this.data.selectedFloor.places.length > 0) {
-				floors_selectPlace(this.data.selectedFloor.places[0]);
+		addFloor: function(newFloor) {
+			if (arguments.length == 0 || newFloor == null) {
+				newFloor = Floor_default();
+			}
+			this.data.floors.push(newFloor);
+			this.selectedFloor = newFloor;
+		},
+		deleteFloor: function() {
+			this.deleted.floors.push(this.selectedFloor);
+			let index = this.data.floors.findIndex((floor) => (floor == this.selectedFloor), this);
+			if (index != -1) {
+				this.data.floors.splice(index, 1);
+			}
+			this.autoselectFloor();
+		},
+		restoreFloor: function(floor, index) {
+			this.addFloor(floor);
+			this.deleted.floors.splice(index, 1);
+			this.autoselectPlace();
+		},
+		autoselectPlace(fromX, fromY) {
+			if (arguments.length < 2 || !fromX || !fromY) {
+				fromX = 0;
+				fromY = 0;
+			}
+			let minDist = Infinity;
+			let minIndex = -1;
+			if (!this.selectedFloor) {
+				this.selectPlace(null);
+				return;
+			}
+			this.selectedFloor.places.forEach((place, index) => {
+				let dist = Math.abs(place.x - fromX) + Math.abs(place.y - fromY);
+				if (dist < minDist) {
+					minDist = dist;
+					minIndex = index;
+				}
+			});
+			if (minIndex != -1) {
+				this.selectPlace(this.selectedFloor.places[minIndex]);
 			} else {
-				floors_selectPlace(null);
+				this.selectPlace(null);
 			}
 		},
 		autoselectFloor() {
 			if (this.data.floors.length > 0) {
-				this.selectedFloorId = this.data.floors[0].id;
-				this.data.selectedFloor = this.data.floors[0];
+				this.selectedFloor = this.data.floors[0];
 				this.autoselectPlace();
 			}
 		},
@@ -153,15 +232,42 @@ Vue.component("vue-floors-edit", {
 		}
 	},
 	watch: {
-		'selectedFloorId': function(floorId, oldVal) {
-			let floor = null;
-			for (let i = 0; i < this.data.floors.length; i++) {
-				if (floorId == this.data.floors[i].id) {
-					this.places = this.data.floors[i].places;
-					floors_selectFloor(this.data.floors[i]);
-					this.autoselectPlace();
+		'selectedFloor': function(floor, oldVal) {
+			if (floor != null) {
+				this.places = floor.places;
+				this.selectedFloor = floor;
+				this.autoselectPlace();
+			}
+		},
+		"data.floors": function(newFloors, oldFloors) {
+			if (newFloors.length != oldFloors.length) {
+				return; // add or remove floor, no reset
+			}
+			if (newFloors.length == 0 || newFloors[0] == oldFloors[0]) {
+				return; // same reference
+			}
+			// On reset after save
+			if (this.selectedFloor) {
+				let selected = this.selectedFloor;
+				let newRef = this.data.floors.find((floor) => (floor.label == selected.label && floor.dispOrder == selected.dispOrder));
+				if (newRef) {
+					this.selectedFloor = newRef;
+				} else {
+					this.autoselectFloor();
 				}
 			}
+		}
+	},
+	computed: {
+		"deleteFloorTitle": function() {
+			if (this.selectedFloor?.id) {
+				return "La suppression d'une salle déjà enregistrée n'est pas supportée actuellement. Contactez votre prestataire pour effectuer la suppression.";
+			} else {
+				return "";
+			}
+		},
+		"sortedFloors": function() {
+			return this.data.floors.sort((a, b) => { return a.dispOrder - b.dispOrder });
 		},
 	},
 	mounted: function() {
