@@ -297,8 +297,7 @@ Vue.component("vue-product-form", {
 				<legend>Volumétrie et contenance</legend>
 				<vue-input-checkbox label="Vente en vrac" v-model="data.product.scaled" id="edit-scaled" />
 				<div class="form-group">
-					<label for="edit-scaleValue">Contenance</label>
-					<input id="edit-scaleValue" type="number" step="0.01" v-model="data.product.scaleValue" v-if="data.product.scaled == false" />
+					<vue-input-number label="Contenance" v-bind:step="0.001" v-model="data.product.scaleValue" v-if="data.product.scaled == false" id="edit-scaleValue" />
 					<select id="edit-scaleType" v-model="data.product.scaleType">
 						<option v-bind:value="0" v-bind:disabled="data.product.scaled == true">pièce</option>
 						<option v-bind:value="1">Kilogramme</option>
@@ -329,7 +328,7 @@ Vue.component("vue-product-form", {
 			if (!this.data.product.scaled) {
 				price = price / this.data.product.scaleValue;
 			}
-			price = price.toFixed(2).toLocaleString() + "€ ";
+			price = price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "€ ";
 			switch (this.data.product.scaleType) {
 				case 0:
 					price += "pièce";
