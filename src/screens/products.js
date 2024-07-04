@@ -395,44 +395,9 @@ function products_showImport() {
 
 function _products_parseCsv(fileContent, callback) {
 	gui_showLoading();
-	let columnMappingDef = {
-		reference: "reference",
-		"référence": "reference",
-		label: "label",
-		"désignation": "label",
-		"category": "category",
-		"catégorie": "category",
-		barcode: "barcode",
-		"code barre": "barcode",
-		prepay: "prepay",
-		"recharge pré-payment": "prepay",
-		scaled: "scaled",
-		"vente au poids": "scaled",
-		scaletype: "scaleType",
-		"poids/volume": "scaleType",
-		scalevalue: "scaleValue",
-		"contenance": "scaleValue",
-		pricebuy: "priceBuy",
-		"prix d'achat ht": "priceBuy",
-		pricesell: "priceSell",
-		"prix de vente ht": "priceSell",
-		taxedprice: "taxedPrice",
-		pricesellvat: "taxedPrice",
-		"prix de vente ttc": "taxedPrice",
-		tax: "tax",
-		"tva": "tax",
-		discountenabled: "discountEnabled",
-		"remise automatique": "discountEnabled",
-		discountrate: "discountRate",
-		"taux de remise": "discountRate",
-		disporder: "dispOrder",
-		"ordre": "dispOrder",
-		visible: "visible",
-		"en vente": "visible"
-	};
 	storage_open(function(event) {
 		storage_readStores(["products", "categories", "taxes"], function(data) {
-			let parser = new CsvParser(ProductDef, columnMappingDef, data.products,
+			let parser = new CsvParser(ProductDef, data.products,
 					[
 						{modelDef: CategoryDef, "records": data.categories},
 						{modelDef: TaxDef, "records": data.taxes}

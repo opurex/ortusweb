@@ -103,18 +103,9 @@ function categories_showImport() {
 
 function _categories_parseCsv(fileContent, callback) {
 	gui_showLoading();
-	let columnMappingDef = {
-		reference: "reference",
-		"référence": "reference",
-		label: "label",
-		"désignation": "label",
-		"parent": "parent",
-		disporder: "dispOrder",
-		"ordre": "dispOrder",
-	};
 	storage_open(function(event) {
 		storage_readStore("categories", function(categories) {
-			let parser = new CsvParser(CategoryDef, columnMappingDef, categories,
+			let parser = new CsvParser(CategoryDef, categories,
 					[{modelDef: CategoryDef, "records": categories}]);
 			let imported = parser.parseContent(fileContent);
 			gui_hideLoading();

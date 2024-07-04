@@ -67,15 +67,9 @@ function discountprofiles_showImport() {
 
 function _discountprofiles_parseCsv(fileContent, callback) {
 	gui_showLoading();
-	let columnMappingDef = {
-		label: "label",
-		"désignation": "label",
-		"rate": "rate",
-		remise: "rate",
-	};
 	storage_open(function(event) {
 		storage_readStore("discountprofiles", function(discountProfiles) {
-			let parser = new CsvParser(DiscountProfileDef, columnMappingDef, discountProfiles, []);
+			let parser = new CsvParser(DiscountProfileDef, discountProfiles, []);
 			let imported = parser.parseContent(fileContent);
 			storage_close();
 			gui_hideLoading();

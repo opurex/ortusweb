@@ -7,10 +7,10 @@ let CategoryDef = {
 		return null;
 	},
 	fields: {
-		"reference": { type: "string", default: "" },
-		"label": { type: "string", default: "" },
-		"dispOrder": { type: "number", default: 0 },
-		"parent": { type: "record", modelName: "category", default: null },
+		"reference": { type: "string", label: "Référence" },
+		"label": { type: "string", label: "Désignation" },
+		"dispOrder": { type: "number", default: 0, label: "Ordre" },
+		"parent": { type: "record", modelName: "category", default: null, label: "Parent" },
 		"hasImage": { type: "boolean", default: false },
 	},
 	refField: "reference",

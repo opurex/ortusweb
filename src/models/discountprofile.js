@@ -14,8 +14,8 @@ let DiscountProfileDef = {
 		return null;
 	},
 	fields: {
-		"label": {type: "string", default: ""},
-		"rate": {type: "rate", default: 0.0},
+		"label": {type: "string", default: "", label: "Désignation"},
+		"rate": {type: "rate", default: 0.0, label: "Remise"},
 	},
 	refField: "label",
 	lookupFields: ["label"],

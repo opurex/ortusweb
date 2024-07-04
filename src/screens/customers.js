@@ -330,29 +330,6 @@ function customers_showImport() {
 
 function _customers_parseCsv(fileContent, callback) {
 	gui_showLoading();
-	let columnMappingDef = {
-		dispname: "dispName", "nom affiché": "dispName",
-		card: "card", "carte": "card",
-		maxdebt: "maxDebt", "dette max": "maxDebt",
-		note: "note", "notes": "note",
-		expiredate: "expireDate", "date d'expiration": "expireDate",
-		visible: "visible", "actif": "visible",
-		discountprofile: "discountProfile", "profil de remise": "discountProfile",
-		tariffarea: "tariffArea", "zone tarifaire": "tariffArea",
-		tax: "tax", "tva": "tax",
-		firstname: "firstName", "nom": "firstName",
-		lastname: "lastName", "prénom": "lastName",
-		email: "email", "courriel": "email",
-		phone1: "phone1", "téléphone": "phone1",
-		phone2: "phone2", "téléphone 2": "phone2",
-		fax: "fax", "fax": "fax",
-		addr1: "addr1", "adresse": "addr1",
-		addr2: "addr2", "adresse 2": "addr2",
-		zipcode: "zipCode", "code postal": "zipCode",
-		city: "city", "ville": "city",
-		region: "region", "région": "region",
-		country: "country", "pays": "country",
-	};
 	CustomerDef.contactFieldList.forEach(f => {
 		if (f in vue.screen.data.contactFields) {
 			let customLabel = vue.screen.data.contactFields[f].value
@@ -363,7 +340,7 @@ function _customers_parseCsv(fileContent, callback) {
 	});
 	storage_open(function(event) {
 		storage_readStores(["customers", "discountprofiles", "tariffareas", "taxes"], function(data) {
-			let parser = new CsvParser(CustomerDef, columnMappingDef, data.customers,
+			let parser = new CsvParser(CustomerDef, data.customers,
 					[{modelDef: DiscountProfileDef, "records": data.discountprofiles},
 					{modelDef: TariffAreaDef, "records": data.tariffareas},
 					{modelDef: TaxDef, "records": data.taxes}]);

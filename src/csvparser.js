@@ -10,15 +10,12 @@ class CsvParser {
 	/**
 	 * Create a parser.
 	 * @param recordDef A record definition object.
-	 * @param mappingDef An object with accepted headers as keys and field name as values.
-	 * Headers are case-insensitive. It shares values with vue-import-preview widget.
 	 * @param existingRecords The list of existing records to check for editions.
 	 * @param linkedRecords A list of {"modelDef": def, "records": list of records} to check
 	 * for fields that references an other record.
 	 */
-	constructor(recordDef, mappingDef, existingRecords, linkedRecords) {
+	constructor(recordDef, existingRecords, linkedRecords) {
 		this.#recordDef = recordDef;
-		this.#columnMappingDef = mappingDef;
 		this.#existingRecords = existingRecords;
 		this.#linkedRecords = linkedRecords;
 	}
@@ -72,9 +69,17 @@ class CsvParser {
 		this.#columnMapping = {};
 		this.#unknownColumns = [];
 		for (let key in line) {
-			if (key.toLowerCase() in this.#columnMappingDef) {
-				this.#columnMapping[key] = this.#columnMappingDef[key.toLowerCase()];
-			} else {
+			let columnKey = key.toLowerCase();
+			let found = false;
+			for (let fieldKey in this.#recordDef.fields) {
+				let field = this.#recordDef.fields[fieldKey];
+				if (columnKey == fieldKey.toLowerCase() || ("label" in field && columnKey == field.label.toLowerCase())) {
+					this.#columnMapping[key] = fieldKey;
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
 				this.#unknownColumns.push(key);
 			}
 		}
