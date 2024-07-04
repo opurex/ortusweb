@@ -581,14 +581,29 @@ Vue.component("vue-product-import", {
 	data: function() {
 		return {
 			csv: null,
-			newProducts: [],
-			editedProducts: [],
-			editedValues: [],
-			unchangedProducts: [],
-			showUnchanged: false,
-			unknownColumns: [],
-			errors: [],
-			warnings: [],
+			linkedRecords: {
+				category: this.data.categories,
+				tax: this.data.taxes,
+			},
+			importResult: null,
+			tableColumns: [
+				{field: "reference", label: "Référence"},
+				{field: "label", label: "Désignation"},
+				{field: "category", label: "Catégorie", type: "record", modelName: "category"},
+				{field: "barcode", label: "Code barre"},
+				{field: "prepay", label: "Recharge pré-payment", type: "boolean"},
+				{field: "scaled", label: "Vente au poids", type: "boolean"},
+				{field: "scaleType", label: "Poids/Volume", type: "scaleType"},
+				{field: "scaleValue", label: "Contenance", type: "number"},
+				{field: "priceBuy", label: "Prix d'achat HT", type: "number5"},
+				{field: "priceSell", label: "Prix de vente HT", type: "number5"},
+				{field: "taxedPrice", label: "Prix de vente TTC", type: "number2"},
+				{field: "tax", label: "TVA", type: "record", modelName: "tax"},
+				{field: "discountEnabled", label: "Remise automatique", type: "boolean"},
+				{field: "discountRate", label: "Taux de remise", type: "rate"},
+				{field: "dispOrder", label: "Ordre", type: "number"},
+				{field: "visible", label: "En vente", type: "boolean"},
+			],
 		};
 	},
 	template: `<div class="product-import">
@@ -611,53 +626,11 @@ Vue.component("vue-product-import", {
 		</nav>
 	</header>
 	<div class="box-body">
-		<h2>Nouveaux produits</h2>
-		<vue-product-import-table v-bind:products="newProducts" v-bind:categories="data.categories" v-bind:taxes="data.taxes"></vue-product-import-table>
-		<h2>Produits modifiés</h2>
-		<p v-if="editedProducts.length > 0">Les cases sur fond rouge indiquent les changements.</p>
-		<vue-product-import-table v-bind:products="editedProducts" v-bind:editedValues="editedValues" v-bind:categories="data.categories" v-bind:taxes="data.taxes"></vue-product-import-table>
-		<h2>Produits non modifiés</h2>
-		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{unchangedProducts.length}} produits</template></a></div>
-		<vue-product-import-table v-show="showUnchanged" v-bind:products="unchangedProducts" v-bind:categories="data.categories" v-bind:taxes="data.taxes"></vue-product-import-table>
-		<template v-if="warnings.length > 0">
-		<h2>Alertes</h2>
-		<table class="table table-bordered table-hover">
-			<thead>
-				<tr>
-					<th>Ligne</th>
-					<th>Information</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="warn in warnings">
-					<td>{{warn.line}}</td>
-					<td>{{warn.message}}</td>
-				</tr>
-			</tbody>
-		</table>
-		</template>
-		<h2 v-if="unknownColumns.length > 0 || errors.length > 0">Erreurs de lecture</h2>
-		<table class="table table-bordered table-hover" v-if="unknownColumns.length > 0 || errors.length > 0">
-			<thead>
-				<tr>
-					<th>Ligne</th>
-					<th>Erreur</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-if="unknownColumns.length > 0">
-					<td>1</td>
-					<td>Les colonnes suivantes ont été ignorées : <template v-for="col in unknownColumns">{{col}} </template>.</td>
-				<tr>
-				<tr v-for="err in errors">
-					<td>{{err.line}}</td>
-					<td>{{err.error}}</td>
-				</tr>
-			</tbody>
-		</table>
-		<div>
-			<a class="btn btn-edit" v-if="newProducts.length > 0 || editedProducts.length > 0" v-on:click="saveChanges">Enregister les modifications</a>
-		</div>
+		<vue-import-preview newTitle="Nouveaux produits" editTitle="Produits modifiés" unchangedTitle="Produits non modifiés" modelsLabel="produits"
+			v-bind:importResult="importResult"
+			v-bind:linkedRecords="linkedRecords"
+			v-bind:tableColumns="tableColumns"
+			v-on:save="saveChanges" />
 	</div>
 </section>
 </div>`,
@@ -667,13 +640,7 @@ Vue.component("vue-product-import", {
 			let thiss = this;
 			let reader = new FileReader();
 			let callback = function(data) {
-				thiss.newProducts = data.newProducts;
-				thiss.editedProducts = data.editedProducts;
-				thiss.editedValues = data.editedValues;
-				thiss.unchangedProducts  = data.unchangedProducts;
-				thiss.unknownColumns = data.unknownColumns;
-				thiss.errors = data.errors;
-				thiss.warnings = data.warnings;
+				thiss.importResult = data;
 			}
 			reader.onload = function(readerEvent) {
 				let fileContent = readerEvent.target.result;
@@ -687,108 +654,7 @@ Vue.component("vue-product-import", {
 		reset: function() {
 			this.csv = null;
 			this.$refs.csvRef.value = "";
-			this.newProducts = [];
-			this.editedProducts = [];
-			this.editedValues = [];
-			this.unchangedProducts = [];
-			this.showUnchanged = false;
-			this.unknownColumns = [];
-			this.errors = [];
-			this.warnings = [];
+			this.importResult = null;
 		},
 	}
-});
-
-Vue.component("vue-product-import-table", {
-	props: ["title", "products", "editedValues", "categories", "taxes"],
-	template: `<div class="because">
-<h2>{{title}}</h2>
-<table class="table table-bordered table-hover">
-	<thead>
-		<tr>
-			<th>Référence</th>
-			<th>Désignation</th>
-			<th>Catégorie</th>
-			<th>Code barre</th>
-			<th>Recharge pré-payment</th>
-			<th>Vente au poids</th>
-			<th>Poids/Volume</th>
-			<th>Contenance</th>
-			<th>Prix d'achat HT</th>
-			<th>Prix de vente HT</th>
-			<th>Prix de vente TTC</th>
-			<th>TVA</th>
-			<th>Remise automatique</th>
-			<th>Taux de remise</th>
-			<th>Ordre</th>
-			<th>En vente</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr v-for="(product, index) in products">
-			<td v-bind:style="hasChanged(index, 'reference')">{{product.reference}}</td>
-			<td v-bind:style="hasChanged(index, 'label')">{{product.label}}</td>
-			<td v-bind:style="hasChanged(index, 'category')">{{category(product.category)}}</td>
-			<td v-bind:style="hasChanged(index, 'barcode')">{{product.barcode}}</td>
-			<td v-bind:style="hasChanged(index, 'prepaid')">{{boolVal(product.prepaid)}}</td>
-			<td v-bind:style="hasChanged(index, 'scaled')">{{boolVal(product.scaled)}}</td>
-			<td v-bind:style="hasChanged(index, 'scaleType')">{{scaleType(product.scaleType)}}</td>
-			<td v-bind:style="hasChanged(index, 'scaleValue')">{{numVal(product.scaleValue)}}</td>
-			<td v-bind:style="hasChanged(index, 'priceBuy')">{{numVal(product.priceBuy)}}</td>
-			<td v-bind:style="hasChanged(index, 'priceSell')">{{numVal(product.priceSell)}}</td>
-			<td v-bind:style="hasChanged(index, 'taxedPrice')">{{numVal(product.taxedPrice)}}</td>
-			<td v-bind:style="hasChanged(index, 'tax')">{{tax(product.tax)}}</td>
-			<td v-bind:style="hasChanged(index, 'discountEnabled')">{{boolVal(product.discountEnabled)}}</td>
-			<td v-bind:style="hasChanged(index, 'discountRate')">{{percentVal(product.discountRate)}}</td>
-			<td v-bind:style="hasChanged(index, 'dispOrder')">{{product.dispOrder}}</td>
-			<td v-bind:style="hasChanged(index, 'visible')"><input type="checkbox" disabled="1" v-bind:checked="product.visible" /></td>
-		</tr>
-	</tbody>
-</table>
-</div>`,
-	methods: {
-		category: function(catId) {
-			for (let i = 0; i < this.categories.length; i++) {
-				if (this.categories[i].id == catId) {
-					return this.categories[i].label;
-				}
-			}
-			return "";
-		},
-		boolVal: function(val) {
-			if (val)
-				return "Oui";
-			return "Non";
-		},
-		numVal: function(val) {
-			if (val == null)
-				return "";
-			return val.toLocaleString();
-		},
-		percentVal: function(val) {
-			return (val * 100).toLocaleString() + "%";
-		},
-		scaleType: function(type) {
-			switch(type) {
-				case 0: case "0": return "-"
-				case 1: case "1": return "Poids"
-				case 2: case "2": return "Litre"
-				case 3: case "3": return "Heure"
-			}
-		},
-		tax: function(taxId) {
-			for (let i = 0; i < this.taxes.length; i++) {
-				if (this.taxes[i].id == taxId) {
-					return this.taxes[i].label;
-				}
-			}
-			return "";
-		},
-		hasChanged: function(index, field) {
-			if (this.editedValues && this.editedValues[index][field]) {
-				return "font-weight:bold;background-color:#a36052;color:#fff";
-			}
-			return "";
-		}
-	},
 });

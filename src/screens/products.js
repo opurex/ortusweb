@@ -394,12 +394,6 @@ function products_showImport() {
 }
 
 function _products_parseCsv(fileContent, callback) {
-	let csv = new CSV(fileContent, {header: true, cast: false});
-	let rawProducts = csv.parse();
-	if (rawProducts.length == 0) {
-		callback({newProducts: [], editedProducts: [], unchangedProducts: [],
-			unknownColumns: [], errors: []});
-	}
 	gui_showLoading();
 	let columnMappingDef = {
 		reference: "reference",
@@ -420,6 +414,8 @@ function _products_parseCsv(fileContent, callback) {
 		"contenance": "scaleValue",
 		pricebuy: "priceBuy",
 		"prix d'achat ht": "priceBuy",
+		pricesell: "priceSell",
+		"prix de vente ht": "priceSell",
 		taxedprice: "taxedPrice",
 		pricesellvat: "taxedPrice",
 		"prix de vente ttc": "taxedPrice",
@@ -434,247 +430,19 @@ function _products_parseCsv(fileContent, callback) {
 		visible: "visible",
 		"en vente": "visible"
 	};
-	columnMapping = {};
-	unknownColumns = [];
-	for (let key in rawProducts[0]) {
-		if (key.toLowerCase() in columnMappingDef) {
-			columnMapping[key] = columnMappingDef[key.toLowerCase()];
-		} else {
-			unknownColumns.push(key);
-		}
-	}
-	let newProducts = [];
-	let editedProducts = [];
-	let editedValues = [];
-	let unchangedProducts = [];
-	let errors = [];
-	let warnings = [];
 	storage_open(function(event) {
 		storage_readStores(["products", "categories", "taxes"], function(data) {
-			// Map by reference for easy mapping
-			let products = data["products"];
-			let categories = data["categories"];
-			let taxes = data["taxes"];
-			let productByRef = [];
-			let categoryByRef = [];
-			let categoryByLabel = [];
-			let taxByRef = [];
-			for (let i = 0; i < products.length; i++) {
-				productByRef[products[i].reference] = products[i];
-			}
-			for (let i = 0; i < categories.length; i++) {
-				categoryByRef[categories[i].reference] = categories[i];
-				categoryByLabel[categories[i].label] = categories[i];
-			}
-			for (let i = 0; i < taxes.length; i++) {
-				taxByRef[taxes[i].label] = taxes[i];
-			}
-			// Convert the incoming csv lines to product data
-			function mapValues(line, mapping) {
-				let ret = {};
-				for (key in line) {
-					if (key in mapping) {
-						ret[mapping[key]] = line[key];
-					}
-				}
-				return ret;
-			}
-			function convertBool(value) {
-				return (value != "0" && value != 0 && value != "");
-			}
-			function convertNum(value) {
-				let v = value.replace(",", ".");
-				v = v.replace(" ", "");
-				return parseFloat(v);
-			}
-
-			function convertScaleValue(value) {
-				let v = value
-					.trim()
-					.replace(",", ".");
-
-				if (v === "") {
-					return 1.0;
-				} else {
-					return parseFloat(v);
-				}
-			}
-			function convertScaleType(value) {
-				if (typeof value == "number") {
-					return value;
-				}
-				switch (value.toLowerCase()) {
-					case 'kilogramme': case 'kg': case 'poid': case 'poids': case '1':
-						return 1;
-					case 'litre': case 'l': case '2':
-						return 2;
-					case 'heure': case 'h': case 'horaire': case '3':
-						return 3;
-					case 'piece': case 'p': case 'u': case 'unité': case '0': case '-':
-						return 0
-				}
-				// TODO : throw some error
-				return 0;
-			}
-			function convertRate(value) {
-				if (typeof value == "string") {
-					let percentIndex = value.indexOf("%");
-					if (percentIndex != -1) {
-						return convertNum(value.substring(0, percentIndex)) / 100.0;
-					}
-					value = convertNum(value);
-				}
-				if (typeof value == "number") {
-					if (value > 1.0) {
-						return value / 100.0;
-					}
-					return value;
-				}
-			}
-			function convertValues(value) {
-				if ("prepay" in value)
-					value.prepay = convertBool(value.prepay);
-				if ("scaled" in value)
-					value.scaled = convertBool(value.scaled);
-				if ("discountEnabled" in value)
-					value.discountEnabled = convertBool(value.discountEnabled);
-				if ("visible" in value)
-					value.visible = convertBool(value.visible);
-				if ("scaleValue" in value)
-					value.scaleValue = convertScaleValue(value.scaleValue);
-				if ("scaleType" in value)
-					value.scaleType = convertScaleType(value.scaleType);
-				if ("priceBuy" in value)
-					if (value.priceBuy == "")
-						value.priceBuy = null;
-					else
-						value.priceBuy = convertNum(value.priceBuy);
-				if ("priceSell" in value)
-					value.priceSell = convertNum(value.priceSell);
-				if ("taxedPrice" in value)
-					value.taxedPrice = convertNum(value.taxedPrice);
-				if ("discountRate" in value)
-					value.discountRate = convertRate(value.discountRate);
-				if ("dispOrder" in value)
-					value.dispOrder = parseInt(value.dispOrder);
-				return value;
-			}
-			for (let i = 0; i < rawProducts.length; i++) {
-				let value = mapValues(rawProducts[i], columnMapping);
-				value = convertValues(value);
-				// Find tax and category id
-				let taxId = null;
-				let tax = null;
-				let categoryId = null;
-				if ("tax" in value) {
-					if (value.tax in taxByRef) {
-						taxId = taxByRef[value.tax].id
-						tax = taxByRef[value.tax];
-						value.tax = taxId;
-					} else {
-						errors.push({line: i + 2, error: "Le champ taxe n'est pas renseigné ou invalide."});
-						continue;
-					}
-				}
-				if ("category" in value) {
-					for (let c = 0; c < categories.length; c++) {
-						if (value.category.toLowerCase() === categories[c].reference.toLowerCase()) {
-							if (value.category !== categories[c].reference) {
-								warnings.push({line: i + 2, message: "La catégorie " + value.category + " a été associée à " + categories[c].label + " (référence " + categories[c].reference + ")"})
-							}
-							categoryId = categories[c].id
-							value.category = categoryId;
-							break;
-						} else if (value.category.toLowerCase() === categories[c].label.toLowerCase()) {
-							if (value.category !== categories[c].label) {
-								warnings.push({line: i + 2, message: "La catégorie " + value.category + " a été associée à " + categories[c].label + " (référence " + categories[c].reference + ")"})
-							}
-							categoryId = categories[c].id
-							value.category = categoryId;
-							break;
-						}
-					}
-
-					if (categoryId == null) {
-						errors.push({line: i + 2, error: "Le champ catégorie n'est pas renseigné ou invalide."});
-						continue;
-					}
-				}
-				// Load or create a new product
-				let prd = null;
-				let newProduct = !(value.reference in productByRef);
-				if (newProduct) {
-					prd = Product_default(value.category, value.tax);
-					if (tax == null || categoryId == null) {
-						errors.push({line: i + 2, error: "Le champ taxe et/ou catégorie n'est pas renseigné ou invalide."});
-						continue;
-					}
-				} else {
-					prd = productByRef[value.reference];
-				}
-				// Compute priceSell when taxedPrice is set and vice-versa
-				if ("taxedPrice" in value) {
-					if (tax == null) {
-						for (let j = 0; j < taxes.length; j++) {
-							if (taxes[j].id == prd.tax) {
-								tax = taxes[j];
-								break;
-							}
-						}
-					}
-					let taxRate = tax.rate;
-					value.priceSell = Number(value.taxedPrice / (1.0 + taxRate)).toFixed(5);
-				} else if ("priceSell" in value) {
-					if (tax == null) {
-						for (let j = 0; j < taxes.length; j++) {
-							if (taxes[j].id == prd.tax) {
-								tax = taxes[j];
-								break;
-							}
-						}
-					}
-					let taxRate = tax.rate;
-					value.taxedPrice = Number(value.priceSell * (1.0 + taxRate)).toFixed(2);
-				}
-				// Merge values
-				let editedVals = [];
-				let changed = false;
-				for (key in value) {
-					if (isNaN(value[key])) {
-						// Error
-					}
-					if (prd[key] != value[key]) {
-						editedVals[key] = true;
-						changed = true;
-						prd[key] = value[key];
-					}
-				}
-				// Fix rounding approximative edit
-				if (editedVals["taxedPrice"] || editedVals["tax"])
-					editedVals["priceSell"] = true;
-				else
-					editedVals["priceSell"] = false;
-				// Put into the return values
-				if (newProduct) {
-					newProducts.push(prd);
-				} else {
-					if (changed) {
-						editedProducts.push(prd)
-						editedValues.push(editedVals);
-					} else {
-						unchangedProducts.push(prd);
-					}
-				}
-			}
-			// Done
+			let parser = new CsvParser(ProductDef, columnMappingDef, data.products,
+					[
+						{modelDef: CategoryDef, "records": data.categories},
+						{modelDef: TaxDef, "records": data.taxes}
+					]);
+			let imported = parser.parseContent(fileContent);
 			gui_hideLoading();
 			storage_close();
-			vue.screen.data.newProducts = newProducts;
-			vue.screen.data.editedProducts = editedProducts;
-			callback({newProducts: newProducts, editedProducts: editedProducts,
-					editedValues: editedValues,
-					unchangedProducts: unchangedProducts,
-					unknownColumns: unknownColumns, errors: errors, warnings: warnings});
+			vue.screen.data.newProducts = imported.newRecords;
+			vue.screen.data.editedProducts = imported.editedRecords;
+			callback(imported);
 		});
 	});
 }

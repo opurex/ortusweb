@@ -43,10 +43,16 @@ class CsvParser {
 			let existingRec = this.#existingRecords.find(r => r[refField] == lineVals[refField]);
 			let rec = null;
 			if (typeof existingRec == "undefined") {
-				rec = recFacto.create(lineVals);
-				newRecords.push(rec);
+				rec = recFacto.create(lineVals, this.#linkedRecords);
+				if (!recFacto.hasErrors()) {
+					newRecords.push(rec);
+				} else {
+					recFacto.getErrors().forEach(errKey => {
+						this.#errors.push({line: i + 2, field: lineVals[errKey], column: errKey, error: "InvalidField", value: lineVals[errKey]});
+					}, this);
+				}
 			} else {
-				recFacto.merge(existingRec, lineVals);
+				recFacto.merge(existingRec, lineVals, this.#linkedRecords);
 				rec = existingRec;
 				if (recFacto.hasChanges()) {
 					editedRecords.push(rec);
@@ -77,7 +83,10 @@ class CsvParser {
 		let ret = {};
 		for (let key in this.#columnMapping) {
 			let fieldName = this.#columnMapping[key];
-			ret[fieldName] = this.#parseValue(fieldName, key, lineData[key], index);
+			let val = this.#parseValue(fieldName, key, lineData[key], index);
+			if (typeof val !== "undefined") {
+				ret[fieldName] = val;
+			}
 		}
 		return ret;	
 	}
@@ -125,9 +134,9 @@ class CsvParser {
 			case "boolean":
 			case "number":
 			case "date":
-				return this.#convertStrVal(value, field.type);
 			case "rate":
-				return this.#convertRate(value);
+			case "scaleType":
+				return this.#convertStrVal(value, field.type);
 			default:
 				console.error("Unknown column type \"" + field.type + "\" for " + key);
 				return value;
@@ -135,30 +144,75 @@ class CsvParser {
 	}
 	#convertStrVal(stringVal, type) {
 		switch (type) {
-			case "string": return stringVal;
-			case "boolean": return (stringVal ? true : false);
+			case "string":
+			case "text":
+				return stringVal;
+			case "boolean":
+				return this.#convertBoolean(stringVal);
 			case "number":
-				let v = stringVal.trim().replace(",", ".");
-				return parseFloat(v);
-			case "rate": return this.#convertRate(stringVal);
-			case "date": return new PTDate(stringVal);
+				return this.#convertNumber(stringVal);
+			case "date":
+				return this.#convertDate(stringVal);
+			case "rate":
+				return this.#convertRate(stringVal);
+			case "scaleType":
+				return this.#convertScaleType(stringVal);
+			default:
+				console.error("Unknown column type \"" + type + "\"");
+				return value;
 		}
-		return stringVal;
+	}
+	#convertBoolean(stringVal) {
+		let v = stringVal.trim().toLowerCase();
+		if (v.length == 0) {
+			return false;
+		}
+		let first = v.charAt(0);
+		return v == "o" || v == "y" || v == "1";
+	}
+	#convertNumber(stringVal) {
+		let num = parseFloat(stringVal.trim().replace(",", "."));
+		if (isNaN(num)) {
+			return undefined;
+		}
+		return num;
+	}
+	#convertDate(stringVal) {
+		return new PTDate(stringVal);
 	}
 	#convertRate(stringVal) {
 		let value = stringVal;
+		// Convert value to number
 		if (typeof value == "string") {
 			let percentIndex = value.indexOf("%");
 			if (percentIndex != -1) {
-				return this.#convertStrVal(value.substring(0, percentIndex), "number") / 100.0;
+				// Explicitely %, return rate
+				return this.#convertNumber(value.substring(0, percentIndex)) / 100.0;
 			}
-			value = this.#convertStrVal(value, "number");
-			// continue
+			// Convert string to number and continue
+			value = this.#convertNumber(value);
 		}
 		if (value > 1.0) {
 			return value / 100.0;
 		}
 		return value;
+	}
+	#convertScaleType(stringVal) {
+		let intVal = parseInt(stringVal, 10);
+		if (! isNaN(intVal) && intVal >= 0 && intVal <= 3) {
+			return intVal;
+		}
+		switch (stringVal.trim().toLowerCase()) {
+			case 'kilogramme': case 'kg': case 'poid': case 'poids': case '1':
+				return 1;
+			case 'litre': case 'l': case '2':
+				return 2;
+			case 'heure': case 'h': case 'horaire': case '3':
+				return 3;
+			case 'piece': case 'p': case 'u': case 'unité': case '0': case '-':
+			default:
+				return 0
+		}
 	}
 	#equalsIgnoreCase(val1, val2, type) {
 		switch (type) {

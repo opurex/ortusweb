@@ -406,7 +406,7 @@ class TableCol
 	 * This does not format images, html nor booleans.
 	 */
 	formatCell(value) {
-		if (value === undefined || value === null || value === '') {
+		if (typeof value === "undefined" || value === null || value === '') {
 			return "";
 		}
 		switch (this.#mType) {
@@ -434,6 +434,9 @@ class TableCol
 	}
 	/** Format value for csv export. */
 	formatCsv(value) {
+		if (typeof value === "undefined" || value === null || value === '') {
+			return "";
+		}
 		switch (this.#mType) {
 			case TABLECOL_TYPE.BOOL:
 				return value ? "1" : "0";

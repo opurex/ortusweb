@@ -76,8 +76,15 @@ Vue.component("vue-import-preview", {
 		this.$emit('save', null);
 	},
 	errorMessage: function(err) {
-		if (err.error == "RecordNotFound") {
-			return err.column + " : la valeur \"" + err.value + "\" n'a pas pu être retrouvée";
+		switch (err.error) {
+			case "RecordNotFound":
+				return err.column + " : la valeur \"" + err.value + "\" n'a pas pu être retrouvée";
+			case "InvalidField":
+				if (typeof err.value == "undefined") {
+					return err.column + " est nécessaire";
+				} else {
+					return err.column + " : la valeur \"" + err.value + "\" est incorrecte";
+				}
 		}
 	},
 	warningMessage: function(warn) {
@@ -117,9 +124,11 @@ Vue.component("vue-import-preview-table", {
 			let val = record[tableColumn.field];
 			switch (tableColumn.type) {
 				case "boolean": return (val ? "Oui" : "Non");
-				case "number": return (val === "" ? "" : val.toLocaleString());
+				case "number": return ((val === "" || val === null) ? "" : val.toLocaleString());
+				case "number2": return ((val === "" || val === null) ? "" : val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+				case "number5": return ((val === "" || val === null) ? "" : val.toLocaleString(undefined, {minimumFractionDigits: 5, maximumFractionDigits: 5}));
 				case "rate": return (val * 100).toLocaleString() + "%";
-				case "scaleType": switch(type) {
+				case "scaleType": switch(val) {
 					case 0: case "0": return "-"
 					case 1: case "1": return "Poids"
 					case 2: case "2": return "Litre"
