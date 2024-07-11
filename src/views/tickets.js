@@ -33,9 +33,14 @@ Vue.component("vue-tickets-list", {
 			</form>
 		</nav>
 	</header>
-	<article class="box-body" id="report-content" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:space-around">
+	<article class="box-body" id="report-content">
 		<vue-table v-bind:table="data.table" ref="ticketTable"></vue-table>
-		<vue-tickets-content v-if="data.selectedTicket" v-bind:ticket="data.selectedTicket"></vue-tickets-content>
+		<div v-if="data.selectedTicket" class="modal-container">
+			<div style="display: flex; flex-direction: column; align-items: end; gap: 1rem; overflow: hidden;">
+				<button type="button" class="btn btn-misc" onclick="javascript:_tickets_selectTicket(null);">Fermer</button>
+				<vue-tickets-content v-if="data.selectedTicket" v-bind:ticket="data.selectedTicket"></vue-tickets-content>
+			</div>
+		</div>
 	</article>
 </section>
 </div>

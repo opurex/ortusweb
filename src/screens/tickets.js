@@ -224,7 +224,7 @@ function _tickets_dataRetreived() {
 			line.push(tax.amount);
 		});
 		line.push(user);
-		line.push("<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>");
+		line.push("<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Afficher</a></div>");
 		lines.push(line);
 	}
 	let footer = ["", "", "", "", "Total", total.cs.toLocaleString(), total.csTaxes.toLocaleString(), "", total.discountAmount.toLocaleString(), total.discountTaxedAmount.toLocaleString(), "", total.overPerceived.toLocaleString()];
@@ -238,11 +238,7 @@ function _tickets_dataRetreived() {
 	footer.push("");
 	footer.push("");
 	vue.screen.data.table.resetContent(lines, footer);
-	if (vue.screen.data.tickets.length > 0) {
-		_tickets_selectTicket(vue.screen.data.tickets[0]);
-	} else {
-		_tickets_selectTicket(null);
-	}
+	_tickets_selectTicket(null);
 }
 
 _tickets_selectTicket = function(ticket) {
