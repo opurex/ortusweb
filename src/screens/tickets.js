@@ -27,6 +27,7 @@ function tickets_show() {
 				.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).help("Le numéro du ticket de la caisse."))
 				.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
 				.column(new TableCol().reference("customer").label("Client").visible(false).help("Le compte client associé au ticket."))
+				.column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).visible(false).help("La variation totale du solde du compte client. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."))
 				.column(new TableCol().reference("finalPrice").label("Montant HT").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant HT du ticket après remise."))
 				.column(new TableCol().reference("finalTaxedPrice").label("Montant TTC").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant TTC du ticket après remise."))
 				.column(new TableCol().reference("discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(false).help("La remise accordée sur la totalité du ticket (incluse dans les montant TTC, HT et de TVA)"))
@@ -215,7 +216,7 @@ function _tickets_dataRetreived() {
 			}
 		}
 		// Fill the table
-		line = [cr, tkt.sequence, tkt.number, date, customer, tkt.finalPrice, tkt.finalTaxedPrice, tkt.discountRate, discountAmount, discountTaxedAmount, pmModesStr, overPerceived];
+		line = [cr, tkt.sequence, tkt.number, date, customer, tkt.custBalance, tkt.finalPrice, tkt.finalTaxedPrice, tkt.discountRate, discountAmount, discountTaxedAmount, pmModesStr, overPerceived];
 		pmModes.forEach(pm => {
 			line.push(pm.amount);
 		});
@@ -227,7 +228,7 @@ function _tickets_dataRetreived() {
 		line.push("<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Afficher</a></div>");
 		lines.push(line);
 	}
-	let footer = ["", "", "", "", "Total", total.cs.toLocaleString(), total.csTaxes.toLocaleString(), "", total.discountAmount.toLocaleString(), total.discountTaxedAmount.toLocaleString(), "", total.overPerceived.toLocaleString()];
+	let footer = ["", "", "", "", "Total", total.custBalance.toLocaleString(), total.cs.toLocaleString(), total.csTaxes.toLocaleString(), "", total.discountAmount.toLocaleString(), total.discountTaxedAmount.toLocaleString(), "", total.overPerceived.toLocaleString()];
 	vue.screen.data.paymentModes.forEach(pm => {
 		footer.push(total.paymentMode[pm.id].toLocaleString());
 	});
