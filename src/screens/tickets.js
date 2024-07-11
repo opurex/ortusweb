@@ -20,6 +20,30 @@ function tickets_show() {
 			if (cashRegisters.length > 0) {
 				cr = cashRegisters[0].id;
 			}
+			let table = new Table().reference("ticket-list");
+			table
+				.column(new TableCol().reference("cashRegster").label("Caisse").visible(false).help("Le nom de la caisse."))
+				.column(new TableCol().reference("sequence").label("Séquence").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."))
+				.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).help("Le numéro du ticket de la caisse."))
+				.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
+				.column(new TableCol().reference("customer").label("Client").visible(false).help("Le compte client associé au ticket."))
+				.column(new TableCol().reference("finalPrice").label("Montant HT").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant HT du ticket après remise."))
+				.column(new TableCol().reference("finalTaxedPrice").label("Montant TTC").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant TTC du ticket après remise."))
+				.column(new TableCol().reference("discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(false).help("La remise accordée sur la totalité du ticket (incluse dans les montant TTC, HT et de TVA)"))
+				.column(new TableCol().reference("discountAmount").label("Montant de remise HT").type(TABLECOL_TYPE.NUMBER2).visible(false).help("La valeur HT de la remise accordée"))
+				.column(new TableCol().reference("discountTaxedAmount").label("Montant de remise TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("La valeur TTC de la remise accordée"))
+				.column(new TableCol().reference("paymentmodes").label("Encaissement").visible(true).help("Les modes de paiement utilisés à l'encaissement."))
+				.column(new TableCol().reference("overPerceived").label("Trop perçu").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."));
+			data["paymentmodes"].forEach(pm => {
+				table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).visible(false).class("z-oddcol").help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
+			});
+			data["taxes"].forEach(tax => {
+				table.column(new TableCol().reference("tax-" + tax.id + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
+				table.column(new TableCol().reference("tax-" + tax.id + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant de TVA collectée associé au taux de TVA."));
+			});
+			table
+				.column(new TableCol().reference("user").label("Opérateur").visible(false).help("Le nom du compte utilisateur qui a réalisé la vente."))
+				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).visible(true).exportable(false).help("Sélectionner le ticket. Ce champ n'est jamais exporté."));
 			vue.screen.data = {
 				"start": start,
 				"stop": stop,
@@ -31,17 +55,7 @@ function tickets_show() {
 				"users": data["users"],
 				"customers": data["customers"],
 				"cashRegisterId": cr,
-				"table": new Table().reference("ticket-list")
-					.column(new TableCol().reference("cashRegster").label("Caisse").visible(false).help("Le nom de la caisse."))
-					.column(new TableCol().reference("sequence").label("Séquence").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."))
-					.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).help("Le numéro du ticket de la caisse."))
-					.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
-					.column(new TableCol().reference("customer").label("Client").visible(false).help("Le compte client associé au ticket."))
-					.column(new TableCol().reference("paymentmodes").label("Encaissement").visible(true).help("Les modes de paiement utilisés à l'encaissement."))
-					.column(new TableCol().reference("finalTaxedPrice").label("Montant").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant TTC du ticket."))
-					.column(new TableCol().reference("overPerceived").label("Trop perçu").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."))
-					.column(new TableCol().reference("user").label("Opérateur").visible(false).help("Le nom du compte utilisateur qui a réalisé la vente."))
-					.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).visible(true).exportable(false).help("Sélectionner le ticket. Ce champ n'est jamais exporté."))
+				"table": table
 			};
 			vue.screen.component = "vue-tickets-list";
 		});
@@ -109,8 +123,23 @@ function _tickets_filterCallback(request, status, response) {
 function _tickets_dataRetreived() {
 	gui_hideLoading();
 	vue.screen.data.tickets = _tickets_data.tickets;
-	let total = 0.0;
-	let overPerceivedTotal = 0.0;
+	let total = {
+		"tickets": 0,
+		"cs": 0.0,
+		"csTaxes": 0.0,
+		"custBalance": 0.0,
+		"discountAmount": 0.0,
+		"discountTaxedAmount": 0.0,
+		"paymentMode": {},
+		"tax": {},
+		"overPerceived": 0.0,
+	};
+	vue.screen.data.paymentModes.forEach(pm => {
+		total.paymentMode[pm.id] = 0.0;
+	});
+	vue.screen.data.taxes.forEach(tax => {
+		total.tax[tax.id] = {"base": 0.0, "amount": 0.0};
+	});
 	let lines = [];
 	for (let i = 0; i < _tickets_data.tickets.length; i++) {
 		let tkt = _tickets_data.tickets[i];
@@ -129,26 +158,55 @@ function _tickets_dataRetreived() {
 			}
 		}
 		let pmTotal = 0.0;
-		let pmModes = {};
-		for (let j = 0; j < tkt.payments.length; j++) {
-			let payment = tkt.payments[j];
-			pmTotal += tkt.payments[j].amount;
-			if (!(payment.paymentMode in pmModes)) {
-				pmModes[payment.paymentMode] = true;
-			}
-		}
+		let pmModes = [];
+		let taxes = [];
+		let actualPrice = 0.0; // total of tax bases, to compute the discount amount until it is stored in the ticket
+		vue.screen.data.paymentModes.forEach(pm => {
+			pmModes.push({id: pm.id, amount: 0.0, label: pm.label});
+		});
+		vue.screen.data.taxes.forEach(tax => {
+			taxes.push({id: tax.id, base: 0.0, amount: 0.0});
+		});
+		tkt.payments.forEach(payment => {
+			pmTotal += payment.amount;
+			total.paymentMode[payment.paymentMode] += payment.amount;
+			let pm = pmModes.find((p) => p.id == payment.paymentMode);
+			pm.amount += payment.amount;
+		});
+		tkt.taxes.forEach(tktTax => {
+			let tax = taxes.find((t) => t.id == tktTax.tax);
+			tax.base += tktTax.base;
+			tax.amount += tktTax.amount;
+			actualPrice += tax.base;
+		});
+		// Compute missing data from the raw ticket
+		/* Assume B2C mode is used (taxedPrice is set, price is not reliable). */
 		let overPerceived = pmTotal - tkt.finalTaxedPrice;
-		overPerceivedTotal += overPerceived;
+		let discountAmount = actualPrice / (1.0 - tkt.discountRate) - actualPrice;
+		discountAmount = Number.parseFloat(discountAmount.toFixed(2));
+		let discountTaxedAmount = tkt.taxedPrice - tkt.finalTaxedPrice;
+		// Add to totals
+		total.tickets++;
+		total.cs += tkt.finalPrice;
+		total.csTaxes += tkt.finalTaxedPrice;
+		total.custBalance += tkt.custBalance;
+		total.overPerceived += overPerceived;
+		total.discountAmount += discountAmount;
+		total.discountTaxedAmount += discountTaxedAmount;
+		taxes.forEach(tax => {
+			total.tax[tax.id].base += tax.base;
+			total.tax[tax.id].amount += tax.amount;
+		});
+		// List payment modes
 		let pmModesStr = "";
-		for (pm in pmModes) {
-			for (let j = 0; j < vue.screen.data.paymentModes.length; j++) {
-				pmMode = vue.screen.data.paymentModes[j]
-				if (pm == pmMode.id) {
-					pmModesStr += ", " + pmMode.label;
-				}
+		pmModes.forEach(pm => {
+			if (pm.amount == 0.0) {
+				return;
 			}
-		}
+			pmModesStr += ", " + pm.label;
+		});
 		pmModesStr = pmModesStr.substring(2);
+		// Retreive username
 		let user = "";
 		for (let j = 0; j < vue.screen.data.users.length; j++) {
 			if (vue.screen.data.users[j].id == tkt.user) {
@@ -156,12 +214,30 @@ function _tickets_dataRetreived() {
 				break;
 			}
 		}
-		lines.push([cr, tkt.sequence, tkt.number, date, customer, pmModesStr,
-			tkt.finalTaxedPrice, overPerceived, user,
-			"<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>"]);
-		total += tkt.finalTaxedPrice;
+		// Fill the table
+		line = [cr, tkt.sequence, tkt.number, date, customer, tkt.finalPrice, tkt.finalTaxedPrice, tkt.discountRate, discountAmount, discountTaxedAmount, pmModesStr, overPerceived];
+		pmModes.forEach(pm => {
+			line.push(pm.amount);
+		});
+		taxes.forEach(tax => {
+			line.push(tax.base);
+			line.push(tax.amount);
+		});
+		line.push(user);
+		line.push("<div class=\"btn-group pull-right\" role=\"group\"><button type=\"button\" class=\"btn btn-edit\" onclick=\"javascript:_tickets_selectTicket(vue.screen.data.tickets[" + i + "]);\">Sélectionner</a></div>");
+		lines.push(line);
 	}
-	vue.screen.data.table.resetContent(lines, ["", "", "", "", "", "Total", total.toLocaleString(), overPerceivedTotal.toLocaleString(), "", ""]);
+	let footer = ["", "", "", "", "Total", total.cs.toLocaleString(), total.csTaxes.toLocaleString(), "", total.discountAmount.toLocaleString(), total.discountTaxedAmount.toLocaleString(), "", total.overPerceived.toLocaleString()];
+	vue.screen.data.paymentModes.forEach(pm => {
+		footer.push(total.paymentMode[pm.id].toLocaleString());
+	});
+	vue.screen.data.taxes.forEach(tax => {
+		footer.push(Number.parseFloat(total.tax[tax.id].base.toFixed(2)).toLocaleString());
+		footer.push(Number.parseFloat(total.tax[tax.id].amount.toFixed(2)).toLocaleString());
+	});
+	footer.push("");
+	footer.push("");
+	vue.screen.data.table.resetContent(lines, footer);
 	if (vue.screen.data.tickets.length > 0) {
 		_tickets_selectTicket(vue.screen.data.tickets[0]);
 	} else {
