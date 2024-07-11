@@ -35,7 +35,7 @@ Vue.component("vue-tickets-list", {
 	</header>
 	<article class="box-body" id="report-content">
 		<vue-table v-bind:table="data.table" ref="ticketTable"></vue-table>
-		<div v-if="data.selectedTicket" class="modal-container">
+		<div v-if="data.selectedTicket" class="modal-container" v-on:click="closeModal">
 			<div style="display: flex; flex-direction: column; align-items: end; gap: 1rem; overflow: hidden;">
 				<button type="button" class="btn btn-misc" onclick="javascript:_tickets_selectTicket(null);">Fermer</button>
 				<vue-tickets-content v-if="data.selectedTicket" v-bind:ticket="data.selectedTicket"></vue-tickets-content>
@@ -44,7 +44,14 @@ Vue.component("vue-tickets-list", {
 	</article>
 </section>
 </div>
-`});
+`,
+	methods: {
+		closeModal: function(event) {
+			if (event.target == event.currentTarget) {
+				_tickets_selectTicket(null);
+			}
+		}
+	}});
 
 Vue.component("vue-tickets-content", {
 	props: ["ticket"],
