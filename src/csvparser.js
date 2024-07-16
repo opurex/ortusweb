@@ -19,6 +19,11 @@ class CsvParser {
 		this.#existingRecords = existingRecords;
 		this.#linkedRecords = linkedRecords;
 	}
+	/**
+	 * Parse the content of a csv file and return a CsvImportResult.
+	 * @param content The raw text content, with headers, passed to CSV.
+	 * @return A fully set CsvImportResult.
+	 */
 	parseContent(content) {
 		// Get csv content, CSV will return an object for each line with header as key.
 		let csv = new CSV(content, {header: true, cast: false});
@@ -84,6 +89,13 @@ class CsvParser {
 			}
 		}
 	}
+	/**
+	 * Read the line and return an dictionary with the parsed values.
+	 * Warnings and errors are added during the process.
+	 * @param index Index of the line, to list errors and warnings.
+	 * @param lineData The dictionary of header => value of a line.
+	 * @return A dictionary of fieldName => parsed value of the record.
+	 */
 	#readLine(index, lineData) {
 		let ret = {};
 		for (let key in this.#columnMapping) {
@@ -95,6 +107,14 @@ class CsvParser {
 		}
 		return ret;	
 	}
+	/**
+	 * Convert a single cell to a record value.
+	 * @param fieldName The name of the field from a ModelDef.
+	 * @param key The header of the column to push errors and warnings.
+	 * @param value The raw csv value to parse.
+	 * @param lineNum The number of the line to push errors and warnings.
+	 * @return The parsed value for the record.
+	 */
 	#parseValue(fieldName, key, value, lineNum) {
 		let field = this.#recordDef.fields[fieldName];
 		switch (field.type) {
