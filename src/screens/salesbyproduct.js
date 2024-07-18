@@ -27,15 +27,6 @@ function salesbyproduct_filter() {
 		"separateByTax": vue.screen.data.separateTaxes,
 		"products": {},
 		"customProducts": {},
-		"total": {
-			"qty": 0,
-			"price": 0.0,
-			"priceTax": 0.0,
-			"priceBuy": 0.0,
-			"margin": 0.0,
-			"tax": 0.0,
-			"taxDetails": {},
-		},
 		"initSalesData": function() {
 			return {
 				"qty": 0,
@@ -121,20 +112,12 @@ function _salesbyproduct_filterCallback(request, status, response) {
 			salesData.qty += line.quantity;
 			salesData.priceTax += line.finalTaxedPrice;
 			salesData.price += price;
-			_salesbyproduct_data.total.qty += line.quantity;
-			_salesbyproduct_data.total.price += price;
-			_salesbyproduct_data.total.priceTax += line.finalTaxedPrice;
 			// Include tax details
 			if (!(line.tax in salesData.taxDetails)) {
 				salesData.taxDetails[line.tax] = {"base": 0.0, "amount": 0.0};
 			}
 			salesData.taxDetails[line.tax].base += price;
 			salesData.taxDetails[line.tax].amount += line.finalTaxedPrice - price;
-			if (!(line.tax in _salesbyproduct_data.total.taxDetails)) {
-				_salesbyproduct_data.total.taxDetails[line.tax] = {"base": 0.0, "amount": 0.0};
-			}
-			_salesbyproduct_data.total.taxDetails[line.tax].base += price;
-			_salesbyproduct_data.total.taxDetails[line.tax].amount += line.finalTaxedPrice - price;
 		}
 	}
 	_salesbyproduct_data.currentPage++;
@@ -247,12 +230,6 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				}
 			}
 		}
-		for (let i = 0; i < taxes.length; i++) {
-			let tax = taxes[i];
-			if (!(tax.id in _salesbyproduct_data.total.taxDetails)) {
-				_salesbyproduct_data.total.taxDetails[tax.id] = {"base": 0.0, "amount": 0.0};
-			}
-		}
 	}
 	let catById = [];
 	for (let i = 0; i < categories.length; i++) {
@@ -301,8 +278,6 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 				if (prd.priceBuy > 0) {
 					line.push(prd.priceBuy * qty);
 					line.push(price - prd.priceBuy * qty);
-					_salesbyproduct_data.total.priceBuy += prd.priceBuy * qty;
-					_salesbyproduct_data.total.margin += price - prd.priceBuy * qty;
 				} else {
 					line.push("");
 					line.push("");
@@ -333,8 +308,6 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 						if (prd.priceBuy > 0) {
 							line.push(prd.priceBuy * qty);
 							line.push(price - prd.priceBuy * qty);
-							_salesbyproduct_data.total.priceBuy += prd.priceBuy * qty;
-							_salesbyproduct_data.total.margin += price - prd.priceBuy * qty;
 						} else {
 							line.push("");
 							line.push("");
@@ -429,47 +402,33 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 		.column(new TableCol().reference("cashRegister").label("Caisse").visible(oldColumnVisible("Caisse", oldColumns, false)).help("La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."))
 		.column(new TableCol().reference("category").label("Catégorie").visible(oldColumnVisible("Catégorie", oldColumns, true)).searchable(true).help("La catégorie actuelle du produit."))
 		.column(new TableCol().reference("reference").label("Reference").visible(oldColumnVisible("Reference", oldColumns, false)).searchable(true).help("La référence du produit."))
-		.column(new TableCol().reference("label").label("Désignation").visible(oldColumnVisible("Désignation", oldColumns, true)).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
-		.column(new TableCol().reference("quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).visible(oldColumnVisible("Quantité", oldColumns, true)).help("La quantité de produit vendue sur la période.").class("z-oddcol"))
-		.column(new TableCol().reference("priceSell").label("Vente HT").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible("Vente HT", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.").class("z-oddcol"))
-		.column(new TableCol().reference("priceBuy").label("Prix d'achat").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible("Prix d'achat", oldColumns, false)).help("Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.").class("z-oddcol"))
-		.column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible("Marge", oldColumns, false)).help("La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.").class("z-oddcol"))
-		.column(new TableCol().reference("priceSellVat").label("Vente TTC").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Vente TTC", oldColumns, false)).help("Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.").class("z-oddcol"));
-	vue.screen.data.table.footer([
-		"", "", "", "", "Total",
-		_salesbyproduct_data.total.qty.toLocaleString(),
-		_salesbyproduct_data.total.price.toLocaleString(),
-		_salesbyproduct_data.total.priceBuy.toLocaleString(),
-		_salesbyproduct_data.total.margin.toLocaleString(),
-		_salesbyproduct_data.total.priceTax.toLocaleString(),
-	]);
+		.column(new TableCol().reference("label").label("Désignation").footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(oldColumnVisible("Désignation", oldColumns, true)).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
+		.column(new TableCol().reference("quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Quantité", oldColumns, true)).help("La quantité de produit vendue sur la période.").class("z-oddcol"))
+		.column(new TableCol().reference("priceSell").label("Vente HT").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Vente HT", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.").class("z-oddcol"))
+		.column(new TableCol().reference("priceBuy").label("Prix d'achat").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Prix d'achat", oldColumns, false)).help("Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.").class("z-oddcol"))
+		.column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Marge", oldColumns, false)).help("La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.").class("z-oddcol"))
+		.column(new TableCol().reference("priceSellVat").label("Vente TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Vente TTC", oldColumns, false)).help("Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.").class("z-oddcol"));
 	if (separateByTax) {
 		for (let i = 0; i < taxes.length; i++) {
 			let tax = taxes[i];
-			let col = new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA.");
+			let col = new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA.");
 			if (i % 2 != 0) {
 				col.class("z-oddcol");
 			}
 			vue.screen.data.table.column(col);
-			col = new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).help("Le montant de TVA collectée associé au taux de TVA.");
+			col = new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).help("Le montant de TVA collectée associé au taux de TVA.");
 			if (i % 2 != 0) {
 				col.class("z-oddcol");
 			}
 			vue.screen.data.table.column(col);
-			col = new TableCol().reference("tax-" + i + "-total").label(tax.label + " TTC").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(tax.label + " TTC", oldColumns, false)).help("Le montant TTC associé au taux de TVA.");
+			col = new TableCol().reference("tax-" + i + "-total").label(tax.label + " TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " TTC", oldColumns, false)).help("Le montant TTC associé au taux de TVA.");
 			if (i % 2 != 0) {
 				col.class("z-oddcol");
 			}
 			vue.screen.data.table.column(col);
-			let totalTaxDetail = _salesbyproduct_data.total.taxDetails[tax.id]
-			vue.screen.data.table.footer(totalTaxDetail.base.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-			vue.screen.data.table.footer(totalTaxDetail.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
-			vue.screen.data.table.footer((totalTaxDetail.base + totalTaxDetail.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 5}));
 		}
 	}
-	lines.forEach(l => {
-		vue.screen.data.table.line(l);
-	});
+	vue.screen.data.table.resetContent(lines);
 	vue.$refs.screenComponent.$refs.salesTable.restoreDefaultPreferences();
 	gui_hideLoading();
 }

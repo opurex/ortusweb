@@ -53,23 +53,10 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		"overPerceivedTotal": 0.0,
 	};
 	for (let i = 0; i < categories.length; i++) {
-		total.categoryTotal.push(0.0);
-	}
-	for (let i = 0; i < paymentModes.length; i++) {
-		total.paymentModeTotal.push(0.0);
-	}
-	for (let i = 0; i < taxes.length; i++) {
-		total.taxTotal.push({"base": 0.0, "amount": 0.0});
-	}
-	for (let i = 0; i < categories.length; i++) {
 		for (let j = 0; j < taxes.length; j++) {
 			catTaxes.push(JSON.parse(JSON.stringify(taxes[j])));
 			catTaxes[i * taxes.length + j]["cat"] = categories[i]["label"];
-			total.catTaxTotal.push({"base": 0.0, "amount": 0.0});
 		}
-	}
-	for (let i = 0; i < customers.length; i++) {
-		total.custBalanceTotal.push(0.0);
 	}
 	let cashRegistersById = [];
 	for (let i = 0; i < cashRegisters.length; i++) {
@@ -135,9 +122,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 			"catTaxes": [],
 			"custBalances": [],
 		}
-		total.tickets += z.ticketCount;
-		total.cs += z.cs;
-		total.errorTotal += closeError;
 		let paymentTotal = 0.0;
 		for (let j = 0; j < paymentModes.length; j++) {
 			let pm = paymentModes[j];
@@ -152,7 +136,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 						renderZIndex = renderZ.payments.length;
 						renderZ.payments.push({"amount": pmt.amount});
 					}
-					total.paymentModeTotal[j] += pmt.amount;
 					paymentTotal += pmt.amount;
 					found = true;
 					keptPayments[j] = true;
@@ -175,8 +158,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				if (z.taxes[k].tax == tax.id) {
 					renderZ.taxes.push({"base": z.taxes[k].base,
 						"amount": z.taxes[k].amount});
-					total.taxTotal[j].base += z.taxes[k].base;
-					total.taxTotal[j].amount += z.taxes[k].amount;
 					csTaxes += z.taxes[k].amount;
 					found = true;
 					keptTaxes[j] = true;
@@ -191,10 +172,8 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				}
 			}
 		}
-		total.csTaxesTotal += csTaxes;
 		renderZ.csTaxes = csTaxes;
 		let overPerceived = paymentTotal - csTaxes;
-		total.overPerceivedTotal += overPerceived;
 		renderZ.overPerceived = overPerceived;
 		for (let j = 0; j < categories.length; j++) {
 			let cat = categories[j];
@@ -202,7 +181,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 			for (let k = 0; k < z.catSales.length; k++) {
 				if (z.catSales[k].reference == cat.reference) {
 					renderZ.categories.push({"amount": z.catSales[k].amount});
-					total.categoryTotal[j] += z.catSales[k].amount;
 					found = true;
 					keptCategories[j] = true;
 					break;
@@ -225,8 +203,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 					if (z.catTaxes[k].reference == cat.reference && z.catTaxes[k].tax == tax.id) {
 						renderZ.catTaxes.push({"base": z.catTaxes[k].base,
 							"amount": z.catTaxes[k].amount});
-						total.catTaxTotal[j * taxes.length + j2].base += z.catTaxes[k].base;
-						total.catTaxTotal[j * taxes.length + j2].amount += z.catTaxes[k].amount;
 						found = true;
 						keptCatTaxes[j * taxes.length + j2] = true;
 						break;
@@ -248,8 +224,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				if (z.custBalances[k].id.customer == customer.id) {
 					renderZ.custBalances.push({"amount": z.custBalances[k].balance});
 					renderZ.custBalance += z.custBalances[k].balance;
-					total.custBalance += z.custBalances[k].balance;
-					total.custBalanceTotal[j] += z.custBalances[k].balance;
 					found = true;
 					keptCustBalances[j] = true;
 					break;
@@ -275,7 +249,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 					renderZs[j]["payments"].splice(i - spliced, 1);
 				}
 				paymentModes.splice(i - spliced, 1);
-				total.paymentModeTotal.splice(i - spliced, 1);
 				spliced++;
 			}
 		}
@@ -288,7 +261,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 					renderZs[j]["taxes"].splice(i - spliced, 1);
 				}
 				taxes.splice(i - spliced, 1);
-				total.taxTotal.splice(i - spliced, 1);
 				spliced++;
 			}
 		}
@@ -301,7 +273,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 					renderZs[j]["categories"].splice(i - spliced, 1);
 				}
 				categories.splice(i - spliced, 1);
-				total.categoryTotal.splice(i - spliced, 1);
 				spliced++;
 			}
 		}
@@ -313,7 +284,6 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				renderZs[j]["catTaxes"].splice(i - spliced, 1);
 			}
 			catTaxes.splice(i - spliced, 1);
-			total.catTaxTotal.splice(i - spliced, 1);
 			spliced++;
 		}
 	}
@@ -324,30 +294,9 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 				renderZs[j]["custBalances"].splice(i - spliced, 1);
 			}
 			customers.splice(i - spliced, 1);
-			total.custBalanceTotal.splice(i - spliced, 1);
 			spliced++;
 		}
 	}
-	// Render
-	total.cs = total.cs.toLocaleString();
-	for (let i = 0; i < total.paymentModeTotal.length; i++) {
-		total.paymentModeTotal[i] = total.paymentModeTotal[i].toLocaleString();
-	}
-	for (let i = 0; i < total.taxTotal.length; i++) {
-		total.taxTotal[i].base = total.taxTotal[i].base.toLocaleString();
-		total.taxTotal[i].amount = total.taxTotal[i].amount.toLocaleString();
-	}
-	for (let i = 0; i < total.categoryTotal.length; i++) {
-		total.categoryTotal[i] = total.categoryTotal[i].toLocaleString();
-	}
-	for (let i = 0; i < total.catTaxTotal.length; i++) {
-		total.catTaxTotal[i].base = total.catTaxTotal[i].base.toLocaleString();
-		total.catTaxTotal[i].amount = total.catTaxTotal[i].amount.toLocaleString();
-	}
-	for (let i = 0; i < total.custBalanceTotal.length; i++) {
-		total.custBalanceTotal[i] = total.custBalanceTotal[i].toLocaleString();
-	}
-	total.overPerceivedTotal = total.overPerceivedTotal.toLocaleString();
 	// Set table
 	let oldColumns = vue.screen.data.table.columns;
 	let oldColumnVisible = function(label, old, default_val) {
@@ -367,46 +316,37 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 		.column(new TableCol().reference("closeDate").label("Clôture").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Clôture", oldColumns, true)).help("La date et heure de clôture de la session de caisse."))
 		.column(new TableCol().reference("openCash").label("Fond ouverture").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond ouverture", oldColumns, true)).help("Le montant du fond de caisse compté à l'ouverture."))
 		.column(new TableCol().reference("closeCash").label("Fond clôture").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond clôture", oldColumns, true)).help("Le montant du fond de caisse compté à la clôture."))
-		.column(new TableCol().reference("expectedCash").label("Fond attendu").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond attendu", oldColumns, true)).help("Le montant du fond de caisse attendu à la clôture, calculé à partir du fond de caisse à l'ouverture et des encaissements."))
-		.column(new TableCol().reference("cashError").label("Erreur de caisse").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Erreur de caisse", oldColumns, true)).help("L'écart entre le fond de caisse à la clôture et le fond de caisse attendu. Lorsqu'il est positif, il y avait trop de monnaie, lorsque négatif, il en manquait."))
-		.column(new TableCol().reference("tickets").label("Tickets").type(TABLECOL_TYPE.NUMBER).visible(oldColumnVisible("Tickets", oldColumns, false)).help("Le nombre de tickets réalisés sur la session de caisse."))
-		.column(new TableCol().reference("cs").label("CA HT").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA", oldColumns, true)).class("z-oddcol").help("Le montant total du chiffre d'affaire hors taxes réalisé pendant la session."))
+		.column(new TableCol().reference("expectedCash").label("Fond attendu").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.CUSTOM, "Totaux").visible(oldColumnVisible("Fond attendu", oldColumns, true)).help("Le montant du fond de caisse attendu à la clôture, calculé à partir du fond de caisse à l'ouverture et des encaissements."))
+		.column(new TableCol().reference("cashError").label("Erreur de caisse").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Erreur de caisse", oldColumns, true)).help("L'écart entre le fond de caisse à la clôture et le fond de caisse attendu. Lorsqu'il est positif, il y avait trop de monnaie, lorsque négatif, il en manquait."))
+		.column(new TableCol().reference("tickets").label("Tickets").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Tickets", oldColumns, false)).help("Le nombre de tickets réalisés sur la session de caisse."))
+		.column(new TableCol().reference("cs").label("CA HT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("CA", oldColumns, true)).class("z-oddcol").help("Le montant total du chiffre d'affaire hors taxes réalisé pendant la session."))
 		.column(new TableCol().reference("csPeriod").label("CA HT mois").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA mois", oldColumns, false)).class("z-oddcol").help("Le cumul du chiffre d'affaire réalisé sur la période. Ce cumul est remis à zéro lorsque la clôture mensuelle est choisie au moment de clôturer la caisse."))
 		.column(new TableCol().reference("csFYear").label("CA HT année").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA année", oldColumns, false)).class("z-oddcol").help("Le cumul du chiffre d'affaire réalisé sur l'année ou exercice fiscal. Ce cumul est remis à zéro lorsque la clôture annuelle est choisie au moment de clôturer la caisse."))
 		.column(new TableCol().reference("csPerpetual").label("CA HT perpétuel").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA perpétuel", oldColumns, false)).class("z-oddcol").help("Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."))
-		.column(new TableCol().reference("csTaxes").label("CA + taxes").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA + taxes", oldColumns, false)).class("z-oddcol").help("Le total TTC de la session."))
-		.column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Balance client", oldColumns, false)).class("z-oddcol").help("La variation totale des soldes des comptes clients. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."));
-	vue.screen.data.table.footer(["", "", "", "", "", "", "Totaux", total.errorTotal.toLocaleString(), total.tickets, total.cs.toLocaleString(), "", "", "", total.csTaxesTotal.toLocaleString(), total.custBalance.toLocaleString()]);
+		.column(new TableCol().reference("csTaxes").label("CA + taxes").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("CA + taxes", oldColumns, false)).class("z-oddcol").help("Le total TTC de la session."))
+		.column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Balance client", oldColumns, false)).class("z-oddcol").help("La variation totale des soldes des comptes clients. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."));
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
-		vue.screen.data.table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(pm.label, oldColumns, true)).help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
-		vue.screen.data.table.footer().push(total.paymentModeTotal[i]);
+		vue.screen.data.table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(pm.label, oldColumns, true)).help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
 	}
-	vue.screen.data.table.column(new TableCol().reference("overPerceived").label("Produit exceptionnel").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Produit exceptionnel", oldColumns, false)).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie ou les arrondis de TVA sur remises."));
-	vue.screen.data.table.footer().push(total.overPerceivedTotal);
+	vue.screen.data.table.column(new TableCol().reference("overPerceived").label("Produit exceptionnel").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Produit exceptionnel", oldColumns, false)).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie ou les arrondis de TVA sur remises."));
 	for (let i = 0; i < taxes.length; i++) {
 		let tax = taxes[i];
-		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
-		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée associé au taux de TVA."));
-		vue.screen.data.table.footer().push(total.taxTotal[i].base);
-		vue.screen.data.table.footer().push(total.taxTotal[i].amount);
+		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
+		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée associé au taux de TVA."));
 	}
 	for (let i = 0; i < categories.length; i++) {
 		let cat = categories[i];
-		vue.screen.data.table.column(new TableCol().reference("cat-" + cat.reference + "-cs").label(cat.label).type(TABLECOL_TYPE.NUMBER5).visible(oldColumnVisible(cat.label, oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."));
-		vue.screen.data.table.footer().push(total.categoryTotal[i]);
+		vue.screen.data.table.column(new TableCol().reference("cat-" + cat.reference + "-cs").label(cat.label).type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(cat.label, oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."));
 	}
 	for (let i = 0; i < catTaxes.length; i++) {
 		let catTax = catTaxes[i];
-		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-base").label(catTax.cat + " " + catTax.label + " base").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."));
-		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-amount").label(catTax.cat + " " + catTax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."));
-		vue.screen.data.table.footer().push(total.catTaxTotal[i].base);
-		vue.screen.data.table.footer().push(total.catTaxTotal[i].amount);
+		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-base").label(catTax.cat + " " + catTax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."));
+		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-amount").label(catTax.cat + " " + catTax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."));
 	}
 	for (let i = 0; i < customers.length; i++) {
 		let customer = customers[i];
-		vue.screen.data.table.column(new TableCol().reference("cust-" + customer.id + "-balance").label(customer.dispName).type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible(customer.dispName, oldColumns, false)).help("La variation du solde client"));
-		vue.screen.data.table.footer().push(total.custBalanceTotal[i]);
+		vue.screen.data.table.column(new TableCol().reference("cust-" + customer.id + "-balance").label(customer.dispName).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(customer.dispName, oldColumns, false)).help("La variation du solde client"));
 	}
 	for (let i = 0; i < renderZs.length; i++) {
 		let z = renderZs[i];

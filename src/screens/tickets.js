@@ -26,21 +26,21 @@ function tickets_show() {
 				.column(new TableCol().reference("sequence").label("Séquence").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."))
 				.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).help("Le numéro du ticket de la caisse."))
 				.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
-				.column(new TableCol().reference("customer").label("Client").visible(false).help("Le compte client associé au ticket."))
-				.column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).visible(false).help("La variation totale du solde du compte client. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."))
-				.column(new TableCol().reference("finalPrice").label("Montant HT").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant HT du ticket après remise."))
-				.column(new TableCol().reference("finalTaxedPrice").label("Montant TTC").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le montant TTC du ticket après remise."))
+				.column(new TableCol().reference("customer").label("Client").footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(false).help("Le compte client associé au ticket."))
+				.column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("La variation totale du solde du compte client. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."))
+				.column(new TableCol().reference("finalPrice").label("Montant HT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(true).help("Le montant HT du ticket après remise."))
+				.column(new TableCol().reference("finalTaxedPrice").label("Montant TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(true).help("Le montant TTC du ticket après remise."))
 				.column(new TableCol().reference("discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(false).help("La remise accordée sur la totalité du ticket (incluse dans les montant TTC, HT et de TVA)"))
-				.column(new TableCol().reference("discountAmount").label("Montant de remise HT").type(TABLECOL_TYPE.NUMBER2).visible(false).help("La valeur HT de la remise accordée"))
-				.column(new TableCol().reference("discountTaxedAmount").label("Montant de remise TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("La valeur TTC de la remise accordée"))
+				.column(new TableCol().reference("discountAmount").label("Montant de remise HT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("La valeur HT de la remise accordée"))
+				.column(new TableCol().reference("discountTaxedAmount").label("Montant de remise TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("La valeur TTC de la remise accordée"))
 				.column(new TableCol().reference("paymentmodes").label("Encaissement").visible(true).help("Les modes de paiement utilisés à l'encaissement."))
-				.column(new TableCol().reference("overPerceived").label("Trop perçu").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."));
+				.column(new TableCol().reference("overPerceived").label("Trop perçu").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."));
 			data["paymentmodes"].forEach(pm => {
-				table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).visible(false).class("z-oddcol").help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
+				table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).class("z-oddcol").help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
 			});
 			data["taxes"].forEach(tax => {
-				table.column(new TableCol().reference("tax-" + tax.id + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
-				table.column(new TableCol().reference("tax-" + tax.id + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant de TVA collectée associé au taux de TVA."));
+				table.column(new TableCol().reference("tax-" + tax.id + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
+				table.column(new TableCol().reference("tax-" + tax.id + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant de TVA collectée associé au taux de TVA."));
 			});
 			table
 				.column(new TableCol().reference("user").label("Opérateur").visible(false).help("Le nom du compte utilisateur qui a réalisé la vente."))

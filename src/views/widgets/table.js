@@ -19,6 +19,12 @@ const TABLECOL_TYPE = {
 	HTML: "html",
 
 }
+const TABLECOL_FOOTER = {
+	/** The footer is manualy provided (default). */
+	CUSTOM: "custom",
+	/** The footer is the sum of all lines (numeric values). */
+	SUM: "sum",
+}
 
 /**
  * Table definition for the vue-table component.
@@ -29,7 +35,6 @@ class Table
 	#mTitle;
 	#mColumns;
 	#mLines;
-	#mFooter;
 	#mExportable;
 	/** Reactive property for VueJS, do not manipulate it by hand. */
 	ready;
@@ -39,6 +44,7 @@ class Table
 	vuecolumns;
 	/** Reactive proxy for VueJS, do not manipulate it by hand. */
 	vuefooter;
+	vuehasfooter;
 
 	/** Chainable empty constructor. */
 	constructor() {
@@ -46,12 +52,15 @@ class Table
 		this.#mTitle = null;
 		this.#mColumns = [];
 		this.#mLines = [];
-		this.#mFooter = [];
 		this.#mExportable = true;
 		this.ready = false;
 		this.vuelines = this.#mLines;
 		this.vuecolumns = this.#mColumns;
-		this.vuefooter = this.#mFooter;
+		this.vuefooter = [];
+		this.#mColumns.forEach(c => {
+			this.vuefooter.push(c.footer());
+		}, this);
+		this.#computeHasFooter();
 	}
 	/**
          * getter/setter.
@@ -109,6 +118,17 @@ class Table
 	columnLength() {
 		return this.#mColumns.length;
 	}
+	#computeHasFooter() {
+		let hasFooter = false;
+		for (let i = 0; i < this.#mColumns.length; i++) {
+			let c = this.#mColumns[i];
+			if (c.footer() !== "") {
+				hasFooter = true;
+				break;
+			}
+		}
+		this.vuehasfooter = hasFooter;
+	}
 	/**
 	 * getter/adder
 	 * @param l The index of the line to get or a new line to add.
@@ -123,6 +143,7 @@ class Table
 			return this.#mLines[l];
 		}
 		this.#mLines.push(l);
+		this.#computeFooters([l]);
 		this.ready = true;
 	}
 	/**
@@ -149,39 +170,39 @@ class Table
 	}
 	/**
 	 * Reset the table and optionaly set new content.
-	 * Remove all lines and footer, keep the references.
+	 * Remove all lines, keep the references.
 	 * When used without argements, the table is not ready anymore.
 	 * @param lines The new table content.
-	 * @param footer The new table footer.
 	 */
-	resetContent(lines, footer) {
+	resetContent(lines) {
 		this.#mLines.splice(0);
-		this.#mFooter.splice(0);
 		if (arguments.length == 0) {
 			this.ready = false;
 		} else {
 			this.#mLines.push(...lines);
-			if (arguments.length > 1) {
-				this.#mFooter.push(...footer);
-			}
 			this.ready = true;
 		}
+		this.#resetFooters();
+		this.#computeFooters(this.#mLines);
+	}
+	#resetFooters() {
+		this.#mColumns.forEach(col => {
+			col.resetFooter();
+		});
 	}
 	/**
-	 * getter/setter. Setter keeps the reference.
-	 * @param f When defined, set the footer and return the instance for chaining.
-         * When not set, get the footer.
-	 * Use display values when setting the footer, they are not affected
-	 * by the type of the column.
-         * @return `This` for the setter, footer for the getter.
-         */
-	footer(f) {
-		if (arguments.length == 0) {
-			return this.#mFooter;
-		}
-		this.#mFooter.splice(0);
-		this.#mFooter.push(...f);
-		return this;
+	* Update the automatic values of the footers with the added lines.
+	* @param lines The array of lines that where added to the table.
+	*/
+	#computeFooters(lines) {
+		lines.forEach((line) => {
+			for (let i = 0; i < this.columnLength(); i++) {
+				let col = this.#mColumns[i];
+				let val = line[i];
+				col.computeFooter(val);
+			}
+		}, this);
+		this.#computeHasFooter();
 	}
 	/**
          * getter/setter.
@@ -203,7 +224,6 @@ class Table
 	 */
 	reset() {
 		this.ready = false;
-		this.#mFooter.splice(0);
 		this.#mLines.splice(0);
 		this.#mColumns.splice(0);
 	}
@@ -233,12 +253,20 @@ class Table
 				}
 			}
 		}
-		if (this.footer().length > 0) {
+		// Add footer
+		if (this.vuehasfooter) {
 			let line = [];
-			for (let i = 0; i < this.footer().length; i++) {
+			for (let i = 0; i < this.columnLength(); i++) {
 				let col = this.column(i);
 				if (col.isVisible && col.exportable()) {
-					line.push(this.footer()[i]);
+					switch (col.footerType()) {
+						case TABLECOL_FOOTER.SUM:
+							line.push(col.formatCsv(col.footer()));
+							break;
+						default:
+							line.push(col.footer());
+							break;
+					}
 				}
 			}
 			csvData.push(line);
@@ -263,6 +291,8 @@ class TableCol
 {
 	#mRef;
 	#mLabel;
+	#mFooterType;
+	#mFooter;
 	#mHelp;
 	#mType;
 	#mClass;
@@ -277,6 +307,8 @@ class TableCol
 		this.#mRef = null;
 		this.#mLabel = "";
 		this.#mHelp = "";
+		this.#mFooterType = TABLECOL_FOOTER.CUSTOM;
+		this.#mFooter = "";
 		this.#mType = TABLECOL_TYPE.STRING;
 		this.#mExportable = true;
 		this.#mSearchable = false;
@@ -335,6 +367,91 @@ class TableCol
 		}
 		this.#mType = t;
 		return this;
+	}
+	/**
+         * getter/setter.
+         * @param ft When defined, set the type and return the instance for chaining.
+         * When not set, get the type. See TABLECOL_FOOTER constants.
+         * Setting the footer type will reset the footer.
+         * Changing the footer after the table is rendered may not update the view.
+         * @param customFooter For TABLECOL_FOOTER.CUSTOM only, when defined,
+         * set the custom footer.
+         * @return `This` for the setter, type for the getter.
+         */
+	footerType(ft, customFooter) {
+		if (arguments.length == 0) {
+			return this.#mFooterType;
+		}
+		switch (ft) {
+			case TABLECOL_FOOTER.SUM:
+				this.#mFooterType = ft;
+				this.resetFooter();
+				break;
+			case TABLECOL_FOOTER.CUSTOM:
+				this.#mFooterType = ft;
+				if (arguments.length > 1) {
+					this.#mFooter = customFooter;
+				} else {
+					this.resetFooter();
+				}
+				break;
+			default:
+				console.error("Unknown footer type " + ft);
+		}
+		return this;
+	}
+	/**
+         * getter/setter.
+         * @param customFooter When defined, set the custom footer
+         * and return the instance for chaining.
+         * Setting the footer does nothing if the footer type is not TABLECOL_FOOTER.CUSTOM.
+         * Custom footer is always converted to a string, regardless of the type of the column.
+         * Changing the footer after the table is rendered may not update the view.
+         * When not set, get the footer value.
+         * @return `This` for the setter, current footer value for the getter.
+         */
+	footer(customFooter) {
+		if (arguments.length == 0) {
+			return this.#mFooter;
+		}
+		if (this.#mFooterType == TABLECOL_FOOTER.CUSTOM) {
+			this.#mFooter = new String(customFooter).valueOf();
+		}
+		return this;
+	}
+	resetFooter() {
+		switch (this.#mFooterType) {
+			case TABLECOL_FOOTER.SUM:
+				this.#mFooter = 0;
+				break;
+			case TABLECOL_FOOTER.CUSTOM:
+				// No update
+				break;
+			default:
+				console.error("Unknown footer type " + ft);
+		}
+	}
+	/**
+	 * Update automatic footer by adding a new value.
+	 * @param newLineValue The value that was added.
+	 */
+	computeFooter(newLineValue) {
+		switch (this.#mFooterType) {
+			case TABLECOL_FOOTER.SUM:
+				let numVal = 0;
+				if (typeof newLineValue != "number") {
+					let val = Number(newLineValue);
+					if (!Number.isNaN(val)) {
+						numVal = val.valueOf();
+					}
+				} else {
+					numVal = newLineValue;
+				}
+				this.#mFooter += numVal;
+				break;
+			default: // do nothing
+				break;
+		}
 	}
 	/**
          * getter/setter.
@@ -589,6 +706,7 @@ Vue.component("vue-table", {
 			currentPage: 0,
 			// Global
 			"TABLECOL_TYPE": TABLECOL_TYPE,
+			"TABLECOL_FOOTER": TABLECOL_FOOTER,
 			"tools_dateToString": tools_dateToString,
 			"tools_dateTimeToString": tools_dateTimeToString,
 			"tools_timeToString": tools_timeToString
@@ -726,9 +844,12 @@ Vue.component("vue-table", {
 			</tr>
 			</template>
 		</tbody>
-		<tfoot v-if="table.vuefooter.length > 0">
+		<tfoot v-if="table.vuehasfooter">
 			<tr>
-				<th v-for="(val, index) in table.vuefooter" v-show="table.vuecolumns[index].isVisible" v-bind:class="table.vuecolumns[index].class()">{{val}}</th>
+				<th v-for="(col, index) in table.vuecolumns" v-show="table.vuecolumns[index].isVisible" v-bind:class="table.vuecolumns[index].class()">
+					<template v-if="col.footerType() == TABLECOL_FOOTER.SUM">{{col.formatCell(col.footer())}}</template>
+					<template v-else>{{col.footer()}}</template>
+				</th>
 			</tr>
 		</tfoot>
 	</table>
