@@ -12,7 +12,9 @@ Vue.component("vue-customer-list", {
 				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image de profil du client. Ce champ ne peut être exporté."))
 				.column(new TableCol().reference("dispName").label("Nom affiché").visible(true).searchable(true).help("Le nom du client tel qu'affiché ou imprimé"))
 				.column(new TableCol().reference("card").label("Carte").visible(false).searchable(true).help("Le numéro ou nom de carte."))
-				.column(new TableCol().reference("balance").label("Solde").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le solde du compte client. Positif lorsque le compte pré-payé est chargé, négatif lorsque le compte a des dettes."))
+				.column(new TableCol().reference("balance").label("Solde").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(true).help("Le solde du compte client. Positif lorsque le compte pré-payé est chargé, négatif lorsque le compte a des dettes."))
+				.column(new TableCol().reference("prepaid").label("Pré-payé").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant pré-payé du compte client. Filtre les soldes positifs uniquement."))
+				.column(new TableCol().reference("debt").label("Dettes").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant de dettes du compte client. Filtre les soldes négatifs uniquement."))
 				.column(new TableCol().reference("maxDebt").label("Dette max").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant de dette maximal autorisé pour ce compte."))
 				.column(new TableCol().reference("notes").label("Note").visible(false).help("Les notes de la fiche client."))
 				.column(new TableCol().reference("expireDate").label("Date d'expiration").type(TABLECOL_TYPE.DATE).visible(false).help("La date d'expiration du compte client."))
@@ -87,35 +89,20 @@ Vue.component("vue-customer-list", {
 		editUrl: function(cust) {
 			return "?p=customer&id=" + cust.id;
 		},
+		resetStats: function() {
+			this.stats.activeCount = 0;
+			this.stats.inactiveCount = 0;
+			this.stats.expiredActiveCount = 0;
+			this.stats.prepaidTotal = 0.0;
+			this.stats.debtTotal = 0.0;
+			this.stats.balanceTotal = 0.0;
+		},
 		assign: function(customers) {
 			this.customers = customers;
 			this.customersTable.resetContent();
+			this.resetStats();
 			for (let i = 0; i < this.customers.length; i++) {
 				let cust = this.customers[i];
-				if (!((this.filterVisible == "all") || (this.filterVisible == "visible" && cust.visible) || (this.filterVisible == "invisible" && !cust.visible))) {
-					continue;
-				}
-				(cust.discountProfile != null) ?
-					cust.dpLabel = this.dpLabels[cust.discountProfile] :
-					cust.dpLabel = "";
-				(cust.tariffArea != null) ?
-					cust.taLabel = this.taLabels[cust.tariffArea] :
-					cust.taLabel = "";
-				(cust.tax != null) ?
-					cust.taxLabel = this.taxLabels[cust.tax] :
-					cust.taxLabel = "";
-				let line = [
-					this.imageSrc(cust),
-					cust.dispName, cust.card, cust.balance, cust.maxDebt,
-					cust.note, cust.expireDate,
-					cust.visible,
-					cust.dpLabel, cust.taLabel, cust.taxLabel, cust.firstName,
-					cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
-					cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
-					cust.country,
-					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"
-				];
-				this.customersTable.line(line);
 				let now = new Date();
 				if (cust.visible) {
 					this.stats.activeCount++;
@@ -131,6 +118,32 @@ Vue.component("vue-customer-list", {
 				} else {
 					this.inactiveCount++;
 				}
+				if (!((this.filterVisible == "all") || (this.filterVisible == "visible" && cust.visible) || (this.filterVisible == "invisible" && !cust.visible))) {
+					continue;
+				}
+				(cust.discountProfile != null) ?
+					cust.dpLabel = this.dpLabels[cust.discountProfile] :
+					cust.dpLabel = "";
+				(cust.tariffArea != null) ?
+					cust.taLabel = this.taLabels[cust.tariffArea] :
+					cust.taLabel = "";
+				(cust.tax != null) ?
+					cust.taxLabel = this.taxLabels[cust.tax] :
+					cust.taxLabel = "";
+				let line = [
+					this.imageSrc(cust),
+					cust.dispName, cust.card, cust.balance,
+					(cust.balance > -0.005) ? cust.balance : 0.0,
+					(cust.balance < 0.005) ? -cust.balance : 0.0,
+					cust.maxDebt, cust.note, cust.expireDate,
+					cust.visible,
+					cust.dpLabel, cust.taLabel, cust.taxLabel, cust.firstName,
+					cust.lastName, cust.email, cust.phone1, cust.phone2, cust.fax,
+					cust.addr1, cust.addr2, cust.zipCode, cust.city, cust.region,
+					cust.country,
+					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(cust) + "\">Modifier</a></div>"
+				];
+				this.customersTable.line(line);
 			}
 		},
 		loadCustomers: function() {
