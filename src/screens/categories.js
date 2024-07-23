@@ -23,7 +23,7 @@ function categories_showCategory(id) {
 				});
 			} else {
 				storage_close();
-				_categories_showCategory(new RecordFactory(CategoryDef).create(), categories);
+				_categories_showCategory(new RecordFactory(CategoryDef).createEmpty(), categories);
 			}
 		});
 	});

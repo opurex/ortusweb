@@ -12,7 +12,7 @@ let ProductDef = {
 		"category": { type: "record", modelName: "category", label: "Catégorie" },
 		"dispOrder": { type: "number", default: 0, label: "Ordre" },
 		"visible": { type: "boolean", default: true, label: "En vente" },
-		"prepay": { type: "boolean", default: false, label: "Recharge pré-payment" },
+		"prepay": { type: "boolean", default: false, label: "Recharge pré-payement" },
 		"priceSell": { type: "number", label: "Prix de vente HT" },
 		"scaled": { type: "boolean", default: false, label: "Vente au poids" },
 		"scaleType": { type: "scaleType", default: 0, label: "Poids/volume" },
@@ -27,15 +27,22 @@ let ProductDef = {
 	},
 	postChange: function(oldPrd, prd, linkedRecords) {
 		if (typeof prd.priceSell != "number" && typeof prd.taxedPrice != "number") {
-			return false;
+			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_FLOAT,
+					this.modelName, "taxedPrice", this.modelId(prd), prd.taxedPrice);
 		}
 		let linkRecs = linkedRecords.find(l => l.modelDef.modelName == this.fields["tax"].modelName);
-		if (prd.tax == null || !(prd.tax in linkRecs.records)) {
-			return false;
+		if (prd.tax == null) {
+			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_NOT_NULL,
+					this.modelName, "tax", this.modelId(prd), prd.tax);
+		}
+		if (!(prd.tax in linkRecs.records)) {
+			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_ASSOCIATION_NOT_FOUND,
+					this.modelName, "tax", this.modelId(prd), prd.tax);
 		}
 		let tax = linkRecs.records.find(t => t.id == prd.tax);
 		if (tax == null) {
-			return false;
+			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_ASSOCIATION_NOT_FOUND,
+					this.modelName, "tax", this.modelId(prd), prd.tax);
 		}
 		if (oldPrd == null) {
 			// New record, check that priceSell or taxedPrice is set and compute the other
@@ -58,7 +65,6 @@ let ProductDef = {
 				prd.priceSell = Number((prd.taxedPrice / (1.0 + tax.rate)).toFixed(5));
 			}
 		}
-		return true;
 	},
 	refField: "reference",
 	lookupFields: ["reference", "label"],

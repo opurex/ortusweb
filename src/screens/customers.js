@@ -30,7 +30,7 @@ function customers_showCustomer(custId) {
 					storage_close();
 				});
 			} else {
-				_customers_showCustomer(new RecordFactory(CustomerDef).create(), data["taxes"], data["tariffareas"], data["discountprofiles"], data["users"]);
+				_customers_showCustomer(new RecordFactory(CustomerDef).createEmpty(), data["taxes"], data["tariffareas"], data["discountprofiles"], data["users"]);
 				storage_close();
 			}
 		});

@@ -4,6 +4,7 @@ class CsvParser {
 	#existingRecords;
 	#linkedRecords;
 	#columnMapping;
+	#columnName;
 	#unknownColumns;
 	#errors;
 	#warnings;
@@ -41,6 +42,9 @@ class CsvParser {
 		let recFacto = new RecordFactory(this.#recordDef);
 		for (let i = 0; i < rawData.length; i++) {
 			let lineVals = this.#readLine(i, rawData[i]);
+			if (lineVals == null) {
+				continue;
+			}
 			let refField = this.#recordDef.refField;
 			let existingRec = this.#existingRecords.find(r => r[refField] == lineVals[refField]);
 			let rec = null;
@@ -49,12 +53,17 @@ class CsvParser {
 				if (!recFacto.hasErrors()) {
 					newRecords.push(rec);
 				} else {
-					recFacto.getErrors().forEach(errKey => {
-						this.#errors.push({line: i + 2, field: lineVals[errKey], column: errKey, error: "InvalidField", value: lineVals[errKey]});
+					recFacto.getErrors().forEach(exception => {
+						this.#errors.push({line: i + 2, column: this.#columnName[exception.field], exception: exception});
 					}, this);
 				}
 			} else {
-				recFacto.merge(existingRec, lineVals, this.#linkedRecords);
+				if (!recFacto.merge(existingRec, lineVals, this.#linkedRecords)) {
+					recFacto.getErrors().forEach(exception => {
+						this.#errors.push({line: i + 2, column: this.#columnName[exception.field], exception: exception});
+					}, this);
+					continue;
+				}
 				rec = existingRec;
 				if (recFacto.hasChanges()) {
 					editedRecords.push(rec);
@@ -72,6 +81,7 @@ class CsvParser {
 	/** Read the first line to map column headers to fields. */
 	#buildMapping(line) {
 		this.#columnMapping = {};
+		this.#columnName = {};
 		this.#unknownColumns = [];
 		for (let key in line) {
 			let columnKey = key.toLowerCase();
@@ -80,6 +90,7 @@ class CsvParser {
 				let field = this.#recordDef.fields[fieldKey];
 				if (columnKey == fieldKey.toLowerCase() || ("label" in field && columnKey == field.label.toLowerCase())) {
 					this.#columnMapping[key] = fieldKey;
+					this.#columnName[fieldKey] = key;
 					found = true;
 					break;
 				}
@@ -98,14 +109,24 @@ class CsvParser {
 	 */
 	#readLine(index, lineData) {
 		let ret = {};
+		let noError = true;
 		for (let key in this.#columnMapping) {
 			let fieldName = this.#columnMapping[key];
-			let val = this.#parseValue(fieldName, key, lineData[key], index);
-			if (typeof val !== "undefined") {
-				ret[fieldName] = val;
+			try {
+				let val = this.#parseValue(fieldName, key, lineData[key], index);
+				if (typeof val !== "undefined") {
+					ret[fieldName] = val;
+				}
+			} catch (e) {
+				this.#errors.push({line: index + 2, column: key, exception: e});
+				noError = false;
 			}
 		}
-		return ret;	
+		if (noError) {
+			return ret;
+		} else {
+			return null;
+		}
 	}
 	/**
 	 * Convert a single cell to a record value.
@@ -150,8 +171,8 @@ class CsvParser {
 					return true;
 				});
 				if (typeof linkedRecord == "undefined") {
-					this.#errors.push({line: lineNum + 2, field: fieldName, column: key, error: "RecordNotFound", value: value});
-					return null;
+					throw new InvalidFieldException(InvalidFieldConstraints.CSTR_ASSOCIATION_NOT_FOUND,
+						this.#recordDef.modelName, fieldName, null, value);
 				}
 				return linkedRecord.id;
 			case "string":

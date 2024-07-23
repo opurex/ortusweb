@@ -27,7 +27,7 @@ Vue.component("vue-import-preview", {
 		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{importResult.unchangedRecords.length}} {{modelsLabel}}</template></a></div>
 		<vue-import-preview-table v-show="showUnchanged" v-bind:records="importResult.unchangedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
-		<template v-if="importResult.warnings.length > 0">
+		<template v-if="importResult.warnings.length > 0 || importResult.unknownColumns.length > 0">
 		<h2>Alertes</h2>
 		<table class="table table-bordered table-hover">
 			<thead>
@@ -37,6 +37,10 @@ Vue.component("vue-import-preview", {
 				</tr>
 			</thead>
 			<tbody>
+				<tr v-if="importResult.unknownColumns.length > 0">
+					<td>1</td>
+					<td>Les colonnes suivantes ont été ignorées : <template v-for="col in importResult.unknownColumns">{{col}} </template></td>
+				<tr>
 				<tr v-for="warn in importResult.warnings">
 					<td>{{warn.line}}</td>
 					<td>{{warningMessage(warn)}}</td>
@@ -44,23 +48,21 @@ Vue.component("vue-import-preview", {
 			</tbody>
 		</table>
 		</template>
-		<template v-if="importResult.unknownColumns.length > 0 || importResult.errors.length > 0">
+		<template v-if="importResult.errors.length > 0">
 		<h2>Erreurs de lecture</h2>
 		<table class="table table-bordered table-hover">
 			<thead>
 				<tr>
 					<th>Ligne</th>
+					<th>Colonne</th>
 					<th>Erreur</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-if="importResult.unknownColumns.length > 0">
-					<td>1</td>
-					<td>Les colonnes suivantes ont été ignorées : <template v-for="col in importResult.unknownColumns">{{col}} </template>.</td>
-				<tr>
 				<tr v-for="err in importResult.errors">
 					<td>{{err.line}}</td>
-					<td>{{errorMessage(err)}}</td>
+					<td>{{err.column}}</td>
+					<td>{{errorMessage(err.exception)}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -75,17 +77,19 @@ Vue.component("vue-import-preview", {
 	save: function() {
 		this.$emit('save', null);
 	},
-	errorMessage: function(err) {
-		switch (err.error) {
-			case "RecordNotFound":
-				return err.column + " : la valeur \"" + err.value + "\" n'a pas pu être retrouvée";
-			case "InvalidField":
-				if (typeof err.value == "undefined") {
-					return err.column + " est nécessaire";
-				} else {
-					return err.column + " : la valeur \"" + err.value + "\" est incorrecte";
-				}
+	errorMessage: function(exception) {
+		if (exception instanceof InvalidFieldException) {
+			switch (exception.constraint) {
+				case InvalidFieldConstraints.CSTR_ASSOCIATION_NOT_FOUND:
+					return "La valeur \"" + exception.value + "\" n'a pas pu être retrouvée";
+				case InvalidFieldConstraints.CSTR_NOT_NULL:
+					return "Ne peut être vide";
+				default:
+					return "La valeur \"" + exception.value + "\" est incorrecte";
+			}
 		}
+		return exception.message;
+
 	},
 	warningMessage: function(warn) {
 		if (warn.warning == "InsensitiveMatch") {
