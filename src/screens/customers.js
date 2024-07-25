@@ -68,16 +68,6 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 			.column(new TableCol().reference("line-discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(false).help("Le taux de remise accordé, inclus dans les champs HT et TTC."))
 			.column(new TableCol().reference("line-finalPrice").label("HT").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."))
 			.column(new TableCol().reference("line-finalTaxedPrice").label("TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket.")),
-		"customerHistoryTickets": new Table().reference("customer-ticket-list")
-			.column(new TableCol().reference("cashRegister").label("Caisse").visible(false).help("Le nom de la caisse."))
-			.column(new TableCol().reference("sequence").label("Séquence").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le numéro de session de la caisse. Le numéro de séquence augmente à chaque clôture de caisse."))
-			.column(new TableCol().reference("number").label("Numéro").type(TABLECOL_TYPE.NUMBER).visible(true).searchable(true).help("Le numéro du ticket de la caisse."))
-			.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATETIME).visible(true).help("La date de réalisation de la vente."))
-			.column(new TableCol().reference("paymentmodes").label("Encaissement").footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(true).searchable(true).help("Les modes de paiement utilisés à l'encaissement."))
-			.column(new TableCol().reference("finalTaxedPrice").label("Montant").footerType(TABLECOL_FOOTER.SUM).type(TABLECOL_TYPE.NUMBER2).visible(true).searchable(true).help("Le montant TTC du ticket."))
-			.column(new TableCol().reference("overPerceived").label("Trop perçu").footerType(TABLECOL_FOOTER.SUM).type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie."))
-			.column(new TableCol().reference("user").label("Opérateur").visible(false).searchable(true).help("Le nom du compte utilisateur qui a réalisé la vente."))
-			.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true).help("Sélectionner le ticket. Ce champ n'est jamais exporté."))
 	}
 	CustomerDef.loadCustomizedContactFields(function(contactFields) {
 		vue.screen.data.contactFields = contactFields;
@@ -292,13 +282,7 @@ function _customers_showHistory(tickets, products) {
 	}
 	vue.screen.data.customerHistory.title("Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
 	vue.screen.data.customerHistory.resetContent(lines);
-	vue.screen.data.customerHistoryTickets.title("Historique des tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
-	vue.screen.data.customerHistoryTickets.resetContent(tktLines);
-	if (vue.screen.data.tickets.length > 0) {
-		_tickets_selectTicket(vue.screen.data.tickets[0]);
-	} else {
-		_tickets_selectTicket(null);
-	}
+	Vue.set(vue.screen.data, "ticketsTitle", "Tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
 	gui_hideLoading();
 }
 

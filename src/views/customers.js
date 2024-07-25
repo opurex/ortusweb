@@ -301,8 +301,7 @@ Vue.component("vue-customer-form", {
 		<vue-table v-bind:table="data.customerHistory"></vue-table>
 	</article>
 	<article class="box-body" id="customer-history-tickets" style="display:flex;flex-direction:row;align-items:center;justify-content:space-around">
-		<vue-table v-bind:table="data.customerHistoryTickets" ref="ticketTable"></vue-table>
-		<vue-tickets-content v-if="data.selectedTicket" v-bind:ticket="data.selectedTicket"></vue-tickets-content>
+		<vue-tickets-table v-bind:tickets="data.tickets" v-bind:title="data.ticketsTitle" v-bind:cashRegisters="data.cashRegisters" v-bind:customers="customersProxy" v-bind:taxes="data.taxes" v-bind:paymentModes="data.paymentModes" v-bind:users="data.users"></vue-tickets-table>
 	</article>
 </section>
 
@@ -340,6 +339,11 @@ Vue.component("vue-customer-form", {
 			} else {
 				return this.data.contactFields[reference].default;
 			}
+		}
+	},
+	computed: {
+		customersProxy: function() {
+			return [this.data.customer];
 		}
 	}
 });
