@@ -689,6 +689,7 @@ Vue.component("vue-table", {
 	},
 	data: function () {
 		return {
+			randId: "table-" + String(Math.random()).replace("0.", "").valueOf(),
 			showHelp: false,
 			/** Index (int) or reference (string) as key, visible (boolean) as value. */
 			defaultColumns: {},
@@ -772,8 +773,8 @@ Vue.component("vue-table", {
 		</ul>
 		<ul class="filter-columns" v-if="filterable" v-bind:class="{'expand-help': showHelp}">
 			<li v-for="(col, index) in table.vuecolumns">
-				<input v-model="col.isVisible" v-bind:id="'filter-column-' + index" type="checkbox" />
-				<label v-bind:for="'filter-column-' + index">{{col.label()}}</label>
+				<input v-model="col.isVisible" v-bind:id="htmlId('filter-column-' + index)" type="checkbox" />
+				<label v-bind:for="htmlId('filter-column-' + index)">{{col.label()}}</label>
 				<p class="help" v-if="showHelp">{{col.help()}}</p>
 			</li>
 		</ul>
@@ -795,18 +796,18 @@ Vue.component("vue-table", {
 	<h2 v-if="table.title()">{{table.title()}}</h2>
 	<nav class="table-pagination" v-if="table.ready">
 		<div class="form-group">
-			<label for="pageNum">Page</label>
+			<label v-bind:for="htmlId('pageNum')">Page</label>
 			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
 			<button type="button" aria-label="Page précédente" title="Page précédente" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
-			<select id="pageNum" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
+			<select v-bind:id="htmlId('pageNum')" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
 				<option v-for="i in pageCount" v-bind:value="i - 1">{{ i }}</option>
 			</select>
 			<button type="button" aria-label="Page suivante"  title="Page suivante" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
 			<button type="button" aria-label="Dernière page"  title="Dernière page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
 		</div>
 		<div class="form-group">
-			<label for="pageSize">Nb par page</label>
-			<select v-model.number="linePerPage" id="pageSize">
+			<label v-bind:for="htmlId('pageSize')">Nb par page</label>
+			<select v-model.number="linePerPage" v-bind:id="htmlId('pageSize')">
 				<option value="50">50</option>
 				<option value="100">100</option>
 				<option value="250">250</option>
@@ -814,7 +815,7 @@ Vue.component("vue-table", {
 				<option value="-1">Tout</option>
 			</select>
 		</div>
-		<vue-input-text id="search" label="Rechercher" v-model="searchString" v-if="searchable" />
+		<vue-input-text v-bind:id="htmlId('search')" label="Rechercher" v-model="searchString" v-if="searchable" />
 	</nav>
 	<table class="table table-bordered table-hover" v-if="table.ready">
 		<thead>
@@ -855,18 +856,18 @@ Vue.component("vue-table", {
 	</table>
 	<nav class="table-pagination" v-if="table.ready">
 		<div class="form-group">
-			<label for="pageNum2">Page</label>
+			<label v-bind:for="htmlId('pageNum2')">Page</label>
 			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
 			<button type="button" aria-label="Page précédente" title="Page précédente" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
-			<select id="pageNum2" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
+			<select v-bind:id="htmlId('pageNum2')" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
 				<option v-for="i in pageCount" v-bind:value="i - 1">{{ i }}</option>
 			</select>
 			<button type="button" aria-label="Page suivante"  title="Page suivante" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
 			<button type="button" aria-label="Dernière page"  title="Dernière page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
 		</div>
 		<div class="form-group">
-			<label for="pageSize2">Nb par page</label>
-			<select v-model.number="linePerPage" id="pageSize2">
+			<label v-bind:for="htmlId('pageSize2')">Nb par page</label>
+			<select v-model.number="linePerPage" v-bind:id="htmlId('pageSize2')">
 				<option value="50">50</option>
 				<option value="100">100</option>
 				<option value="250">250</option>
@@ -1027,6 +1028,9 @@ Vue.component("vue-table", {
 			}
 			this.searchPending = false;
 			this.useSearch = true;
+		},
+		htmlId: function(id) {
+			return this.randId + "-" + id;
 		}
 	},
 	watch: {
