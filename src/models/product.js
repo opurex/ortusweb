@@ -35,10 +35,6 @@ let ProductDef = {
 			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_NOT_NULL,
 					this.modelName, "tax", this.modelId(prd), prd.tax);
 		}
-		if (!(prd.tax in linkRecs.records)) {
-			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_ASSOCIATION_NOT_FOUND,
-					this.modelName, "tax", this.modelId(prd), prd.tax);
-		}
 		let tax = linkRecs.records.find(t => t.id == prd.tax);
 		if (tax == null) {
 			throw new InvalidFieldException(InvalidFieldConstraints.CSTR_ASSOCIATION_NOT_FOUND,
