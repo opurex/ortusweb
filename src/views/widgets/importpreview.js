@@ -88,6 +88,9 @@ Vue.component("vue-import-preview", {
 					return "La valeur \"" + exception.value + "\" est incorrecte";
 			}
 		}
+		if (exception instanceof MissingReferenceColumnException) {
+			return "La colonne est manquante et nécessaire pour pouvoir effectuer l'import";
+		}
 		return exception.message;
 
 	},

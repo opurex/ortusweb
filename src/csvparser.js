@@ -39,6 +39,17 @@ class CsvParser {
 		let unchangedRecords = [];
 		this.#errors = [];
 		this.#warnings = [];
+		// Check for the reference field in content
+		if (!((this.#recordDef.refField) in this.#columnName)) {
+			let refFieldName = this.#recordDef.refField;
+			if ((refFieldName in this.#recordDef.fields) && ("label" in this.#recordDef.fields[refFieldName])) {
+				refFieldName = this.#recordDef.fields[refFieldName].label;
+			}
+			this.#errors.push({line: 1, column: refFieldName, exception: new MissingReferenceColumnException(this.#recordDef.modelName, this.#recordDef.refField)});
+			return new CsvImportResult(newRecords, editedRecords, editedValues, unchangedRecords,
+				this.#unknownColumns, this.#errors, this.#warnings);
+		}
+		// Read lines
 		let recFacto = new RecordFactory(this.#recordDef);
 		for (let i = 0; i < rawData.length; i++) {
 			let lineVals = this.#readLine(i, rawData[i]);
@@ -289,5 +300,16 @@ class CsvImportResult {
 		this.unknownColumns = unknownCols;
 		this.errors = errs;
 		this.warnings = warns;
+	}
+}
+
+class MissingReferenceColumnException extends Error
+{
+	modelName;
+	field;
+	constructor(modelName, field) {
+		super("Missing column for lookup: " + field);
+		this.modelName = modelName;
+		this.field = field;
 	}
 }
