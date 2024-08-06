@@ -191,6 +191,34 @@ Vue.component("vue-product-list", {
 				});
 			}
 		},
+		updateTableTitle: function() {
+			if (this.currentCategoryId != "") {
+				let category = this.data.categories.find(c => c.id == this.currentCategoryId, this);
+				if (typeof category != "undefined") {
+					let status;
+					switch (this.filterVisible) {
+						case "visible": status = " en vente"; break;
+						case "invisible": status = " hors vente"; break;
+						default: status = ""; break;
+					}
+					let prefix;
+					if (this.filterVisible != "all") {
+						prefix = "Produits de la catégorie \"";
+					} else {
+						prefix = "Tous les produits de la catégorie \"";
+					}
+					this.productsTable.title(prefix + category.label + "\"" + status);
+				}
+			} else {
+				let title = "Tous les produits";
+				switch (this.filterVisible) {
+					case "visible": title += " en vente"; break;
+					case "invisible": title += " hors vente"; break;
+					default: break;
+				}
+				this.productsTable.title(title);
+			}
+		}
 	},
 	computed: {
 		newUrl: function() {
@@ -202,6 +230,7 @@ Vue.component("vue-product-list", {
 	},
 	mounted: function() {
 		this.loadProducts();
+		this.updateTableTitle();
 	},
 	watch: {
 		sorting: function (newSort, oldSort) {
@@ -209,9 +238,11 @@ Vue.component("vue-product-list", {
 		},
 		currentCategoryId: function(newCatId, oldCatID) {
 			this.loadProducts();
+			this.updateTableTitle();
 		},
 		filterVisible: function(newVisible, oldVisible) {
 			this.sortAndAssign(this.sortedProducts);
+			this.updateTableTitle();
 		}
 	},
 });
