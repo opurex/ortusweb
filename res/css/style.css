@@ -298,6 +298,11 @@ dt {
 	margin-top: 0px;
 }
 
+.text-flow {
+	align-items: center;
+	column-gap: 1rem;
+}
+
 /* Login form */
 
 #login-logo {

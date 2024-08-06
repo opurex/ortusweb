@@ -11,26 +11,19 @@ Vue.component("vue-import-preview", {
 		warnings: {type: Array, default: function() { return[]; }}
 	},
 	data: function() {
-		return {showUnchanged: false};
+		return {
+			showErrors: true,
+			showWarnings: true,
+			showUnchanged: false
+		};
 	},
 	template: `<div class="because" v-if="importResult != null">
-		<template v-if="importResult.newRecords.length > 0">
-		<h2>{{newTitle}}</h2>
-		<vue-import-preview-table v-bind:records="importResult.newRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
-		</template>
-		<template v-if="importResult.editedRecords.length > 0">
-		<h2>{{editTitle}}</h2>
-		<p>Les cases sur fond rouge indiquent les changements.</p>
-		<vue-import-preview-table v-bind:records="importResult.editedRecords" v-bind:editedValues="importResult.editedValues" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
-		</template>
-		<template v-if="importResult.unchangedRecords.length > 0">
-		<h2>{{unchangedTitle}}</h2>
-		<div><a class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{importResult.unchangedRecords.length}} {{modelsLabel}}</template></a></div>
-		<vue-import-preview-table v-show="showUnchanged" v-bind:records="importResult.unchangedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
-		</template>
 		<template v-if="importResult.warnings.length > 0 || importResult.unknownColumns.length > 0">
-		<h2>Alertes</h2>
-		<table class="table table-bordered table-hover">
+		<div class="text-flow">
+			<h2>Alertes</h2>
+			<div><button type="button" class="btn btn-add" v-on:click="showWarnings = !showWarnings"><template v-if="showWarnings">Masquer</template><template v-else>Montrer les {{warnCount}} alertes</template></button></div>
+		</div>
+		<table class="table table-bordered table-hover" v-show="showWarnings">
 			<thead>
 				<tr>
 					<th>Ligne</th>
@@ -50,8 +43,11 @@ Vue.component("vue-import-preview", {
 		</table>
 		</template>
 		<template v-if="importResult.errors.length > 0">
-		<h2>Erreurs de lecture</h2>
-		<table class="table table-bordered table-hover">
+		<div class="text-flow">
+			<h2>Erreurs de lecture</h2>
+			<div><button type="button" class="btn btn-add" v-on:click="showErrors = !showErrors"><template v-if="showErrors">Masquer</template><template v-else>Montrer les {{importResult.errors.length}} erreurs</template></button></div>
+		</div>
+		<table class="table table-bordered table-hover" v-show="showErrors">
 			<thead>
 				<tr>
 					<th>Ligne</th>
@@ -67,6 +63,22 @@ Vue.component("vue-import-preview", {
 				</tr>
 			</tbody>
 		</table>
+		</template>
+		<template v-if="importResult.newRecords.length > 0">
+		<h2>{{newTitle}}</h2>
+		<vue-import-preview-table v-bind:records="importResult.newRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		</template>
+		<template v-if="importResult.editedRecords.length > 0">
+		<h2>{{editTitle}}</h2>
+		<p>Les cases sur fond rouge indiquent les changements.</p>
+		<vue-import-preview-table v-bind:records="importResult.editedRecords" v-bind:editedValues="importResult.editedValues" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
+		</template>
+		<template v-if="importResult.unchangedRecords.length > 0">
+		<div class="text-flow">
+			<h2>{{unchangedTitle}}</h2>
+			<div><button type="button" class="btn btn-add" v-on:click="showUnchanged = !showUnchanged"><template v-if="showUnchanged">Masquer</template><template v-else>Montrer les {{importResult.unchangedRecords.length}} {{modelsLabel}}</template></button></div>
+		</div>
+		<vue-import-preview-table v-show="showUnchanged" v-bind:records="importResult.unchangedRecords" v-bind:linkedRecords="linkedRecords" v-bind:tableColumns="tableColumns" />
 		</template>
 		<template v-if="importResult.newRecords.length > 0 || importResult.editedRecords.length > 0">
 		<div>
@@ -116,6 +128,15 @@ Vue.component("vue-import-preview", {
 		if (warn.warning == "InsensitiveMatch") {
 			return warn.message;
 		}
+	},
+    },
+    computed: {
+	warnCount: function() {
+		let count = this.importResult.warnings.length;
+		if (this.importResult.unknownColumns.length > 0) {
+			count++;
+		}
+		return count;
 	}
     }
 });

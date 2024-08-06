@@ -246,6 +246,11 @@ nav button,
 	}
 }
 
+.text-flow {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 /* Loading filter */
 
 #loading {
