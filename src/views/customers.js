@@ -405,6 +405,7 @@ Vue.component("vue-customer-import", {
 	</header>
 	<div class="box-body">
 		<vue-import-preview newTitle="Nouvelles fiches" editTitle="Fiches modifiées" unchangedTitle="Fiches non modifiées" modelsLabel="fiches client"
+			v-bind:modelDef="data.modelDef"
 			v-bind:importResult="importResult"
 			v-bind:allRecords="data.customers"
 			v-bind:linkedRecords="linkedRecords"

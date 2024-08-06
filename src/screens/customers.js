@@ -290,6 +290,7 @@ function customers_showImport() {
 	storage_open(function(event) {
 		storage_readStores(["customers", "discountprofiles", "tariffareas", "taxes"], function(data) {
 			vue.screen.data = {
+				"modelDef": CustomerDef,
 				"customers": data.customers,
 				"discountProfiles": data.discountprofiles,
 				"tariffAreas": data.tariffareas,

@@ -61,7 +61,9 @@ function discountprofile_saveCallback(request, status, response) {
 }
 
 function discountprofiles_showImport() {
-	vue.screen.data = {};
+	vue.screen.data = {
+		"modelDef": DiscountProfileDef,
+	};
 	vue.screen.component = "vue-discountprofile-import";
 }
 

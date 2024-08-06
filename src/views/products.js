@@ -626,6 +626,7 @@ Vue.component("vue-product-import", {
 	</header>
 	<div class="box-body">
 		<vue-import-preview newTitle="Nouveaux produits" editTitle="Produits modifiés" unchangedTitle="Produits non modifiés" modelsLabel="produits"
+			v-bind:modelDef="data.modelDef"
 			v-bind:importResult="importResult"
 			v-bind:linkedRecords="linkedRecords"
 			v-bind:tableColumns="tableColumns"

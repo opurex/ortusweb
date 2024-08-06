@@ -106,6 +106,7 @@ Vue.component("vue-discountprofile-import", {
 	</header>
 	<div class="box-body">
 		<vue-import-preview newTitle="Nouveaux profils" editTitle="Profils modifiés" unchangedTitle="Profils non modifiés" modelsLabel="profils"
+			v-bind:modelDef="data.modelDef"
 			v-bind:importResult="importResult"
 			v-bind:linkedRecords="linkedRecords"
 			v-bind:tableColumns="tableColumns"

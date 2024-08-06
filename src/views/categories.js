@@ -218,6 +218,7 @@ Vue.component("vue-category-import", {
 	</header>
 	<div class="box-body">
 		<vue-import-preview newTitle="Nouvelles catégories" editTitle="Catégories modifiées" unchangedTitle="Catégories non modifiées" modelsLabel="catégories"
+			v-bind:modelDef="data.modelDef"
 			v-bind:importResult="importResult"
 			v-bind:linkedRecords="linkedRecords"
 			v-bind:tableColumns="tableColumns"

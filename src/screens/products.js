@@ -384,6 +384,7 @@ function products_showImport() {
 	storage_open(function(event) {
 		storage_readStores(["categories", "taxes"], function(data) {
 			vue.screen.data = {
+				"modelDef": ProductDef,
 				"categories": data.categories,
 				"taxes": data.taxes,
 			}

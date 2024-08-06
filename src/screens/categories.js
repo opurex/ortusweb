@@ -93,6 +93,7 @@ function categories_showImport() {
 	storage_open(function(event) {
 		storage_readStores(["categories"], function(data) {
 			vue.screen.data = {
+				"modelDef": CategoryDef,
 				"categories": data.categories,
 			}
 			vue.screen.component = "vue-category-import";

@@ -3,6 +3,7 @@ Vue.component("vue-import-preview", {
 		newTitle: {type: String},
 		editTitle: {type: String},
 		unchangedTitle: {type: String},
+		modelDef: {type: Object},
 		modelsLabel: {type: String},
 		importResult: {type: Object, default: function() { return null; }},
 		linkedRecords: {type: Object, default: function() { return {}; }},
@@ -61,7 +62,7 @@ Vue.component("vue-import-preview", {
 			<tbody>
 				<tr v-for="err in importResult.errors">
 					<td>{{err.line}}</td>
-					<td>{{err.column}}</td>
+					<td>{{errorColumn(err)}}</td>
 					<td>{{errorMessage(err.exception)}}</td>
 				</tr>
 			</tbody>
@@ -76,6 +77,23 @@ Vue.component("vue-import-preview", {
     methods: {
 	save: function() {
 		this.$emit('save', null);
+	},
+	errorColumn: function(err) {
+		if (err.column != null && err.column != "") {
+			return err.column;
+		}
+		if ("field" in err.exception) {
+			let fieldName = err.exception.field;
+			if (this.modelDef != null) {
+				if (fieldName in this.modelDef.fields) {
+					if ("label" in this.modelDef.fields[fieldName]) {
+						return this.modelDef.fields[fieldName].label;
+					}
+				}
+			}
+			return fieldName;
+		}
+		return "Inconnue";
 	},
 	errorMessage: function(exception) {
 		if (exception instanceof InvalidFieldException) {
