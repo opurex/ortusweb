@@ -144,7 +144,7 @@ Vue.component("vue-import-preview", {
 Vue.component("vue-import-preview-table", {
 	props: ["title", "tableColumns", "records", "editedValues", "linkedRecords"],
 	template: `<div class="because">
-<h2>{{title}}</h2>
+<h2 v-if="title">{{title}}</h2>
 <table class="table table-bordered table-hover">
 	<thead>
 		<tr>
