@@ -2,6 +2,7 @@ function home_show() {
 	vue.screen.data = {
 		user: vue.login.user,
 		server: vue.login.server,
+		version: JSADMIN_VERSION,
 	}
 	if (storage_hasData()) {
 		let syncDate = storage_getSyncDate();

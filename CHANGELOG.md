@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 The semantic of version number is 'Level.Version'. Level is for compatibility between sofwares and Version is the release number.
 
+## [8.25] - 2024-08-06
+
+### Added
+- Tax amounts, payment mode amounts, discount amounts and customer's balance to tickets list
+- Add debt and prepaid along customer's balance to customer's list
+- Explicit error when importing without reference or missing required fields
+- Current filter (category, status) shown in product list title
+
+### Changed
+- Ticket is displayed in a popup instead of to the right of the table
+- columnMappingDef is merged into ModelDef
+- Table footers are automatically computed according to the definition of the column
+- CSV import uses exeptions for error handling
+- Ticket list and customer's history share the same component
+
+### Fixed
+- Some inconsistencies and errors when importing product from csv
+- Some format inconsistencies in table footers
+- Customers' stats piling up when filtering
+- Clicking on checkbox labels when 2 tables are shown on the same page (customer's history)
+
+
 ## [8.24] - 2024-03-13
 
 ### Added

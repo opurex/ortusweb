@@ -1,3 +1,5 @@
+const JSADMIN_VERSION = "8.25";
+
 /** The vue.js app. */
 var vue = null;
 var appData = {
