@@ -54,20 +54,21 @@ function _customers_showCustomer(customer, taxes, tariffAreas, discountProfiles,
 		"stop": stop,
 		"tickets": [],
 		"customerHistory": new Table().reference("customer-history-list")
-			.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du produit. Ce champ ne peut être exporté."))
-			.column(new TableCol().reference("date").label("Date").visible(true).help("La date d'achat.")) // type = String for date range
-			.column(new TableCol().reference("ticket").label("Ticket").visible(false).searchable(true).help("Le numéro du ticket correspondant."))
-			.column(new TableCol().reference("payments").label("Paiement").visible(false).help("Le mode de paiement associé au ticket. Il est commun à toutes les lignes d'un même ticket et ne correspond pas au paiement de la ligne."))
-			.column(new TableCol().reference("discountRate").label("Remise du ticket").visible(false).help("Le taux de remise appliqué à tout le ticket. La remise n'est pas prise en compte dans les champs HT et TTC."))
-			.column(new TableCol().reference("line-reference").label("Reference").visible(false).searchable(true).help("La référence du produit."))
-			.column(new TableCol().reference("line-label").label("Désignation").visible(true).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
-			.column(new TableCol().reference("line-unitPrice").label("PU HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le prix unitaire hors taxes avant remise."))
-			.column(new TableCol().reference("line-unitTaxedPrice").label("PU TTC").type(TABLECOL_TYPE.NUMBER2).visible(false).help("Le prix unitaire TTC avant remise."))
-			.column(new TableCol().reference("line-taxRate").label("TVA").type(TABLECOL_TYPE.PERCENT).visible(false).help("Le taux de TVA appliqué."))
-			.column(new TableCol().reference("line-quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).visible(true).help("La quantité de produit."))
-			.column(new TableCol().reference("line-discountRate").label("Remise").type(TABLECOL_TYPE.PERCENT).footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(false).help("Le taux de remise accordé, inclus dans les champs HT et TTC."))
-			.column(new TableCol().reference("line-finalPrice").label("HT").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le montant de chiffre d'affaire hors taxes associé. Il comprend la remise de la ligne mais pas la remise du ticket."))
-			.column(new TableCol().reference("line-finalTaxedPrice").label("TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("Le prix de vente TTC. Il comprend la remise de la ligne mais pas la remise du ticket.")),
+			.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("The product image. This field cannot be exported."))
+			.column(new TableCol().reference("date").label("Date").visible(true).help("The purchase date.")) // type = String for date range
+			.column(new TableCol().reference("ticket").label("Ticket").visible(false).searchable(true).help("The corresponding ticket number."))
+			.column(new TableCol().reference("payments").label("Payment").visible(false).help("The payment method associated with the ticket. It is the same for all lines of the same ticket and does not reflect the payment of the individual line."))
+			.column(new TableCol().reference("discountRate").label("Ticket Discount").visible(false).help("The discount rate applied to the entire ticket. This discount is not reflected in the HT (before tax) and TTC (after tax) fields."))
+			.column(new TableCol().reference("line-reference").label("Reference").visible(false).searchable(true).help("The product reference."))
+			.column(new TableCol().reference("line-label").label("Description").visible(true).searchable(true).help("The product name as shown on POS buttons and receipts."))
+			.column(new TableCol().reference("line-unitPrice").label("Unit Price (Excl. Tax)").type(TABLECOL_TYPE.NUMBER5).visible(false).help("The unit price excluding tax before discount."))
+			.column(new TableCol().reference("line-unitTaxedPrice").label("Unit Price (Incl. Tax)").type(TABLECOL_TYPE.NUMBER2).visible(false).help("The unit price including tax before discount."))
+			.column(new TableCol().reference("line-taxRate").label("VAT").type(TABLECOL_TYPE.PERCENT).visible(false).help("The VAT rate applied."))
+			.column(new TableCol().reference("line-quantity").label("Quantity").type(TABLECOL_TYPE.NUMBER).visible(true).help("The product quantity."))
+			.column(new TableCol().reference("line-discountRate").label("Discount").type(TABLECOL_TYPE.PERCENT).footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(false).help("The discount rate applied to the line, included in both HT and TTC fields."))
+			.column(new TableCol().reference("line-finalPrice").label("Subtotal (Excl. Tax)").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(false).help("The net sales amount excluding VAT. It includes the line discount but not the ticket-wide discount."))
+			.column(new TableCol().reference("line-finalTaxedPrice").label("Total (Incl. Tax)").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(false).help("The total sale price including tax. Includes the line discount but not the ticket discount."))
+
 	}
 	CustomerDef.loadCustomizedContactFields(function(contactFields) {
 		vue.screen.data.contactFields = contactFields;
@@ -280,9 +281,9 @@ function _customers_showHistory(tickets, products) {
 			line[1] = tools_dateTimeToString(line[1]);
 		}
 	}
-	vue.screen.data.customerHistory.title("Historique d'achat du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
+	vue.screen.data.customerHistory.title("Purchase history from" + tools_dateToString(vue.screen.data.start) + " to " + tools_dateToString(vue.screen.data.stop));
 	vue.screen.data.customerHistory.resetContent(lines);
-	Vue.set(vue.screen.data, "ticketsTitle", "Tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
+	Vue.set(vue.screen.data, "ticketsTitle", "Tickets from  " + tools_dateToString(vue.screen.data.start) + " to " + tools_dateToString(vue.screen.data.stop));
 	gui_hideLoading();
 }
 
@@ -357,7 +358,8 @@ function customers_saveMultipleCallback(results) {
 		let res = results[Object.keys(results)[0]];
 		let showMsg = function() {
 			gui_hideLoading();
-			gui_showWarning("Les données n'ont pas été envoyées, veuillez réitérer l'opération.");
+			gui_showWarning("The data was not sent, please try the operation again.");
+
 		}
 		if (srvcall_callbackCatch(res.request, res.status, res.response, showMsg)) {
 			return;
@@ -370,7 +372,7 @@ function customers_saveMultipleCallback(results) {
 		let status = results[reqId].status;
 		let response = results[reqId].response;
 		if (status == 400) {
-			errors.push("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			errors.push("Something is wrong with the form data. " + request.statusText);
 			continue;
 		}
 		let respCust = JSON.parse(response);
@@ -396,11 +398,13 @@ function customers_saveMultipleCallback(results) {
 		gui_hideLoading();
 		if (errors.length > 0) {
 			if (saves.length > 0) {
-				errors.push("Les autres enregistrements ont été pris en compte. Vous pouvez recharger le fichier pour retrouver les erreurs.");
+				// errors.push("Les autres enregistrements ont été pris en compte. Vous pouvez recharger le fichier pour retrouver les erreurs.");
+				errors.push("The other records have been processed. You can reload the file to find the errors.");
+
 			}
 			gui_showError(errors);
 		} else {
-			gui_showMessage("Les données ont été enregistrées.");
+			gui_showMessage("The data has been saved.");
 		}
 		vue.screen.data = {};
 		vue.$refs.screenComponent.reset();
@@ -409,7 +413,7 @@ function customers_saveMultipleCallback(results) {
 	if (saves.length == 0) {
 		gui_hideLoading();
 		if (errors.length == 0) {
-			gui_showErrors("Aucune opération.");
+			gui_showErrors("No operation.");
 		} else {
 			gui_showErrors(errors);
 		}

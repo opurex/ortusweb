@@ -3,13 +3,13 @@ Vue.component("vue-paymentmode-list", {
 	data: function() {
 		return {
 			paymentModesTable: new Table().reference("paymentmode-list")
-				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du bouton du mode de paiement. Ce champ ne peut être exporté."))
-				.column(new TableCol().reference("reference").label("Référence").visible(false).help("La référence doit être unique pour chaque mode de paiement."))
-				.column(new TableCol().reference("label").label("Désignation").visible(true).help("Le nom du mode de paiement tel qu'affiché sur les boutons de la caisse."))
-				.column(new TableCol().reference("visible").label("Actif").type(TABLECOL_TYPE.BOOL).visible(true).help("Si le mode de paiement peut être encaissé ou non."))
-				.column(new TableCol().reference("roles").label("Rôles").visible(true).help("Les rôles autorisés à encaisser avec ce mode de paiement."))
-				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage."))
-				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("The image for the payment mode button. This field cannot be exported."))
+				.column(new TableCol().reference("reference").label("Reference").visible(false).help("The reference must be unique for each payment mode."))
+				.column(new TableCol().reference("label").label("Name").visible(true).help("The name of the payment mode as shown on the register buttons."))
+				.column(new TableCol().reference("visible").label("Active").type(TABLECOL_TYPE.BOOL).visible(true).help("Whether the payment mode can be used for payments."))
+				.column(new TableCol().reference("roles").label("Roles").visible(true).help("Roles allowed to use this payment mode."))
+				.column(new TableCol().reference("dispOrder").label("Order").type(TABLECOL_TYPE.NUMBER).visible(false).help("Display order."))
+				.column(new TableCol().reference("operation").label("Operation").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="paymentmode-list">
@@ -17,18 +17,18 @@ Vue.component("vue-paymentmode-list", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Liste des modes de paiement</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Payment Modes List</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
-				<li><a class="btn btn-add" href="?p=paymentmode">Ajouter un mode de paiement</a></li>
+				<li><a class="btn btn-add" href="?p=paymentmode">Add a payment mode</a></li>
 			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
-		<p class="warning" v-if="data.cashWarning"><strong>Attention :</strong> Pour que les montants du fond de caisse à l'ouverture et à la clôture puisse fonctionner, le mode de paiements équivalent aux espèces doit avoir la référence <em>cash</em></p>
+		<p class="warning" v-if="data.cashWarning"><strong>Warning:</strong> For the cash drawer opening/closing amounts to work, the payment mode for cash must have the reference <em>cash</em></p>
 		<vue-table v-bind:table="paymentModesTable"></vue-table>
 	</article>
 </section>
@@ -53,7 +53,7 @@ Vue.component("vue-paymentmode-list", {
 				pm.reference, pm.label,
 				pm.visible,
 				pm.roles.join(", "), pm.dispOrder,
-				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(pm) + "\">Modifier</a></div>",
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(pm) + "\">Edit</a></div>",
 			];
 			this.paymentModesTable.line(line);
 		});
@@ -67,22 +67,22 @@ Vue.component("vue-paymentmode-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=paymentmodes">Liste des modes de paiement</a></li>
-				<li><h1>Édition d'un mode de paiement</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=paymentmodes">Payment Modes List</a></li>
+				<li><h1>Edit a Payment Mode</h1></li>
 			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
 		<form id="edit-paymentmode-form" class="form-large" onsubmit="javascript:paymentmodes_savePaymentMode(); return false;">
 			<fieldset>
-				<legend>Mode de paiement</legend>
+				<legend>Payment Mode</legend>
 				<div class="form-group">
-					<label for="edit-label">Désignation à l'encaissement</label>
+					<label for="edit-label">Label for payment</label>
 					<input id="edit-label" type="text" v-model="data.paymentMode.label" required="true" />
 				</div>
 				<div class="form-group">
-					<label for="edit-backlabel">Désignation au rendu</label>
+					<label for="edit-backlabel">Label for return</label>
 					<input id="edit-backlabel" type="text" v-model="data.paymentMode.backLabel" />
 				</div>
 				<div class="form-group">
@@ -92,32 +92,32 @@ Vue.component("vue-paymentmode-form", {
 					<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:paymentmodes_toggleImage();return false;" >{{data.deleteImageButton}}</a>
 				</div>
 				<div class="form-group">
-					<label for="edit-reference">Référence</label>
+					<label for="edit-reference">Reference</label>
 					<input id="edit-reference" type="text" v-model="data.paymentMode.reference" required="true" />
 				</div>
 				<div class="form-group">
-					<label for="edit-dispOrder">Ordre</label>
+					<label for="edit-dispOrder">Order</label>
 					<input id="edit-dispOrder" type="number" v-model.number="data.paymentMode.dispOrder">
 				</div>
 				<div class="form-group">
 					<label for="edit-type">Type</label>
 					<select id="edit-type" v-model="data.paymentMode.type">
 						<option value="0">Standard</option>
-						<option value="1">Nécéssite l'assignation à un client enregistré</option>
-						<option value="3">Enregistre une dette client</option>
-						<option value="5">Utilise le solde pré-payé</option>
+						<option value="1">Requires assignment to a registered customer</option>
+						<option value="3">Registers a customer debt</option>
+						<option value="5">Uses pre-paid balance</option>
 					</select>
 				</div>
 				<div class="form-group">
 					<input id="edit-visible" type="checkbox" name="visible" v-model="data.paymentMode.visible">
-					<label for="edit-visible">Actif</label>
+					<label for="edit-visible">Active</label>
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Valeurs faciales</legend>
+				<legend>Denominations</legend>
 				<table>
 					<thead>
-						<tr><th></th><th>Valeur</th><th></th></tr>
+						<tr><th></th><th>Value</th><th></th></tr>
 					</thead>
 					<tbody>
 						<tr v-for="(value, index) in data.paymentMode.values">
@@ -132,21 +132,21 @@ Vue.component("vue-paymentmode-form", {
 					</tbody>
 				</table>
 				<div class="form-control">
-					<nav><button class="btn btn-add" type="button" v-on:click="addValue">Ajouter une valeur</button></nav>
+					<nav><button class="btn btn-add" type="button" v-on:click="addValue">Add a value</button></nav>
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Rendus monnaie</legend>
+				<legend>Change Returns</legend>
 				<table>
 					<thead>
-						<tr><th>Excédent min.</th><th>Mode de rendu</th><th></th></tr>
+						<tr><th>Min. excess</th><th>Return mode</th><th></th></tr>
 					</thead>
 					<tbody>
 						<tr v-for="(ret, index) in data.paymentMode.returns">
 							<td><input type="number" v-model="ret.minAmount" step="0.01" /></td>
 							<td><select v-model="ret.returnMode" required="true">
-								<option disabled value="">Sélectionner</option>
-								<!-- if payment mode doesn't exist yet ... -->
+								<option disabled value="">Select</option>
+								<!-- if payment mode doesn't exist yet -->
 								<option v-if="!data.paymentMode.id" v-bind:value.int="-1">{{currentModeLabel()}}</option>
 								<option v-for="pm in data.paymentModes" :key="pm.id" v-bind:value="pm.id">{{pm.label}}</option>
 							</select></td>
@@ -155,11 +155,11 @@ Vue.component("vue-paymentmode-form", {
 					</tbody>
 				</table>
 				<div class="form-control">
-					<nav><button class="btn btn-add" type="button" v-on:click="addReturn">Ajouter un rendu</button></nav>
+					<nav><button class="btn btn-add" type="button" v-on:click="addReturn">Add a return</button></nav>
 				</div>
 			</fieldset>
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>
@@ -198,7 +198,7 @@ Vue.component("vue-paymentmode-form", {
 			if (this.data.paymentMode.label) {
 				return this.data.paymentMode.label;
 			} else {
-				return "Même moyen de paiement";
+				return "Same payment mode";
 			}
 		}
 	}

@@ -1,4 +1,3 @@
-
 Vue.component("vue-login", {
 	props: ["login"],
 	data: function() {
@@ -9,17 +8,17 @@ Vue.component("vue-login", {
 	template: `<div id="login" class="login-box" v-if="login.loggedIn == false">
 	<aside class="box box-body">
 		<div id="login-logo">
-			<img src="res/img/pasteque_logo.png" alt="Pasteque-Admin" />
+			<img src="res/img/opurexlogo.png" alt="Opurex POS Admin" />
 		</div>
 		<fieldset>
-			<legend>Police d'écriture</legend>
+			<legend>Font</legend>
 			<div class="form-group">
 				<input id="font-pt" type="radio" name="font" value="default" v-model="font" />
-				<label for="font-pt" class="default-font">Par défaut</label>
+				<label for="font-pt" class="default-font">Default</label>
 			</div>
 			<div class="form-group">
 				<input id="font-system" type="radio" name="font" value="system" v-model="font" />
-				<label for="font-system" class="no-font">Désactiver la police</label>
+				<label for="font-system" class="no-font">Disable font</label>
 			</div>
 			<div class="form-group">
 				<input id="font-opendyslexic" type="radio" name="font" value="opendyslexic" v-model="font" />
@@ -31,28 +30,28 @@ Vue.component("vue-login", {
 			</div>
 		</fieldset>
 	</aside>
-	<nav class="box box-body login-box-body ">
-		<h1>Connexion à votre serveur Pastèque</h1>
+	<nav class="box box-body login-box-body">
+		<h1>Login to Opurex Pos server</h1>
 		<p class="form-msg"></p>
-		<form name="loginform" onsubmit="javascript:login_sendLogin();return false;" id="loginform" action="." method="post" class="form-tiny">
+		<form name="loginform" onsubmit="javascript:login_sendLogin();return false;" id="loginform" action="" method="post" class="form-tiny">
 			<div class="form-group">
-				<label class="control-label required" for="user_server">Serveur</label>
+				<label class="control-label required" for="user_server">Server</label>
 				<input type="text" id="user_server" required="required" class="form-control" v-model="login.server" />
 			</div>
 			<div class="form-group">
-				<label class="control-label required" for="user_login">Identifiant</label>
+				<label class="control-label required" for="user_login">Username</label>
 				<input type="text" id="user_login" required="required" class="form-control" v-model="login.user" />
 			</div>
 			<div class="form-group">
-				<label class="control-label required" for="user_pass">Mot de passe</label>
+				<label class="control-label required" for="user_pass">Password</label>
 				<input type="password" id="user_pass" required="required" class="form-control" v-model="login.password" />
 			</div>
 			<div class="form-group">
 				<input type="checkbox" name="https" id="user_https" v-model="login.https" />
-				<label for="user_https">Connexion sécurisée <span class="tooltip">(utiliser HTTPS)</span></label>
+				<label for="user_https">Secure connection <span class="tooltip">(use HTTPS)</span></label>
 			</div>
 			<div class="form-control">
-				<button class="btn btn-primary" type="submit">Se connecter</button>
+				<button class="btn btn-primary" type="submit">Log in</button>
 			</div>
 		</form>
 	</nav>
@@ -84,4 +83,3 @@ Vue.component("vue-login", {
 		}
 	}
 });
-

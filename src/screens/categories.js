@@ -58,11 +58,12 @@ function category_saveCallback(request, status, response) {
 	}
 	if (status == 400) {
 		if (request.statusText == "Reference is already taken") {
-			gui_showError("La référence existe déjà, veuillez en choisir une autre.");
-			document.getElementById("edit-reference").focus(); // TODO: make this Vuejsy.
+			gui_showError("The reference already exists. Please choose another one.");
+			document.getElementById("edit-reference").focus(); // TODO: make this Vue-friendly.
 		} else {
-			gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			gui_showError("Something's wrong with the form data. " + request.statusText);
 		}
+
 		gui_hideLoading();
 		return;
 	}
@@ -149,7 +150,7 @@ function categories_saveMultipleCallback(results) {
 		let res = results[Object.keys(results)[0]];
 		let showMsg = function() {
 			gui_hideLoading();
-			gui_showWarning("Les données n'ont pas été envoyées, veuillez réitérer l'opération.");
+			gui_showWarning("Data was not submitted. Please repeat the operation.");
 		}
 		if (srvcall_callbackCatch(res.request, res.status, res.response, showMsg)) {
 			return;
@@ -164,10 +165,11 @@ function categories_saveMultipleCallback(results) {
 		if (status == 400) {
 			let err = JSON.parse(response);
 			if (err.error == "InvalidField") {
-				errors.push("La référence " + err.value + " n'est pas unique. La catégorie n'a pas été enregistré.");
+				errors.push("The reference " + err.value + " is not unique. The category was not saved.");
 			} else {
-				errors.push("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+				errors.push("Something's wrong with the form data. " + request.statusText);
 			}
+
 			continue;
 		}
 		if (reqId.substr(0, 4) == "new-") {
@@ -187,12 +189,13 @@ function categories_saveMultipleCallback(results) {
 		gui_hideLoading();
 		if (errors.length > 0) {
 			if (saves.length > 0) {
-				errors.push("Les autres enregistrements ont été pris en compte. Vous pouvez recharger le fichier pour retrouver les erreurs.");
+				errors.push("The other records were saved. You can reload the file to review the errors.");
 			}
 			gui_showError(errors);
 		} else {
-			gui_showMessage("Les données ont été enregistrées.");
+			gui_showMessage("The data has been saved.");
 		}
+
 		vue.screen.data = {};
 		vue.$refs.screenComponent.reset();
 		categories_showImport();
@@ -200,7 +203,7 @@ function categories_saveMultipleCallback(results) {
 	if (saves.length == 0) {
 		gui_hideLoading();
 		if (errors.length == 0) {
-			gui_showErrors("Aucune opération.");
+			gui_showErrors("No operation performed.");
 		} else {
 			gui_showErrors(errors);
 		}

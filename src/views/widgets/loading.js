@@ -5,7 +5,7 @@
 Vue.component("vue-loading", {
 	props: ["loading"],
 	template: `<div id="loading" v-if="loading.loading">
-	<p>Chargement...</p>
+	<p>Loading...</p>
 	<p v-if="loading.progressMax" id="loading-progress">{{loading.progress}}/{{loading.progressMax}}</p>
 </div>
 `

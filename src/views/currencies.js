@@ -3,16 +3,16 @@ Vue.component("vue-currency-list", {
 	data: function() {
 		return {
 			currenciesTable: new Table().reference("currency-list")
-				.column(new TableCol().reference("reference").label("Référence").visible(false).searchable(true).help("La référence doit être unique pour chaque devise. Elle permet la modification lors de l'import."))
-				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom de la devise tel qu'affiché sur les boutons de la caisse."))
-				.column(new TableCol().reference("main").label("Principale").type(TABLECOL_TYPE.BOOL).visible(false).help("Si cette devise est la devise par défaut, devise de référence pour les montants."))
-				.column(new TableCol().reference("rate").label("Taux").type(TABLECOL_TYPE.NUMBER).visible(true).help("Taux de change vers la devise principale."))
-				.column(new TableCol().reference("symbol").label("Symbole").visible(false).searchable(true).help("Le symbole monétaire de la devise."))
-				.column(new TableCol().reference("decimalSeparator").label("Sep. décimales").visible(false).help("Le séparateur entre les entiers et les décimales (souvent , ou .)"))
-				.column(new TableCol().reference("thousandsSeparator").label("Sep. milliers").visible(false).help("Le séparateur entre les milliers (souvent vide ou espace)."))
-				.column(new TableCol().reference("format").label("Format").visible(false).help("Le format d'affichage des valeurs."))
-				.column(new TableCol().reference("visible").label("Active").type(TABLECOL_TYPE.BOOL).visible(true).help("Si la devise est utilisable ou non."))
-				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
+				.column(new TableCol().reference("reference").label("Reference").visible(false).searchable(true).help("The reference must be unique for each currency. It allows editing during import."))
+				.column(new TableCol().reference("label").label("Name").visible(true).searchable(true).help("The currency name as displayed on the POS buttons."))
+				.column(new TableCol().reference("main").label("Main").type(TABLECOL_TYPE.BOOL).visible(false).help("If this currency is the default currency, reference currency for amounts."))
+				.column(new TableCol().reference("rate").label("Rate").type(TABLECOL_TYPE.NUMBER).visible(true).help("Exchange rate to the main currency."))
+				.column(new TableCol().reference("symbol").label("Symbol").visible(false).searchable(true).help("The currency symbol."))
+				.column(new TableCol().reference("decimalSeparator").label("Decimal Sep.").visible(false).help("The separator between whole numbers and decimals (often , or .)"))
+				.column(new TableCol().reference("thousandsSeparator").label("Thousands Sep.").visible(false).help("The separator between thousands (often empty or space)."))
+				.column(new TableCol().reference("format").label("Format").visible(false).help("The display format for values."))
+				.column(new TableCol().reference("visible").label("Active").type(TABLECOL_TYPE.BOOL).visible(true).help("Whether the currency is usable or not."))
+				.column(new TableCol().reference("operation").label("Operation").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="currency-list">
@@ -20,13 +20,13 @@ Vue.component("vue-currency-list", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Liste des devises</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Currency List</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
-				<li><a class="btn btn-add" href="?p=currency">Ajouter une devise</a></li>
+				<li><a class="btn btn-add" href="?p=currency">Add a Currency</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -48,7 +48,7 @@ Vue.component("vue-currency-list", {
 				curr.main, curr.rate,
 				curr.symbol, curr.decimalSeparator, curr.thousandsSeparator,
 				curr.format, curr.visible,
-				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(curr) + "\">Modifier</a></div>",
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(curr) + "\">Edit</a></div>",
 			];
 			this.currenciesTable.line(line);
 		}
@@ -65,9 +65,9 @@ Vue.component("vue-currency-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=currencies">Liste des devises</a></li>
-				<li><h1>Édition d'une devise</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=currencies">Currency List</a></li>
+				<li><h1>Edit a Currency</h1></li>
 			</ul>
 		</nav>
 	</header>
@@ -76,22 +76,22 @@ Vue.component("vue-currency-form", {
 			<fieldset>
 				<legend>Description</legend>
 				<div class="form-group">
-					<label for="edit-label">Désignation</label>
+					<label for="edit-label">Name</label>
 					<input id="edit-label" type="text" v-model="data.currency.label" required="true" />
 				</div>
 				<div class="form-group">
-					<label for="edit-reference">Référence</label>
+					<label for="edit-reference">Reference</label>
 					<input id="edit-reference" type="text" v-model="data.currency.reference" required="true" />
 				</div>
 				<div class="form-group">
-					<label for="edit-dispOrder">Taux de change</label>
-					<span>1 {{data.currency.label}} = </span>
+					<label for="edit-dispOrder">Exchange Rate</label>
+					<span>1 {{data.currency.label}} = </span>
 					<input id="edit-dispOrder" type="number" v-model.number="data.currency.rate" min="0.00" step="0.01">
-					<span> {{mainCurrencyLbl}}</span>
+					<span> {{mainCurrencyLbl}}</span>
 				</div>
 				<div class="form-group">
 					<input id="edit-main" type="checkbox" name="main" v-model="data.currency.main" v-bind:disabled="data.wasMain" />
-					<label for="edit-main">Devise principale</label>
+					<label for="edit-main">Main Currency</label>
 				</div>
 				<div class="form-group">
 					<input id="edit-visible" type="checkbox" name="main" v-model="data.currency.visible">
@@ -101,26 +101,26 @@ Vue.component("vue-currency-form", {
 			<fieldset>
 				<legend>Format</legend>
 				<div class="form-group">
-					<label for="edit-symbole">Symbole monétaire</label>
+					<label for="edit-symbole">Currency Symbol</label>
 					<input id="edit-symbol" type="text" v-model="data.currency.symbol" />
 				</div>
 				<div class="form-group">
-					<label for="edit-decimal">Séparateur de décimales</label>
+					<label for="edit-decimal">Decimal Separator</label>
 					<input id="edit-decimal" type="text" v-model="data.currency.decimalSeparator" />
 				</div>
 				<div class="form-group">
-					<label for="edit-thousand">Séparateur de milliers</label>
+					<label for="edit-thousand">Thousands Separator</label>
 					<input id="edit-thousand" type="text" v-model="data.currency.thousandsSeparator" />
 				</div>
 				<div class="form-group">
 					<label for="edit-format">Format</label>
 					<input id="edit-format" type="text" v-model="data.currency.format" />
 				</div>
-				<div>Le format est un champ technique. Le format courant est #,##0.00$ (2 décimales, symbole monétaire en fin, chiffres regroupés par 3).
+				<div>The format is a technical field. The current format is #,##0.00$ (2 decimals, currency symbol at the end, digits grouped by 3).
 				</div>
 			</fieldset>
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>
@@ -144,4 +144,3 @@ Vue.component("vue-currency-form", {
 		}
 	}
 });
-

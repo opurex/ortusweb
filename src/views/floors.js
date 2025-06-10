@@ -22,17 +22,17 @@ Vue.component("vue-floors-edit", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Plan de tables</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Table Plan</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
-				<li><button class="btn btn-add" v-on:click="addFloor()">Ajouter une salle</button></li>
+				<li><button class="btn btn-add" v-on:click="addFloor()">Add Room</button></li>
 				<li>
-					<label for="select-floor">Salle</label>
+					<label for="select-floor">Room</label>
 					<select class="form-control" id="select-floor" v-model="selectedFloor">
-						<option disabled value="">Liste des salles ordonnées</option>
+						<option disabled value="">Ordered Room List</option>
 						<option v-for="floor in sortedFloors" :key="floor.id" v-bind:value="floor">{{floor.label}}</option>
 					</select>
 				</li>
@@ -40,12 +40,12 @@ Vue.component("vue-floors-edit", {
 		</nav>
 	</header>
 	<article class="box-body">
-		<p class="warning">Attention : veillez à ce que les caisse soient fermées avant de modifier le plan de table, au risque de perdre les commandes en cours au rechargement.</p>
+		<p class="warning">Warning: Make sure cash registers are closed before modifying the table plan, otherwise ongoing orders may be lost upon reload.</p>
 		<form id="edit-map" class="form-large form-mosaic" onsubmit="return false;">
 			<fieldset class="form-tiny" v-if="selectedPlace">
-				<legend>Table sélectionnée</legend>
+				<legend>Selected Table</legend>
 				<div class="form-group">
-					<label for="place-label">Nom de la table</label>
+					<label for="place-label">Table Name</label>
 					<input id="place-label" type="text" v-model="selectedPlace.label" />
 				</div>
 				<div class="form-group">
@@ -57,40 +57,40 @@ Vue.component("vue-floors-edit", {
 					<input id="place-y" type="number" step="1" v-model="selectedPlace.y" />
 				</div>
 				<div class="form-control">
-					<button type="button" id="place-delete" class="btn btn-remove" v-on:click="deletePlace()">Supprimer la table</button>
+					<button type="button" id="place-delete" class="btn btn-remove" v-on:click="deletePlace()">Delete Table</button>
 				</div>
 			</fieldset>
 			<fieldset class="form-tiny" v-else>
-				<legend>Table sélectionnée</legend>
+				<legend>Selected Table</legend>
 				<div class="form-group">
-					<label>Nom de la table</label>
-					<input type="text" disabled="true" placeholder="Aucune table sélectionnée">
+					<label>Table Name</label>
+					<input type="text" disabled="true" placeholder="No table selected">
 				</div>
 				<div class="form-group">
-					<label>Position X (horizontal)</label>
-					<input type="text" disabled="true" placeholder="Aucune table sélectionnée">
+					<label>X Position (horizontal)</label>
+					<input type="text" disabled="true" placeholder="No table selected">
 				</div>
 				<div class="form-group">
-					<label>Position Y (vertical)</label>
-					<input type="text" disabled="true" placeholder="Aucune table sélectionnée">
+					<label>Y Position (vertical)</label>
+					<input type="text" disabled="true" placeholder="No table selected">
 				</div>
 				<div class="form-control">
-					<button type="button" class="btn btn-remove" disabled="true">Supprimer la table</button>
+					<button type="button" class="btn btn-remove" disabled="true">Delete Table</button>
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Plan de tables <span style="font-size: x-small; font-style: italic;">(suggestion de présentation)</span></legend>
+				<legend>Table Plan <span style="font-size: x-small; font-style: italic;">(layout suggestion)</span></legend>
 				<div class="form-group" v-if="selectedFloor">
-					<label for="floor-label">Nom de la salle</label>
+					<label for="floor-label">Room Name</label>
 					<input id="floor-label" type="text" v-model="selectedFloor.label">
 				</div>
 				<div class="form-group" v-if="selectedFloor">
-					<label for="floor-dispOrder">Ordre d'affichage</label>
+					<label for="floor-dispOrder">Display Order</label>
 					<input id="floor-dispOrder" type="number" step="1" v-model="selectedFloor.dispOrder" />
 				</div>
 				<div class="form-control">
-					<button type="button" class="btn btn-add" v-on:click="addPlace()">Ajouter une table</button>
-					<button type="button" id="floor-delete" class="btn btn-remove" v-bind:disabled="selectedFloor?.id" v-on:click="deleteFloor()" v-bind:title="deleteFloorTitle">Supprimer la salle</button>
+					<button type="button" class="btn btn-add" v-on:click="addPlace()">Add Table</button>
+					<button type="button" id="floor-delete" class="btn btn-remove" v-bind:disabled="selectedFloor?.id" v-on:click="deleteFloor()" v-bind:title="deleteFloorTitle">Delete Room</button>
 				</div>
 				<div class="floor-display" id="floor-display" v-on:mousemove="mousemovePlace($event)" v-on:mouseup="mouseupPlace($event)">
 					<ul>
@@ -103,16 +103,16 @@ Vue.component("vue-floors-edit", {
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Éléments supprimés</legend>
+				<legend>Deleted Items</legend>
 				<ul class="deleted-places">
-					<li class="place-list" v-for="(place, index) in deleted.places">{{place.label}} <button class="btn btn-misc" type="button" v-on:click="restorePlace(place, index)"><img style="height: 2ex;" src="res/img/cancel.png" alt="Restaurer" title="Restaurer"></button></li>
+					<li class="place-list" v-for="(place, index) in deleted.places">{{place.label}} <button class="btn btn-misc" type="button" v-on:click="restorePlace(place, index)"><img style="height: 2ex;" src="res/img/cancel.png" alt="Restore" title="Restore"></button></li>
 				</ul>
 				<ul class="deleted-floors">
-					<li class="floor-list" v-for="(floor, index) in deleted.floors">{{floor.label}} ({{floor.places.length}} tables)<button class="btn btn-misc" type="button" v-on:click="restoreFloor(floor, index)"><img style="height: 2ex;" src="res/img/cancel.png" alt="Restaurer" title="Restaurer"></button></li>
+					<li class="floor-list" v-for="(floor, index) in deleted.floors">{{floor.label}} ({{floor.places.length}} tables)<button class="btn btn-misc" type="button" v-on:click="restoreFloor(floor, index)"><img style="height: 2ex;" src="res/img/cancel.png" alt="Restore" title="Restore"></button></li>
 				</ul>
 			</fieldset>
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="button" v-on:click="save">Enregistrer les modifications</button>
+				<button class="btn btn-primary btn-send" type="button" v-on:click="save">Save Changes</button>
 			</div>
 		</form>
 	</article>
@@ -261,7 +261,7 @@ Vue.component("vue-floors-edit", {
 	computed: {
 		"deleteFloorTitle": function() {
 			if (this.selectedFloor?.id) {
-				return "La suppression d'une salle déjà enregistrée n'est pas supportée actuellement. Contactez votre prestataire pour effectuer la suppression.";
+				return "Deleting a room that has already been saved is not currently supported. Please contact your service provider to perform the deletion.";
 			} else {
 				return "";
 			}

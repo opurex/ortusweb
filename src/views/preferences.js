@@ -5,18 +5,18 @@ Vue.component("vue-preferences", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Préférences</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Preferences</h1></li>
 			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
 		<form id="edit-preferences-form" class="form-large" onsubmit="javascript:preferences_save(); return false;">
 			<fieldset>
-				<legend>Police d'écriture</legend>
+				<legend>Font</legend>
 				<div class="form-group">
 					<input id="font-system" type="radio" name="font" value="system" v-model="data.font" v-on:change="updateFont()" />
-					<label for="font-system" class="no-font">Désactiver la police</label>
+					<label for="font-system" class="no-font">Disable font</label>
 				</div>
 				<div class="form-group">
 					<input id="font-pt" type="radio" name="font" value="sans" v-model="data.font" v-on:change="updateFont()" />
@@ -33,18 +33,18 @@ Vue.component("vue-preferences", {
 			</fieldset>
 
 			<div class="form-group">
-				<label for="tablePageSize">Nombre de lignes par page de tableau</label>
+				<label for="tablePageSize">Number of rows per table page</label>
 				<select v-model.number="data.tablePageSize" id="tablePageSize">
 					<option value="50">50</option>
 					<option value="100">100</option>
 					<option value="250">250</option>
 					<option value="500">500</option>
-					<option value="-1">Tout</option>
+					<option value="-1">All</option>
 				</select>
 			</div>
 
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>
@@ -57,4 +57,3 @@ Vue.component("vue-preferences", {
 		}
 	}
 });
-

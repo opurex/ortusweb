@@ -747,29 +747,29 @@ Vue.component("vue-table", {
 	},
 		template: `<div class="table">
 	<div class="filters noprint" v-if="table.vuecolumns.length > 0 && (filterable || exportable)">
-		<h3>Afficher/masquer des colonnes</h3>
+		<h3>Show/hide columns</h3>
 		<ul class="filter-actions">
 			<li>
 				<button type="button" class="btn btn-misc" v-on:click="toggleHelp">
 					<template v-if="showHelp">
-					<img src="res/img/column_descr_hide.png" alt="" style="height: 26px; padding-right: 5px;" />
-					<span style="float: right; margin-top: 5px;">Cacher le descriptif des champs</span>
+						<img src="res/img/column_descr_hide.png" alt="" style="height: 26px; padding-right: 5px;" />
+						<span style="float: right; margin-top: 5px;">Hide field descriptions</span>
 					</template>
 					<template v-else>
-					<img src="res/img/column_descr_show.png" alt="" style="height: 26px; padding-right: 5px;" />
-					<span style="float: right; margin-top: 5px;">Afficher le descriptif des champs</span>
+						<img src="res/img/column_descr_show.png" alt="" style="height: 26px; padding-right: 5px;" />
+						<span style="float: right; margin-top: 5px;">Show field descriptions</span>
 					</template>
 				</button>
 			</li>
 			<li><button type="button" class="btn btn-misc" v-on:click="checkAllColumns">
-			<img src="res/img/column_expand.png" alt="" style="height: 26px; padding-right: 5px;" />
-			<span style="float: right; margin-top: 5px;">Afficher toutes les colonnes</span>
+				<img src="res/img/column_expand.png" alt="" style="height: 26px; padding-right: 5px;" />
+				<span style="float: right; margin-top: 5px;">Show all columns</span>
 			</button></li>
 			<li><button type="button" class="btn btn-misc" v-on:click="uncheckAllColumns">
-			<img src="res/img/column_collapse.png" alt="" style="height: 26px; padding-right: 5px;" />
-			<span style="float: right; margin-top: 5px;">Masquer toutes les colonnes</span>
+				<img src="res/img/column_collapse.png" alt="" style="height: 26px; padding-right: 5px;" />
+				<span style="float: right; margin-top: 5px;">Hide all columns</span>
 			</button></li>
-			<li><button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Inverser les colonnes affichées</button></li>
+			<li><button type="button" class="btn btn-misc" v-on:click="invertCheckedColumns">Invert displayed columns</button></li>
 		</ul>
 		<ul class="filter-columns" v-if="filterable" v-bind:class="{'expand-help': showHelp}">
 			<li v-for="(col, index) in table.vuecolumns">
@@ -780,53 +780,53 @@ Vue.component("vue-table", {
 		</ul>
 		<ul class="filter-defaults" v-if="table.reference()">
 			<li><button type="button" class="btn btn-misc" v-on:click="restoreDefaultPreferences">
-			<img src="res/img/column_restore_params.png" alt="" style="height: 26px; padding-right: 5px;" />
-			<span style="float: right; margin-top: 5px;">Restaurer l'affichage par défaut</span>
+				<img src="res/img/column_restore_params.png" alt="" style="height: 26px; padding-right: 5px;" />
+				<span style="float: right; margin-top: 5px;">Restore default view</span>
 			</button></li>
 			<li><button type="button" class="btn btn-misc" v-on:click="savePreferences">
-			<img src="res/img/column_save_params.png" alt="" style="height: 26px; padding-right: 5px;" />
-			<span style="float: right; margin-top: 5px;">Enregistrer comme affichage par défaut</span>
+				<img src="res/img/column_save_params.png" alt="" style="height: 26px; padding-right: 5px;" />
+				<span style="float: right; margin-top: 5px;">Save as default view</span>
 			</button></li>
 		</ul>
 		<div v-if="table.ready && table.exportable()">
-			<a class="btn btn-add" v-on:click="exportCsvOther">Exporter le tableau</a>
-			<a class="btn btn-add" v-on:click="exportCsvExcel">Exporter le tableau (Excel)</a>
+			<a class="btn btn-add" v-on:click="exportCsvOther">Export table</a>
+			<a class="btn btn-add" v-on:click="exportCsvExcel">Export table (Excel)</a>
 		</div>
 	</div>
 	<h2 v-if="table.title()">{{table.title()}}</h2>
 	<nav class="table-pagination" v-if="table.ready">
 		<div class="form-group">
 			<label v-bind:for="htmlId('pageNum')">Page</label>
-			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
-			<button type="button" aria-label="Page précédente" title="Page précédente" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
+			<button type="button" aria-label="First page" title="First page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
+			<button type="button" aria-label="Previous page" title="Previous page" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
 			<select v-bind:id="htmlId('pageNum')" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
 				<option v-for="i in pageCount" v-bind:value="i - 1">{{ i }}</option>
 			</select>
-			<button type="button" aria-label="Page suivante"  title="Page suivante" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
-			<button type="button" aria-label="Dernière page"  title="Dernière page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
+			<button type="button" aria-label="Next page"  title="Next page" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
+			<button type="button" aria-label="Last page"  title="Last page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
 		</div>
 		<div class="form-group">
-			<label v-bind:for="htmlId('pageSize')">Nb par page</label>
+			<label v-bind:for="htmlId('pageSize')">Items per page</label>
 			<select v-model.number="linePerPage" v-bind:id="htmlId('pageSize')">
 				<option value="50">50</option>
 				<option value="100">100</option>
 				<option value="250">250</option>
 				<option value="500">500</option>
-				<option value="-1">Tout</option>
+				<option value="-1">All</option>
 			</select>
 		</div>
-		<vue-input-text v-bind:id="htmlId('search')" label="Rechercher" v-model="searchString" v-if="searchable" />
+		<vue-input-text v-bind:id="htmlId('search')" label="Search" v-model="searchString" v-if="searchable" />
 	</nav>
 	<table class="table table-bordered table-hover" v-if="table.ready">
 		<thead>
-			<tr>
-				<template v-for="(col, index) in table.vuecolumns">
+		<tr>
+			<template v-for="(col, index) in table.vuecolumns">
 				<th v-show="col.isVisible" v-bind:class="col.class()">{{col.label()}}</th>
-				</template>
-			</tr>
+			</template>
+		</tr>
 		</thead>
 		<tbody>
-			<template v-for="(line,index) in table.vuelines">
+		<template v-for="(line,index) in table.vuelines">
 			<tr v-if="visibleLine(index)">
 				<template v-for="(value, colIndex) in line">
 					<td v-if="table.vuecolumns[colIndex].isVisible" v-bind:class="[table.vuecolumns[colIndex].class(), {numeric: table.vuecolumns[colIndex].isNumber(), datetime: table.vuecolumns[colIndex].isDateOrTime()}]">
@@ -840,44 +840,42 @@ Vue.component("vue-table", {
 						<template v-else-if="table.vuecolumns[colIndex].type() == TABLECOL_TYPE.HTML"><span v-html="value"></span></template>
 						<template v-else>{{table.vuecolumns[colIndex].formatCell(value)}}</template>
 					</td>
-
 				</template>
 			</tr>
-			</template>
+		</template>
 		</tbody>
 		<tfoot v-if="table.vuehasfooter">
-			<tr>
-				<th v-for="(col, index) in table.vuecolumns" v-show="table.vuecolumns[index].isVisible" v-bind:class="table.vuecolumns[index].class()">
-					<template v-if="col.footerType() == TABLECOL_FOOTER.SUM">{{col.formatCell(col.footer())}}</template>
-					<template v-else>{{col.footer()}}</template>
-				</th>
-			</tr>
+		<tr>
+			<th v-for="(col, index) in table.vuecolumns" v-show="table.vuecolumns[index].isVisible" v-bind:class="table.vuecolumns[index].class()">
+				<template v-if="col.footerType() == TABLECOL_FOOTER.SUM">{{col.formatCell(col.footer())}}</template>
+				<template v-else>{{col.footer()}}</template>
+			</th>
+		</tr>
 		</tfoot>
 	</table>
 	<nav class="table-pagination" v-if="table.ready">
 		<div class="form-group">
 			<label v-bind:for="htmlId('pageNum2')">Page</label>
-			<button type="button" aria-label="Première page" title="Première page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
-			<button type="button" aria-label="Page précédente" title="Page précédente" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
+			<button type="button" aria-label="First page" title="First page" v-on:click="movePage(-2)" v-bind:disabled="currentPage == 0">&lt;&lt;</button>
+			<button type="button" aria-label="Previous page" title="Previous page" v-on:click="movePage(-1)" v-bind:disabled="currentPage == 0">&lt;</button>
 			<select v-bind:id="htmlId('pageNum2')" v-model.number="currentPage" v-bind:disabled="pageCount == 1">
 				<option v-for="i in pageCount" v-bind:value="i - 1">{{ i }}</option>
 			</select>
-			<button type="button" aria-label="Page suivante"  title="Page suivante" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
-			<button type="button" aria-label="Dernière page"  title="Dernière page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
+			<button type="button" aria-label="Next page"  title="Next page" v-on:click="movePage(1)" v-bind:disabled="currentPage == pageCount - 1">&gt;</button>
+			<button type="button" aria-label="Last page"  title="Last page" v-on:click="movePage(2)" v-bind:disabled="currentPage == pageCount - 1">&gt;&gt;</button>
 		</div>
 		<div class="form-group">
-			<label v-bind:for="htmlId('pageSize2')">Nb par page</label>
+			<label v-bind:for="htmlId('pageSize2')">Items per page</label>
 			<select v-model.number="linePerPage" v-bind:id="htmlId('pageSize2')">
 				<option value="50">50</option>
 				<option value="100">100</option>
 				<option value="250">250</option>
 				<option value="500">500</option>
-				<option value="-1">Tout</option>
+				<option value="-1">All</option>
 			</select>
 		</div>
 	</nav>
-</div>
-`,
+</div> `,
 	methods: {
 		// CSV functions
 		exportCsv: function (withExcelBom) {

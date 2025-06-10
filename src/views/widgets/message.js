@@ -9,7 +9,7 @@ Vue.component("vue-message", {
 	onclick="javascript:gui_closeMessageBox();">
 		<p v-for="msg in message.message">{{msg}}</p>
 		<template v-if="message.stack">
-		<p>Informations techniques :</p>
+		<p>Technical information :</p>
 		<pre class="stacktrace" v-if="message.stack">{{message.stack}}</pre>
 		</template>
 </div>

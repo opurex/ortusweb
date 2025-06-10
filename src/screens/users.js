@@ -57,7 +57,8 @@ function user_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		// gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something is wrong with the form data. " + request.statusText);
 		gui_hideLoading();
 		return;
 	}
@@ -89,16 +90,18 @@ function user_updPwdCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		// gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something is wrong with the form data. " + request.statusText);
+
 		gui_hideLoading();
 		return;
 	}
 	let respPwd = JSON.parse(response);
 	if (respPwd != true) {
-		gui_showError("Le mot de passe n'a pas pu être modifié.");
+		gui_showError("The password could not be changed.");
 		gui_hideLoading();
 	} else {
-		gui_showMessage("Le mot de passe a été réinitialisé.");
+		gui_showMessage("The password has been reset.");
 		gui_hideLoading();
 		// Store the updated password localy even if it is not encrypted yet (until next sync)
 		storage_open(function(event) {

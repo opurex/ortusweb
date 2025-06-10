@@ -5,38 +5,38 @@ Vue.component("vue-zticket-list", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Liste des tickets Z</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>List of Z Tickets</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<form id="ztickets-filter" onsubmit="javascript:ztickets_filter();return false;">
 				<div class="form-group">
-					<label for="start">Ouverture entre le</label>
+					<label for="start">Opening between</label>
 					<vue-inputdate id="start" v-model="data.start" />
 				</div>
 				<div class="form-group">
-					<label for="stop">et le</label>
+					<label for="stop">and</label>
 					<vue-inputdate id="stop" v-model="data.stop" />
 				</div>
 				<div class="form-group">
 					<input id="add-zeros" type="checkbox" v-model="data.addZeros" />
-					<label for="add-zeros">Afficher les montants à 0</label>
+					<label for="add-zeros">Show zero amounts</label>
 				</div>
 				<div class="form-group">
 					<input id="include-unused-payments" type="checkbox" v-model="data.includeUnusedPayments" />
-					<label for="include-unused-payments">Inclure les modes de paiements non utilisés</label>
+					<label for="include-unused-payments">Include unused payment methods</label>
 				</div>
 				<div class="form-group">
 					<input id="include-unused-taxes" type="checkbox" v-model="data.includeUnusedTaxes" />
-					<label for="include-unused-taxes">Inclure les taxes non utilisées</label>
+					<label for="include-unused-taxes">Include unused taxes</label>
 				</div>
 				<div class="form-group">
 					<input id="include-unused-categories" type="checkbox" v-model="data.includeUnusedCategories" />
-					<label for="include-unused-categories">Inclure les catégories non utilisées</label>
+					<label for="include-unused-categories">Include unused categories</label>
 				</div>
 				<div class="form-control">
-					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
+					<button class="btn btn-primary btn-send" type="submit">Search</button>
 				</div>
 			</form>
 		</nav>
@@ -47,4 +47,3 @@ Vue.component("vue-zticket-list", {
 </section>
 </div>
 `});
-

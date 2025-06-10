@@ -44,7 +44,7 @@ function discountprofile_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something is wrong with the form data. " + request.statusText);
 		gui_hideLoading();
 		return;
 	}
@@ -108,7 +108,7 @@ function discountprofiles_saveMultipleCallback(results) {
 		let res = results[Object.keys(results)[0]];
 		let showMsg = function() {
 			gui_hideLoading();
-			gui_showWarning("Les données n'ont pas été envoyées, veuillez réitérer l'opération.");
+			gui_showWarning("The data was not sent, please try the operation again.");
 		}
 		if (srvcall_callbackCatch(res.request, res.status, res.response, showMsg)) {
 			return;
@@ -121,7 +121,7 @@ function discountprofiles_saveMultipleCallback(results) {
 		let status = results[reqId].status;
 		let response = results[reqId].response;
 		if (status == 400) {
-			errors.push("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			errors.push("There is something wrong with the form data. " + request.statusText);
 			continue;
 		}
 		if (reqId.substr(0, 4) == "new-") {
@@ -141,11 +141,11 @@ function discountprofiles_saveMultipleCallback(results) {
 		gui_hideLoading();
 		if (errors.length > 0) {
 			if (saves.length > 0) {
-				errors.push("Les autres enregistrements ont été pris en compte. Vous pouvez recharger le fichier pour retrouver les erreurs.");
+				errors.push("The other records have been processed. You can reload the file to find the errors.");
 			}
 			gui_showError(errors);
 		} else {
-			gui_showMessage("Les données ont été enregistrées.");
+			gui_showMessage("The data has been saved.");
 		}
 		vue.screen.data = {};
 		vue.$refs.screenComponent.reset();
@@ -154,7 +154,7 @@ function discountprofiles_saveMultipleCallback(results) {
 	if (saves.length == 0) {
 		gui_hideLoading();
 		if (errors.length == 0) {
-			gui_showErrors("Aucune opération.");
+			gui_showErrors("No operation.");
 		} else {
 			gui_showErrors(errors);
 		}

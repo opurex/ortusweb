@@ -45,7 +45,7 @@ function cashregister_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something's wrong with the form data. " + request.statusText);
 		gui_hideLoading();
 		return;
 	}

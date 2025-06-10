@@ -5,8 +5,8 @@ Vue.component("vue-resources-list", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Personnalisation</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Customization</h1></li>
 			</ul>
 		</nav>
 	</header>
@@ -16,26 +16,26 @@ Vue.component("vue-resources-list", {
 			<col style="width:10%; min-width: 5em;" />
 			<thead>
 				<tr>
-					<th>Nom</th>
-					<th>Opération</th>
+					<th>Name</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="resource in data.resources">
 					<td>{{resource.dispName}}</td>
-					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(resource)">Modifier</a></nav></td>
+					<td><nav><a class="btn btn-edit" v-bind:href="editUrl(resource)">Edit</a></nav></td>
 				</tr>
 				<tr>
-					<td>Coordonnées clients</td>
-					<td><nav><a class="btn btn-edit" href="?p=resource&label=option.customer.customFields">Modifier</a></nav></td>
+					<td>Customer Contact Details</td>
+					<td><nav><a class="btn btn-edit" href="?p=resource&label=option.customer.customFields">Edit</a></nav></td>
 				</tr>
 			</tbody>
 		</table>
-		<p>Pour que vos tickets puissent faire office de facture, les mentions suivantes doivent être ajoutées dans l'en-tête ou le pied de ticket : (cf <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F31808" target="_blank">service-public.fr</a>)</p>
+		<p>To allow your receipts to serve as invoices, the following information must be added in the header or footer of the receipt: (see <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F31808" target="_blank">service-public.fr</a>)</p>
 		<ul>
-			<li>La raison sociale et Siren ou Siret, le numéro de RCS ou RM (si disponible), la forme juridique et le montant du capital,</li>
-			<li>L'adresse du siège social et le nom de l'établissement,</li>
-			<li>Pensez également à assigner un compte client pour l'identification ;</li>
+			<li>Company name and Siren or Siret number, RCS or RM registration number (if available), legal form and capital amount,</li>
+			<li>Registered office address and establishment name,</li>
+			<li>Also remember to assign a customer account for identification;</li>
 		</ul>
 	</article>
 </section>
@@ -54,8 +54,8 @@ Vue.component("vue-resource-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=resources">Personnalisation</a></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=resources">Customization</a></li>
 				<li><h1>{{data.resource.dispName}}</h1></li>
 			</ul>
 		</nav>
@@ -63,16 +63,16 @@ Vue.component("vue-resource-form", {
 	<article class="box-body">
 		<form id="edit-resource-form" class="form-tiny" onsubmit="javascript:resources_saveResource(); return false;">
 			<div class="form-group">
-				<label for="edit-reference" style="display:none">Valeur</label>
-				<textarea v-if="data.resource.type == data.resTypes.Resource_TYPE_TEXT" style="font-family:monospace width:auto !important" id="edit-textarea" v-bind:cols="data.resource.textWidth" rows="7" v-model="data.resource.content" />
+				<label for="edit-reference" style="display:none">Value</label>
+				<textarea v-if="data.resource.type == data.resTypes.Resource_TYPE_TEXT" style="font-family:monospace; width:auto !important" id="edit-textarea" v-bind:cols="data.resource.textWidth" rows="7" v-model="data.resource.content"></textarea>
 				<template v-else>
-				<img v-if="data.hasImage" id="resource-image" class="img img-thumbnail" v-bind:src="imageData(data.resource)" />
-				<input id="edit-image" type="file" accept="image/*" />
-				<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:resources_toggleImage();return false;" >{{data.deleteContentButton}}</a>
+					<img v-if="data.hasImage" id="resource-image" class="img img-thumbnail" v-bind:src="imageData(data.resource)" />
+					<input id="edit-image" type="file" accept="image/*" />
+					<a v-if="data.hadImage" class="btn btn-del" onclick="javascript:resources_toggleImage();return false;">{{data.deleteContentButton}}</a>
 				</template>
 			</div>
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>
@@ -80,7 +80,7 @@ Vue.component("vue-resource-form", {
 </div>`,
 	methods: {
 		imageData: function(res) {
-			if (res.content != null) {
+			if (res.content != null) {
 				return "data:;base64," + res.content;
 			} else {
 				return "";
@@ -101,21 +101,21 @@ Vue.component("vue-customercontact", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=resources">Personnalisation</a></li>
-				<li><h1>Coordonnées comptes clients</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=resources">Customization</a></li>
+				<li><h1>Customer Account Contact Details</h1></li>
 			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
 		<form id="edit-preferences-form" class="form-large" v-on:submit.prevent="save()">
-			<p>Personnalisez les intitulés des champs de coordonnées client pour les réutiliser à d'autres fins.</p>
+			<p>Customize the labels of customer contact fields to reuse them for other purposes.</p>
 			<div class="form-group" v-for="f in fields">
 				<vue-input-text v-bind:id="f.label" v-bind:label="f.default" v-model="f.value" v-bind:placeholder="f.default"></vue-input-text>
 			</div>
 
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>

@@ -68,7 +68,7 @@ Vue.component("vue-input-image", {
 	computed: {
 		deleteImageButton: {
 			get: function() {
-				return (this.hasImage ? "Supprimer" : "Restaurer");
+				return (this.hasImage ? "Delete" : "Restore");
 			},
 		}
 	},

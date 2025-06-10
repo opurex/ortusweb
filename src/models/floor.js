@@ -1,6 +1,6 @@
 function Floor_default() {
 	return {
-		"label": "Nvlle Salle",
+		"label": "New Room",
 		"dispOrder": 0,
 		"places": [],
 	};

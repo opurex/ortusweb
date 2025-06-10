@@ -1,44 +1,52 @@
-const JSADMIN_VERSION = "8.25";
+ const JSADMIN_VERSION = "8.25";
 
 /** The vue.js app. */
 var vue = null;
-var appData = {
-	db: null,
-	generalDbError: function(event) {
-		gui_showError(["Impossible d'accéder aux stockage des données locales (aussi appelé données de site). Ce problème provient la plupart du temps du mode de navigation privée. Le bouton \"déconnexion\" une fois connecté·e permet de vider les données de l'interface de gestion.",
-			"Si vous l'utilisez le mode de navigation privée, essayez avec le mode de navigation normal.",
-			"Si vous ne l'utilisez pas, vérifiez les paramètres de conservation de l'historique dans les préférences du navigateur. Pour Firefox, dans l'onglet \"Vie privée et sécurité\", section \"Historique\", sélectionnez \"Conserver l'historique\" ou \"Utiliser les paramètres personnalisés pour l'historique\" en cochant au moins \"Conserver l'historique de navigation et des téléchargements\"."]);
-		return;
-	},
-	readDbError: function(event) {
-console.info(event.stack);
-		gui_showError(["Impossible de lire les données locales. Pour aider à résoudre ce problème, vous pouvez envoyer les informations suivantes à votre prestataire Pastèque si le problème persiste.",
-			"Nom : " + event.error.name,
-			"Message : " + event.error.message], event.stack);
-		gui_hideLoading();
-		storage_close();
-	},
-	localWriteDbSuccess: function(event) {
-		gui_hideLoading();
-		gui_showMessage("Les modifications ont été enregistrées");
-		storage_close();
-	},
-	localWriteDbError: function(event) {
-		gui_hideLoading();
-		gui_showError(["Les modifications ont été enregistrées mais une erreur est survenue. Veuillez recharger les données depuis l'écran d'accueil pour prendre en compte les changements.",
-			"Si le problème est recurrent, vous pouvez envoyer les informations suivantes à votre prestataire Pastèque pour aider à résoudre le problème.",
-			"Nom : " + event.error.name,
-			"Message : "  + event.error.message]);
-		storage_close();
-	},
-	localWriteOpenDbError: function(event) {
-		gui_hideLoading();
-		gui_showError(["Les modifications ont été enregistrées mais une erreur est survenue. Veuillez recharger les données depuis l'écran d'accueil pour prendre en compte les changements.",
-			"Si le problème est recurrent, vous pouvez envoyer les informations suivantes à votre prestataire Pastèque pour aider à résoudre le problème.",
-			"Nom : " + event.error.name,
-			"Message : "  + event.error.message]);
-	}
-};
+ var appData = {
+	 db: null,
+	 generalDbError: function(event) {
+		 gui_showError([
+			 "Unable to access local data storage (also called site data). This issue usually arises from using private browsing mode. The \"logout\" button, once logged in, allows you to clear the management interface data.",
+			 "If you are using private browsing mode, try switching to normal browsing mode.",
+			 "If you are not using it, check your browser's history retention settings. For Firefox, in the \"Privacy & Security\" tab, under the \"History\" section, select \"Remember history\" or \"Use custom settings for history\" and make sure \"Remember browsing and download history\" is checked."
+		 ]);
+		 return;
+	 },
+	 readDbError: function(event) {
+		 console.info(event.stack);
+		 gui_showError([
+			 "Unable to read local data. To help resolve this issue, you can send the following information to your PastÃ¨que provider if the problem persists.",
+			 "Name: " + event.error.name,
+			 "Message: " + event.error.message
+		 ], event.stack);
+		 gui_hideLoading();
+		 storage_close();
+	 },
+	 localWriteDbSuccess: function(event) {
+		 gui_hideLoading();
+		 gui_showMessage("Changes have been saved");
+		 storage_close();
+	 },
+	 localWriteDbError: function(event) {
+		 gui_hideLoading();
+		 gui_showError([
+			 "Changes have been saved but an error occurred. Please reload the data from the home screen to apply the changes.",
+			 "If the problem persists, you can send the following information to your PastÃ¨que provider to help resolve it.",
+			 "Name: " + event.error.name,
+			 "Message: " + event.error.message
+		 ]);
+		 storage_close();
+	 },
+	 localWriteOpenDbError: function(event) {
+		 gui_hideLoading();
+		 gui_showError([
+			 "Changes have been saved but an error occurred. Please reload the data from the home screen to apply the changes.",
+			 "If the problem persists, you can send the following information to your PastÃ¨que provider to help resolve it.",
+			 "Name: " + event.error.name,
+			 "Message: " + event.error.message
+		 ]);
+	 }
+ };
 
 function route(screen) {
 	if (arguments.length == 0) {
@@ -212,7 +220,7 @@ function boot() {
 		start();
 	}, function(event) {
 		if (event === false) {
-			gui_showError("Stockage des données non disponible. Votre navigateur est peut être obsolète.");
+			gui_showError("Data storage not available. Your browser may be outdated.");
 		} else {
 			appData.generalDbError(event);
 		}

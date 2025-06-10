@@ -118,16 +118,16 @@ function login_loginCallback(request, status, response) {
 		}
 		// else nobreak
 	case 403:
-		gui_showMessage("Utilisateur ou mot de passe invalide.");
+		gui_showMessage("Invalid username or password.");
 		break;
 	case 0:
 		if (response == "") {
-			gui_showError("Connexion refusée, le serveur " + login_getHostUrl() + " est-il correct ?");
+			gui_showError("Connection refused. Is the server " + login_getHostUrl() + " correct?");
 			break;
 		}
 		// else nobreak
 	default:
-		gui_showError("Le serveur est indisponible (" + status + " : " + response + ").");
+		gui_showError("The server is unavailable (" + status + " : " + response + ").");
 		break;
 	}
 }

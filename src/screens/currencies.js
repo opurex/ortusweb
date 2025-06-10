@@ -56,12 +56,13 @@ function currency_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		if (request.statusText == "Reference is already taken") {
-			gui_showError("La référence existe déjà, veuillez en choisir une autre.");
-			document.getElementById("edit-reference").focus(); // TODO: make this Vuejsy.
+		if (request.statusText === "Reference is already taken") {
+			gui_showError("The reference already exists. Please choose another one.");
+			document.getElementById("edit-reference").focus(); // TODO: Make this Vue-friendly.
 		} else {
-			gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			gui_showError("Something's wrong with the form data. " + request.statusText);
 		}
+
 		gui_hideLoading();
 		return;
 	}

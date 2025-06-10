@@ -5,30 +5,30 @@ Vue.component("vue-salesdetails", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Détail des ventes</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Sales Details</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<form id="tickets-filter" onsubmit="javascript:salesdetails_filter();return false;">
 				<div class="form-group">
-					<label for="start">Du</label>
+					<label for="start">From</label>
 					<vue-inputdate id="start" v-model="data.start" />
 				</div>
 				<div class="form-group">
-					<label for="stop">au</label>
+					<label for="stop">To</label>
 					<vue-inputdate id="stop" v-model="data.stop" />
 				</div>
 				<div class="form-control">
-					<button class="btn btn-primary btn-send" type="submit">Rechercher</button>
+					<button class="btn btn-primary btn-send" type="submit">Search</button>
 				</div>
 			</form>
 		</nav>
 	</header>
 	<article class="box-body" id="report-content">
-		<p class="notice"><strong>Note :</strong> Le prix d'achat et la catégorie correspondent aux informations actuellement renseignées sur la fiche produit et non à celles au moment de la vente.</p>
+		<p class="notice"><strong>Note:</strong> The purchase price and category correspond to the current information on the product record, not those at the time of sale.</p>
 		<vue-table v-bind:table="data.table"></vue-table>
 	</article>
 </section>
-</div>
-`});
+</div>`
+});

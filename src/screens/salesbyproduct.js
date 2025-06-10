@@ -392,22 +392,37 @@ function _salesbyproduct_render(cashRegisters, categories, products, taxes) {
 		}
 		return default_val;
 	};
-	vue.screen.data.table.title("Ventes par produits du "
+	vue.screen.data.table.title("Sales by products from  "
 			+ tools_dateToString(vue.screen.data.start)
 			+ " au "
 			+ tools_dateToString(vue.screen.data.stop));
 	vue.screen.data.table.reset();
 	vue.screen.data.table
-		.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).visible(oldColumnVisible("Image", oldColumns, true)).exportable(false).help("L'image du produit. Ce champ ne peut être exporté."))
-		.column(new TableCol().reference("cashRegister").label("Caisse").visible(oldColumnVisible("Caisse", oldColumns, false)).help("La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."))
-		.column(new TableCol().reference("category").label("Catégorie").visible(oldColumnVisible("Catégorie", oldColumns, true)).searchable(true).help("La catégorie actuelle du produit."))
-		.column(new TableCol().reference("reference").label("Reference").visible(oldColumnVisible("Reference", oldColumns, false)).searchable(true).help("La référence du produit."))
-		.column(new TableCol().reference("label").label("Désignation").footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(oldColumnVisible("Désignation", oldColumns, true)).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
-		.column(new TableCol().reference("quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Quantité", oldColumns, true)).help("La quantité de produit vendue sur la période.").class("z-oddcol"))
-		.column(new TableCol().reference("priceSell").label("Vente HT").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Vente HT", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.").class("z-oddcol"))
-		.column(new TableCol().reference("priceBuy").label("Prix d'achat").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Prix d'achat", oldColumns, false)).help("Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.").class("z-oddcol"))
-		.column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Marge", oldColumns, false)).help("La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.").class("z-oddcol"))
-		.column(new TableCol().reference("priceSellVat").label("Vente TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Vente TTC", oldColumns, false)).help("Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.").class("z-oddcol"));
+
+		// .column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).visible(oldColumnVisible("Image", oldColumns, true)).exportable(false).help("L'image du produit. Ce champ ne peut être exporté."))
+		// .column(new TableCol().reference("cashRegister").label("Caisse").visible(oldColumnVisible("Caisse", oldColumns, false)).help("La caisse pour laquelle les vente sont comptabilisées. Si l'option Détailler par caisse n'est pas cochée, ce champ est vide."))
+		// .column(new TableCol().reference("category").label("Catégorie").visible(oldColumnVisible("Catégorie", oldColumns, true)).searchable(true).help("La catégorie actuelle du produit."))
+		// .column(new TableCol().reference("reference").label("Reference").visible(oldColumnVisible("Reference", oldColumns, false)).searchable(true).help("La référence du produit."))
+		// .column(new TableCol().reference("label").label("Désignation").footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(oldColumnVisible("Désignation", oldColumns, true)).searchable(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
+		// .column(new TableCol().reference("quantity").label("Quantité").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Quantité", oldColumns, true)).help("La quantité de produit vendue sur la période.").class("z-oddcol"))
+		// .column(new TableCol().reference("priceSell").label("Vente HT").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Vente HT", oldColumns, false)).help("Le montant de chiffre d'affaire hors taxes réalisé par le produit sur la période concernée.").class("z-oddcol"))
+		// .column(new TableCol().reference("priceBuy").label("Prix d'achat").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Prix d'achat", oldColumns, false)).help("Le prix d'achat hors taxes actuel. Ce montant n'a pas d'historique et ne correspond pas forcément au prix d'achat au moment de la vente.").class("z-oddcol"))
+		// .column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Marge", oldColumns, false)).help("La marge réalisée sur les ventes du produit sur la période. Cette marge est calculée en fonction du prix d'achat actuel et non du prix d'achat au moment de la vente.").class("z-oddcol"))
+		// .column(new TableCol().reference("priceSellVat").label("Vente TTC").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Vente TTC", oldColumns, false)).help("Le montant de chiffre d'affaire TTC réalisé par le produit sur la période concernée.").class("z-oddcol"));
+		//
+
+		.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).visible(oldColumnVisible("Image", oldColumns, true)).exportable(false).help("The product image. This field cannot be exported."))
+		.column(new TableCol().reference("cashRegister").label("Cash Register").visible(oldColumnVisible("Cash Register", oldColumns, false)).help("The cash register for which sales are accounted. If the option 'Detail by cash register' is not checked, this field is empty."))
+		.column(new TableCol().reference("category").label("Category").visible(oldColumnVisible("Category", oldColumns, true)).searchable(true).help("The current category of the product."))
+		.column(new TableCol().reference("reference").label("Reference").visible(oldColumnVisible("Reference", oldColumns, false)).searchable(true).help("The product reference."))
+		.column(new TableCol().reference("label").label("Designation").footerType(TABLECOL_FOOTER.CUSTOM, "Total").visible(oldColumnVisible("Designation", oldColumns, true)).searchable(true).help("The product name as displayed on cash register buttons and tickets."))
+		.column(new TableCol().reference("quantity").label("Quantity").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Quantity", oldColumns, true)).help("The quantity of product sold during the period.").class("z-oddcol"))
+		.column(new TableCol().reference("priceSell").label("Sales excl. tax").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Sales excl. tax", oldColumns, false)).help("The amount of sales revenue excluding tax generated by the product during the period.").class("z-oddcol"))
+		.column(new TableCol().reference("priceBuy").label("Purchase Price").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Purchase Price", oldColumns, false)).help("The current purchase price excluding tax. This amount has no history and does not necessarily correspond to the purchase price at the time of sale.").class("z-oddcol"))
+		.column(new TableCol().reference("margin").label("Margin").type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Margin", oldColumns, false)).help("The margin realized on the product sales during the period. This margin is calculated based on the current purchase price and not the purchase price at the time of sale.").class("z-oddcol"))
+		.column(new TableCol().reference("priceSellVat").label("Sales incl. tax").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Sales incl. tax", oldColumns, false)).help("The amount of sales revenue including tax generated by the product during the period.").class("z-oddcol"));
+
+
 	if (separateByTax) {
 		for (let i = 0; i < taxes.length; i++) {
 			let tax = taxes[i];

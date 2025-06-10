@@ -108,13 +108,13 @@ function _producttags_addPdfTag(content, format, product, col, row, dh, dv) {
 	let priceRefText = priceOne.toLocaleString(undefined, { minimumFractionDigits: 2 }) + vue.screen.data.currency.symbol;
 	switch (product.scaleType) {
 		case 1:
-			priceRefText += " le kg";
+			priceRefText += " per kg";
 			break;
 		case 2:
-			priceRefText += " le litre";
+			priceRefText += " per litre";
 			break;
 		case 3:
-			priceRefText += " l'heure";
+			priceRefText += " per hour";
 			break;
 	}
 	if (product.scaleType != 0) {

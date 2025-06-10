@@ -135,14 +135,25 @@ function tariffareas_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
+		// if (request.statusText == "Reference is already taken") {
+		// 	gui_showError("La référence existe déjà, veuillez en choisir une autre.");
+		// 	document.getElementById("edit-reference").focus(); // TODO: make this Vuejsy.
+		// } else {
+		// 	gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		// }
+		// gui_hideLoading();
+		// return;
+
 		if (request.statusText == "Reference is already taken") {
-			gui_showError("La référence existe déjà, veuillez en choisir une autre.");
-			document.getElementById("edit-reference").focus(); // TODO: make this Vuejsy.
+			gui_showError("The reference already exists, please choose another one.");
+			document.getElementById("edit-reference").focus(); // TODO: make this Vue.js style.
 		} else {
-			gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			gui_showError("Something's wrong with the form data. " + request.statusText);
 		}
 		gui_hideLoading();
 		return;
+
+
 	}
 	let area = vue.screen.data.tariffarea;
 	if (!("id" in area)) {
@@ -163,15 +174,24 @@ function _tariffareas_parseCsv(fileContent) {
 		Vue.set(vue.screen.data.tariffarea, "prices", []);
 	}
 	gui_showLoading();
+	// let columnMappingDef = {
+	// 	reference: "reference",
+	// 	"référence": "reference",
+	// 	priceSellVat: "priceSellVat",
+	// 	"prix de vente ttc": "priceSellVat",
+	// 	tax: "tax",
+	// 	"tva": "tax"
+	//
+	// };
 	let columnMappingDef = {
 		reference: "reference",
-		"référence": "reference",
+		"reference": "reference",             // "rÃ©fÃ©rence" â "reference"
 		priceSellVat: "priceSellVat",
-		"prix de vente ttc": "priceSellVat",
+		"selling price incl. tax": "priceSellVat",  // "prix de vente ttc" â "selling price incl. tax"
 		tax: "tax",
-		"tva": "tax"
-		
+		"vat": "tax"                          // "tva" â "vat"
 	};
+
 	columnMapping = {};
 	unknownColumns = [];
 	for (let key in rawPrices[0]) {
@@ -270,14 +290,15 @@ function _tariffareas_parseCsv(fileContent) {
 			Vue.set(vue.screen.data.tariffarea, "prices", prices);
 			gui_hideLoading();
 			if (errors.length > 0) {
-				let message = ["La liste des tarifs a été modifiée, mais les références suivantes n'ont pas été trouvées :"];
+				let message = ["The price list has been updated, but the following references were not found:"];
 				for (let i = 0; i < errors.length; i++) {
 					message.push(errors[i]);
 				}
 				gui_showWarning(message);
 			} else {
-				gui_showMessage("La liste des tarifs a été remplacée. N'oubliez pas d'enregistrer.")
+				gui_showMessage("The price list has been replaced. Don't forget to save.");
 			}
+
 		});
 	});
 }

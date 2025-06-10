@@ -57,30 +57,30 @@ function _resources_fillCustomData(res) {
 	let lbl = res.label;
 	switch (lbl) {
 		case "Printer.Ticket.Logo":
-			res.dispName = "Logo de ticket (Desktop)";
+			res.dispName = "Logo of ticket (Desktop)";
 			res.dispOrder = 0;
 			break;
 		case "Printer.Ticket.Header":
-			res.dispName = "En-tête de ticket (Desktop)";
+			res.dispName = "Ticket header (Desktop)";
 			res.textWidth = 42;
 			res.dispOrder = 1;
 			break;
 		case "Printer.Ticket.Footer":
-			res.dispName = "Pied de ticket (Desktop)";
+			res.dispName = "Ticket footer (Desktop)";
 			res.textWidth = 42;
 			res.dispOrder = 2;
 			break;
 		case "MobilePrinter.Logo":
-			res.dispName = "Logo de ticket (Android)";
+			res.dispName = "Logo of ticket (Android)";
 			res.dispOrder = 3;
 			break;
 		case "MobilePrinter.Header":
-			res.dispName = "En-tête de ticket (Android)";
+			res.dispName = "Ticket header (Android)";
 			res.textWidth = 32;
 			res.dispOrder = 4;
 			break;
 		case "MobilePrinter.Footer":
-			res.dispName = "Pied de ticket (Android)";
+			res.dispName = "Ticket footer (Android)";
 			res.textWidth = 32;
 			res.dispOrder = 5;
 			break;
@@ -196,12 +196,14 @@ function resources_saveResource() {
 				};
 				reader.onerror = function(event) {
 					gui_hideLoading();
-					gui_showError("Le fichier n'a pu être envoyé");
+					// gui_showError("Le fichier n'a pu être envoyé");
+					gui_showError("The file could not be sent");
 				}
 				reader.readAsBinaryString(imgTag.files[0]);
 			} else {
 				gui_hideLoading();
-				gui_showMessage("Les modifications ont été enregistrées");
+				// gui_showMessage("Les modifications ont été enregistrées");
+				gui_showMessage("The changes have been saved");
 			}
 		}
 	}
@@ -212,7 +214,7 @@ function _resources_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something is wrong with the form data. " + request.statusText);
 		gui_hideLoading();
 		return;
 	}
@@ -253,7 +255,7 @@ function _resources_saveCustomFieldsCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something is wrong with the form data. " + request.statusText);
 		gui_hideLoading();
 		return;
 	}

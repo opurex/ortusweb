@@ -26,12 +26,14 @@ function accounting_showZ() {
 					extra: {},
 				},
 				"table": new Table().reference("accounting-z-list")
-					.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATE).visible(true).help("La date d'ouverture de la session."))
-					.column(new TableCol().reference("account").label("Compte").visible(true).help("Le numéro de compte de la ligne"))
-					.column(new TableCol().reference("label").label("Libellé").visible(true).help("Libellé de la ligne"))
-					.column(new TableCol().reference("debit").label("Débit").visible(true).type(TABLECOL_TYPE.NUMBER2))
-					.column(new TableCol().reference("credit").label("Crédit").visible(true).type(TABLECOL_TYPE.NUMBER2))
-					.column(new TableCol().reference("reference").label("Pièce").visible(true).help("Le nom de la pièce de référence de l'écriture"))
+
+					.column(new TableCol().reference("date").label("Date").type(TABLECOL_TYPE.DATE).visible(true).help("Session opening date."))
+					.column(new TableCol().reference("account").label("Account").visible(true).help("Account number for the entry"))
+					.column(new TableCol().reference("label").label("Description").visible(true).help("Entry description"))
+					.column(new TableCol().reference("debit").label("Debit").visible(true).type(TABLECOL_TYPE.NUMBER2))
+					.column(new TableCol().reference("credit").label("Credit").visible(true).type(TABLECOL_TYPE.NUMBER2))
+					.column(new TableCol().reference("reference").label("Document").visible(true).help("Reference document name for the entry"))
+
 			}
 			vue.screen.component = "vue-accounting-z";
 			storage_close();
@@ -110,7 +112,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 					vue.screen.data.missing.sales[tax.tax] = taxesById?.[tax.tax]?.label;
 				}
 			}
-			let labelSales = "Ventes ";
+			let labelSales = "Sales ";
 			if (tax.tax in taxesById) {
 				labelSales += taxesById[tax.tax].label;
 			}
@@ -132,7 +134,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 						vue.screen.data.missing.taxes[tax.tax] = taxesById?.[tax.tax]?.label;
 					}
 				}
-				let labelTax = "TVA collectée ";
+				let labelTax = "VAT Collected";
 				if (tax.tax in taxesById) {
 					labelTax += taxesById[tax.tax].label;
 				}
@@ -149,7 +151,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 			}
 		});
 		z.payments.forEach(function(pmt) {
-			let label = "Encaissement ";
+			let label = "Payment Received";
 			if (pmt.paymentMode in paymentModesById) {
 				// Ignore debt and prepaid, those are accounted in customer's balance
 				let mode = paymentModesById[pmt.paymentMode];
@@ -184,7 +186,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 					vue.screen.data.missing.customers[cust.customer] = customersById?.[cust.customer]?.dispName;
 				}
 			}
-			let label = "Balance client ";
+			let label = "Customer Balance";
 			let credit = "";
 			let debit = "";
 			if (cust.customer in customersById) {
@@ -204,7 +206,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 			closeError = z.closeCash - z.expectedCash;
 		}
 		if (closeError != 0.0) {
-			let label = "Erreur de caisse";
+			let label = "Cash Register Error";
 			let account = null;
 			if (paymentModeCash) {
 				account = vue.screen.data.accounts.paymentModes?.[paymentModeCash.id];
@@ -234,7 +236,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 			let debit = "";
 			let account, label;
 			if (unbalance > 0.0) {
-				label = "Produit exceptionnel";
+				label = "Exceptional Product";
 				let key = "extraCredit";
 				account = vue.screen.data.accounts.extra?.[key];
 				if (!account) {
@@ -245,7 +247,7 @@ function _accounting_parseZTickets(cashRegisters, paymentModes, taxes, categorie
 				}
 				credit = unbalance;
 			} else {
-				label = "Perte exceptionnelle";
+				label = "Exceptional Loss";
 				let key = "extraDebit";
 				account = vue.screen.data.accounts.extra?.[key];
 				if (!account) {

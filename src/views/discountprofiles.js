@@ -3,33 +3,35 @@ Vue.component("vue-discountprofile-list", {
 	data: function() {
 		return {
 			dpTable: new Table().reference("discountProfile-list")
-				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom du profil de remise tel qu'affiché sur les boutons de la caisse."))
-				.column(new TableCol().reference("rate").label("Remise").type(TABLECOL_TYPE.PERCENT).visible(true).help("La remise appliquée."))
-				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
+				.column(new TableCol().reference("label").label("Name").visible(true).searchable(true).help("The name of the discount profile as shown on the POS buttons."))
+				.column(new TableCol().reference("rate").label("Discount").type(TABLECOL_TYPE.PERCENT).visible(true).help("The discount applied."))
+				.column(new TableCol().reference("operation").label("Operation").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
-	template: `<div class="discountprofile-list">
-<section class="box box-medium">
-	<header>
-		<nav class="browser">
-			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Liste des profils de remise</h1></li>
-			</ul>
-		</nav>
-		<nav class="navbar">
-			<ul>
-				<li><a class="btn btn-add" href="?p=discountprofile">Ajouter un profil de remise</a></li>
-				<li><a class="btn btn-add" href="?p=discountprofileImport">Importer un fichier</a></li>
-			</ul>
-		</nav>
-	</header>
-	<article class="box-body">
-		<vue-table v-bind:table="dpTable"></vue-table>
-	</article>
-</section>
-</div>`,
-	methods: {
+	template: `
+<div class="discountprofile-list">
+	<section class="box box-medium">
+		<header>
+			<nav class="browser">
+				<ul>
+					<li><a href="?p=home">Home</a></li>
+					<li><h1>Discount Profile List</h1></li>
+				</ul>
+			</nav>
+			<nav class="navbar">
+				<ul>
+					<li><a class="btn btn-add" href="?p=discountprofile">Add a Discount Profile</a></li>
+					<li><a class="btn btn-add" href="?p=discountprofileImport">Import a File</a></li>
+				</ul>
+			</nav>
+		</header>
+		<article class="box-body">
+			<vue-table v-bind:table="dpTable"></vue-table>
+		</article>
+	</section>
+</div> `,
+
+methods: {
 		editUrl: function(profile) {
 			return "?p=discountprofile&id=" + profile.id;
 		},
@@ -39,7 +41,7 @@ Vue.component("vue-discountprofile-list", {
 		this.data.discountProfiles.forEach(function(dp) {
 			let line = [
 				dp.label, dp.rate,
-				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(dp) + "\">Modifier</a></div>"
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + thiss.editUrl(dp) + "\">Edit</a></div>"
 			];
 			thiss.dpTable.line(line);
 		})
@@ -53,18 +55,18 @@ Vue.component("vue-discountprofile-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=discountprofiles">Liste des profils de remise</a></li>
-				<li><h1>Édition d'un profil de remise</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=discountprofiles">Discount Profile List</a></li>
+				<li><h1>Edit a Discount Profile</h1></li>
 			</ul>
 		</nav>
 	</header>
 	<article class="box-body">
 		<form id="edit-discountprofile-form" class="form-large" onsubmit="javascript:discountprofile_saveProfile(); return false;">
-			<vue-input-text label="Désignation" v-model="data.discountProfile.label" v-bind:required="true" id="edit-label" />
-			<vue-input-rate label="Remise" v-model.number="data.discountProfile.rate" id="edit-rate" />
+			<vue-input-text label="Label" v-model="data.discountProfile.label" v-bind:required="true" id="edit-label" />
+			<vue-input-rate label="Discount" v-model.number="data.discountProfile.rate" id="edit-rate" />
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>
@@ -80,8 +82,8 @@ Vue.component("vue-discountprofile-import", {
 			linkedRecords: { },
 			importResult: null,
 			tableColumns: [
-				{field: "label", label: "Désignation"},
-				{field: "rate", label: "Remise", type: "rate"},
+				{field: "label", label: "Label"},
+				{field: "rate", label: "Discount", type: "rate"},
 			]
 		};
 	},
@@ -90,22 +92,22 @@ Vue.component("vue-discountprofile-import", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=discountprofiles">Liste des profils</a></li>
-				<li><h1>Modification des profils de remise par fichier csv</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=discountprofiles">Profile List</a></li>
+				<li><h1>Edit Discount Profiles via CSV File</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
 				<li>
-					<label for="csv-file">Fichier</label>
+					<label for="csv-file">File</label>
 					<input ref="csvRef" type="file" accept="text/csv" id="csv-file" name="csv" v-on:change="readCsv" />
 				</li>
 			</ul>
 		</nav>
 	</header>
 	<div class="box-body">
-		<vue-import-preview newTitle="Nouveaux profils" editTitle="Profils modifiés" unchangedTitle="Profils non modifiés" modelsLabel="profils"
+		<vue-import-preview newTitle="New Profiles" editTitle="Modified Profiles" unchangedTitle="Unchanged Profiles" modelsLabel="profiles"
 			v-bind:modelDef="data.modelDef"
 			v-bind:importResult="importResult"
 			v-bind:linkedRecords="linkedRecords"

@@ -30,7 +30,7 @@ var productTagFormats = [
 		"reference": { "x": -0.1, "y": 6, "width": 10, "dots": 3, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 100631 51x33.8 32",
+		"dispName": "Print 100631 51x33.8 32",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 13.5, "h": 4},
 		"padding": { "v": 0, "h": 0},
@@ -44,7 +44,7 @@ var productTagFormats = [
 		"reference": { "x": 25, "y": 27, "width": 24, "dots": 8, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 100974 20x8 51",
+		"dispName": "Print 100974 20x8 51",
 		"paper": { "size": "A5", "orientation": "portrait"},
 		"margin": { "v": 7.1, "h": 2.4},
 		"padding": { "v": 0, "h": 0},
@@ -58,7 +58,7 @@ var productTagFormats = [
 		"reference": { "x": -0.1, "y": 6, "width": 10, "dots": 3, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 118990 38x21.2 65",
+		"dispName": "Print 118990 38x21.2 65",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 10.5, "h": 10.5},
 		"padding": { "v": 0, "h": 0},
@@ -72,7 +72,7 @@ var productTagFormats = [
 		"reference": { "x": 19, "y": 17.5, "width": 17, "dots": 6, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 118991 48.5x25.4 40",
+		"dispName": "Print 118991 48.5x25.4 40",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 21.5, "h": 8},
 		"padding": { "v": 0, "h": 0},
@@ -86,7 +86,7 @@ var productTagFormats = [
 		"reference": { "x": 24, "y": 20.4, "width": 22.5, "dots": 7, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 118992 52.5x21.2 56",
+		"dispName": "Print 118992 52.5x21.2 56",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 0, "h": 0},
 		"padding": { "v": 0, "h": 0},
@@ -100,7 +100,7 @@ var productTagFormats = [
 		"reference": { "x": 26, "y": 17.5, "width": 24, "dots": 6, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 118995 70x33.8 24",
+		"dispName": "Print 118995 70x33.8 24",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 13.3, "h": 0},
 		"padding": { "v": 0, "h": 0},
@@ -114,7 +114,7 @@ var productTagFormats = [
 		"reference": { "x": 35, "y": 27, "width": 33, "dots": 7, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 119007 70x25 33",
+		"dispName": "Print 119007 70x25 33",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 10.5, "h": 0},
 		"padding": { "v": 0, "h": 0},
@@ -128,7 +128,7 @@ var productTagFormats = [
 		"reference": { "x": 34, "y": 21, "width": 34, "dots": 7, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 119601 22x16 153",
+		"dispName": "Print 119601 22x16 153",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 13, "h": 0},
 		"padding": { "v": 0, "h": 0},
@@ -142,7 +142,7 @@ var productTagFormats = [
 		"reference": { "x": -0.1, "y": 14, "width": 10, "dots": 7, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 119602 50x20 56",
+		"dispName": "Print 119602 50x20 56",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 13, "h": 5},
 		"padding": { "v": 0, "h": 0},
@@ -156,7 +156,7 @@ var productTagFormats = [
 		"reference": { "x": 25, "y": 16, "width": 23, "dots": 7, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 119603 50x25 44",
+		"dispName": "Print 119603 50x25 44",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 13, "h": 5},
 		"padding": { "v": 0, "h": 0},
@@ -170,7 +170,7 @@ var productTagFormats = [
 		"reference": { "x": 25, "y": 17, "width": 23, "dots": 7, "frame": 0}
 	},
 	{
-		"dispName": "Agipa 130142 48.5x25.4 44",
+		"dispName": "Print 130142 48.5x25.4 44",
 		"paper": { "size": "A4", "orientation": "portrait"},
 		"margin": { "v": 9, "h": 8},
 		"padding": { "v": 0, "h": 0},

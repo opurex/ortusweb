@@ -3,11 +3,11 @@ Vue.component("vue-tariffarea-list", {
 	data: function() {
 		return {
 			areasTable: new Table().reference("tariffarea-list")
-				.column(new TableCol().reference("reference").label("Référence").visible(false).searchable(true).help("La référence doit être unique pour chaque zone. Elle permet la modification lors de l'import."))
-				.column(new TableCol().reference("label").label("Désignation").visible(true).searchable(true).help("Le nom de la zone tel qu'affiché sur les boutons de la caisse."))
-				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage de la catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouvelles catégories. Par exemple 10, 20, 30…"))
-				.column(new TableCol().reference("tariff").label("Tarifs").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le nombre de tarifs définis dans cette zone."))
-				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
+				.column(new TableCol().reference("reference").label("Reference").visible(false).searchable(true).help("The reference must be unique for each zone. It allows modification during import."))
+				.column(new TableCol().reference("label").label("Name").visible(true).searchable(true).help("The name of the zone as displayed on the cash register buttons."))
+				.column(new TableCol().reference("dispOrder").label("Order").type(TABLECOL_TYPE.NUMBER).visible(false).help("The display order of the category. Orders donât have to be sequential, which allows easier insertion of new categories. For example 10, 20, 30â¦"))
+				.column(new TableCol().reference("tariff").label("Tariffs").type(TABLECOL_TYPE.NUMBER).visible(false).help("The number of tariffs defined in this zone."))
+				.column(new TableCol().reference("operation").label("Operation").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="tariffarea-list">
@@ -15,20 +15,20 @@ Vue.component("vue-tariffarea-list", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Liste des zones tarifaires</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>List of Tariff Zones</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
-				<li><a class="btn btn-add" href="?p=tariffarea">Ajouter une zone</a></li>
+				<li><a class="btn btn-add" href="?p=tariffarea">Add a Zone</a></li>
 			</ul>
 			<ul>
 				<li>
-					<label for="sort">Trier par</label>
+					<label for="sort">Sort by</label>
 					<select id="sort" name="sort" v-model="data.sort" v-on:change="sort">
-						<option value="dispOrder">Ordre</option>
-						<option value="label">Désignation</option>
+						<option value="dispOrder">Order</option>
+						<option value="label">Name</option>
 					</select>
 				</li>
 			</ul>
@@ -61,7 +61,7 @@ Vue.component("vue-tariffarea-list", {
 			let line = [
 				area.reference, area.label, area.dispOrder,
 				area.prices.length,
-				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(area) + "\">Modifier</a></div>",
+				"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(area) + "\">Edit</a></div>",
 			];
 			this.areasTable.line(line);
 		}
@@ -79,21 +79,21 @@ Vue.component("vue-tariffarea-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=tariffareas">Liste des zones tarifaires</a></li>
-				<li><h1>Édition d'une zone tarifaire</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=tariffareas">List of Tariff Zones</a></li>
+				<li><h1>Edit a Tariff Zone</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
 				<li>
-					<button class="btn btn-add" v-on:click="exportCsv(false)">Exporter la zone</button>
+					<button class="btn btn-add" v-on:click="exportCsv(false)">Export Zone</button>
 				</li>
 				<li>
-					<button class="btn btn-add" v-on:click="exportCsv(true)">Exporter la zone (Excel)</button>
+					<button class="btn btn-add" v-on:click="exportCsv(true)">Export Zone (Excel)</button>
 				</li>
 				<li>
-					<label for="csv-file">Remplacer par un fichier</label>
+					<label for="csv-file">Replace with a file</label>
 					<input ref="csvRef" type="file" accept="text/csv" id="csv-file" name="csv" v-on:change="readCsv" />
 				</li>
 			</ul>
@@ -102,19 +102,19 @@ Vue.component("vue-tariffarea-form", {
 	<article class="box-body">
 		<form id="edit-category-form" class="form-large" onsubmit="javascript:tariffareas_saveArea(); return false;">
 			<div class="form-group">
-				<label for="edit-label">Désignation</label>
+				<label for="edit-label">Name</label>
 				<input id="edit-label" type="text" v-model="data.tariffarea.label" required="true" />
 			</div>
 			<div class="form-group">
-				<label for="edit-reference">Référence</label>
+				<label for="edit-reference">Reference</label>
 				<input id="edit-reference" type="text" v-model="data.tariffarea.reference" required="true" />
 			</div>
 			<div class="form-group">
-				<label for="edit-dispOrder">Ordre</label>
+				<label for="edit-dispOrder">Order</label>
 				<input id="edit-dispOrder" type="number" v-model.number="data.tariffarea.dispOrder">
 			</div>
 
-			<h2>Prix</h2>
+			<h2>Prices</h2>
 			<vue-catalog-picker v-bind:categories="data.categories" v-bind:prdPickCallback="pickProduct" />
 
 			<table>
@@ -125,12 +125,12 @@ Vue.component("vue-tariffarea-form", {
 				<col style="width:10%; min-width: 5em;" />
 				<thead>
 					<tr>
-						<th>Désignation</th>
-						<th>Prix de vente original</th>
-						<th>Prix de vente HT</th>
-						<th>Prix de vente TTC</th>
-						<th>TVA</th>
-						<th>Opération</th>
+						<th>Name</th>
+						<th>Original Selling Price</th>
+						<th>Selling Price (excl. VAT)</th>
+						<th>Selling Price (incl. VAT)</th>
+						<th>VAT</th>
+						<th>Operation</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -140,16 +140,16 @@ Vue.component("vue-tariffarea-form", {
 						<td><input type="number" v-model.number="price.price" disabled="true" /></td>
 						<td><input type="number" v-model.number="price.priceSellVat" step="0.01" v-on:change="updatePrice(price)" /></td>
 						<td><select v-model="price.tax" v-on:change="updatePrice(price)">
-							<option v-bind:value="null">Inchangée</option>
+							<option v-bind:value="null">Unchanged</option>
 							<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 						</select></td>
-						<td><button type="button" class="btn btn-delete" v-on:click="deletePrice(price.product)">X</button></a></td>
+						<td><button type="button" class="btn btn-delete" v-on:click="deletePrice(price.product)">X</button></td>
 					</tr>
 				</tbody>
 			</table>
 
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</article>
@@ -175,7 +175,7 @@ Vue.component("vue-tariffarea-form", {
 					break;
 				}
 			}
-			return priceSell = Number(product.priceSell * (1.0 + tax.rate)).toFixed(2);
+			return Number(product.priceSell * (1.0 + tax.rate)).toFixed(2);
 		},
 		label: function(prdId) {
 			if (!(prdId in this.data.productCache)) {
@@ -228,7 +228,7 @@ Vue.component("vue-tariffarea-form", {
 		},
 		exportCsv: function(withExcelBom) {
 			let csvData = [];
-			csvData.push(["Référence", "Prix de vente TTC", "TVA"]);
+			csvData.push(["Reference", "Selling Price (incl. VAT)", "VAT"]);
 			for (let i = 0; i < this.data.tariffarea.prices.length; i++) {
 				let price = this.data.tariffarea.prices[i];
 				let priceSellVat = price.priceSellVat.toLocaleString();

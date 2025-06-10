@@ -5,27 +5,27 @@ Vue.component("vue-product-list", {
 			currentCategoryId: this.data.selectedCatId,
 			sorting: this.data.sort,
 			filterVisible: this.data.filterVisible,
-			sortedProducts: [], // in data instead of computed because asychronous
+			sortedProducts: [], // in data instead of computed because asynchronous
 			productsTable: new Table().reference("product-list")
-				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("L'image du bouton du produit. Ce champ ne peut être exporté."))
-				.column(new TableCol().reference("reference").label("Référence").searchable(true).visible(false).help("La référence doit être unique pour chaque produit. Elle permet la modification lors de l'import de produits."))
-				.column(new TableCol().reference("label").label("Désignation").searchable(true).visible(true).help("Le nom du produit tel qu'affiché sur les boutons de la caisse et le ticket."))
-				.column(new TableCol().reference("category").label("Catégorie").visible(false).help("La désignation de la catégorie à laquelle est rattachée le produit."))
-				.column(new TableCol().reference("barcode").label("Code barre").searchable(true).visible(false).help("Le code barre faculcatif du produit. Le code barre peut être une série de caractères arbitraires pour une saisie manuelle."))
-				.column(new TableCol().reference("prepay").label("Recharge pré-payement").type(TABLECOL_TYPE.BOOL).visible(false).help("L'achat de se produit augmente le solde client du même montant. Les produits pré-payés ne rentrent pas dans le chiffre d'affaire et permettent également dee rembourser des dettes client."))
-				.column(new TableCol().reference("scale").label("Vente au poids").type(TABLECOL_TYPE.BOOL).visible(false).help("Si actif, la quantité peut être non unitaire et sera demandée lors de l'ajout à une commande."))
-				.column(new TableCol().reference("scaleType").label("Poids/Volume").visible(false).help("Indique l'unité pour la contenance."))
-				.column(new TableCol().reference("scaleValue").label("Contenance").type(TABLECOL_TYPE.NUMBER).visible(false).help("Indique la contenance dans le produit. Pour un bocal de 200g par exemple, la contenance sera 0,2. Ce champ permet de calculer le prix au litre ou au kilogramme."))
-				.column(new TableCol().reference("priceBuy").label("Prix d'achat HT").type(TABLECOL_TYPE.NUMBER).visible(false).help("Le prix d'achat hors taxes. Ce champ facultatif permet de calculer la marge. Il n'est pas historisé."))
-				.column(new TableCol().reference("priceSell").label("Prix de vente HT").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Le prix de vente unitaire hors taxes du produit."))
-				.column(new TableCol().reference("priceSellVat").label("Prix de vente TTC").type(TABLECOL_TYPE.NUMBER2).visible(true).help("Le prix de vente unitaire TTC du produit."))
-				.column(new TableCol().reference("margin").label("Marge").type(TABLECOL_TYPE.NUMBER5).visible(false).help("La marge hors taxe indicative. Si le prix d'achat n'est pas renseigné, la marge correspond au prix de vente hors taxes."))
-				.column(new TableCol().reference("tax").label("TVA").visible(false).help("Le taux de TVA associé."))
-				.column(new TableCol().reference("discountEnabled").label("Remise automatique").type(TABLECOL_TYPE.BOOL).visible(false).help("Indique si une remise doit être automatiquement assignée lors de l'ajout du produit à une commande."))
-				.column(new TableCol().reference("discountRate").label("Taux de remise").type(TABLECOL_TYPE.PERCENT).visible(false).help("Le taux de remise à appliquer automatiquement lorsque l'option Remise automatique est activée."))
-				.column(new TableCol().reference("dispOrder").label("Ordre").type(TABLECOL_TYPE.NUMBER).visible(false).help("L'ordre d'affichage du produit dans sa catégorie. Les ordres ne doivent pas forcément se suivre, ce qui permet de faciliter l'intercallage de nouveaux produits. Par exemple 10, 20, 30…"))
-				.column(new TableCol().reference("visible").label("En vente").type(TABLECOL_TYPE.BOOL).visible(false).help("Indique si le produit est actuellement en vente ou non. Lorsque le produit n'est pas en vente, il n'apparaîtra pas sur les caisses."))
-				.column(new TableCol().reference("operation").label("Opération").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
+				.column(new TableCol().reference("image").label("Image").type(TABLECOL_TYPE.THUMBNAIL).exportable(false).visible(true).help("The product button image. This field cannot be exported."))
+				.column(new TableCol().reference("reference").label("Reference").searchable(true).visible(false).help("The reference must be unique for each product. It allows modification during product import."))
+				.column(new TableCol().reference("label").label("Name").searchable(true).visible(true).help("The product name as displayed on POS buttons and the receipt."))
+				.column(new TableCol().reference("category").label("Category").visible(false).help("The category name to which the product belongs."))
+				.column(new TableCol().reference("barcode").label("Barcode").searchable(true).visible(false).help("The optional product barcode. It can be any string for manual input."))
+				.column(new TableCol().reference("prepay").label("Prepaid recharge").type(TABLECOL_TYPE.BOOL).visible(false).help("Buying this product increases the customer's balance by the same amount. Prepaid products are not included in revenue and can also be used to refund customer debt."))
+				.column(new TableCol().reference("scale").label("Sold by weight").type(TABLECOL_TYPE.BOOL).visible(false).help("If active, the quantity can be non-unitary and will be requested when adding to an order."))
+				.column(new TableCol().reference("scaleType").label("Weight/Volume").visible(false).help("Indicates the unit of measure for content."))
+				.column(new TableCol().reference("scaleValue").label("Content").type(TABLECOL_TYPE.NUMBER).visible(false).help("Indicates the quantity inside the product. For example, a 200g jar would have a content of 0.2. This allows for price-per-liter or kilogram calculations."))
+				.column(new TableCol().reference("priceBuy").label("Purchase price (excl. tax)").type(TABLECOL_TYPE.NUMBER).visible(false).help("The purchase price excluding taxes. Optional field used to calculate margin. It is not versioned."))
+				.column(new TableCol().reference("priceSell").label("Selling price (excl. tax)").type(TABLECOL_TYPE.NUMBER5).visible(false).help("The unit selling price excluding taxes."))
+				.column(new TableCol().reference("priceSellVat").label("Selling price (incl. tax)").type(TABLECOL_TYPE.NUMBER2).visible(true).help("The unit selling price including taxes."))
+				.column(new TableCol().reference("margin").label("Margin").type(TABLECOL_TYPE.NUMBER5).visible(false).help("Indicative margin excluding taxes. If the purchase price is not provided, margin equals the selling price excl. tax."))
+				.column(new TableCol().reference("tax").label("VAT").visible(false).help("The associated VAT rate."))
+				.column(new TableCol().reference("discountEnabled").label("Automatic discount").type(TABLECOL_TYPE.BOOL).visible(false).help("Indicates if a discount should be automatically applied when adding the product to an order."))
+				.column(new TableCol().reference("discountRate").label("Discount rate").type(TABLECOL_TYPE.PERCENT).visible(false).help("The discount rate to apply automatically when automatic discount is enabled."))
+				.column(new TableCol().reference("dispOrder").label("Order").type(TABLECOL_TYPE.NUMBER).visible(false).help("The display order of the product in its category. Orders donât have to be sequential, allowing easy insertion of new products (e.g., 10, 20, 30â¦)."))
+				.column(new TableCol().reference("visible").label("For sale").type(TABLECOL_TYPE.BOOL).visible(false).help("Indicates whether the product is currently for sale. If not for sale, it wonât appear on POS."))
+				.column(new TableCol().reference("operation").label("Operation").type(TABLECOL_TYPE.HTML).exportable(false).visible(true))
 		};
 	},
 	template: `<div class="product-list">
@@ -33,42 +33,42 @@ Vue.component("vue-product-list", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><h1>Liste des produits</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><h1>Product List</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
-				<li><a class="btn btn-add" v-bind:href="newUrl">Ajouter un produit</a></li>
-				<li><a class="btn btn-add" v-bind:href="newCompoUrl">Ajouter une composition</a></li>
-				<li><a class="btn btn-add" href="?p=productImport">Importer un fichier</a></li>
+				<li><a class="btn btn-add" v-bind:href="newUrl">Add Product</a></li>
+				<li><a class="btn btn-add" v-bind:href="newCompoUrl">Add Composition</a></li>
+				<li><a class="btn btn-add" href="?p=productImport">Import File</a></li>
 			</ul>
 			<ul>
 				<li>
-					<label for="filter-category">Catégorie</label>
+					<label for="filter-category">Category</label>
 					<select id="filter-category" name="category" v-model="currentCategoryId">
 						<option v-for="cat in data.categories" v-bind:value="cat.id">{{cat.label}}</option>
-						<option value="">Tout afficher</option>
+						<option value="">Show All</option>
 					</select>
 				</li>
 				<li>
-					<label for="filter-invisible">État</label>
+					<label for="filter-invisible">Status</label>
 					<select id="filter-invisible" v-model="filterVisible">
-						<option value="visible">En vente</option>
-						<option value="invisible">Hors vente</option>
-						<option value="all">Tout</option>
+						<option value="visible">For Sale</option>
+						<option value="invisible">Not for Sale</option>
+						<option value="all">All</option>
 					</select>
 				</li>
 				<li>
-					<label for="sort">Trier par</label>
+					<label for="sort">Sort by</label>
 					<select id="sort" name="sort" v-model="sorting">
-						<option value="dispOrder">Ordre</option>
-						<option value="label">Désignation</option>
-						<option value="reference">Référence</option>
-						<option value="priceBuy">Prix d'achat</option>
-						<option value="priceSell">Prix de vente hors-taxes</option>
-						<option value="priceSellVat">Prix de vente TTC</option>
-						<option value="margin">Marge</option>
+						<option value="dispOrder">Order</option>
+						<option value="label">Name</option>
+						<option value="reference">Reference</option>
+						<option value="priceBuy">Purchase Price</option>
+						<option value="priceSell">Selling Price (excl. tax)</option>
+						<option value="priceSellVat">Selling Price (incl. tax)</option>
+						<option value="margin">Margin</option>
 					</select>
 				</li>
 			</ul>
@@ -79,7 +79,7 @@ Vue.component("vue-product-list", {
 	</div>
 </section>
 </div>`,
-	methods: {
+methods: {
 		imageSrc: function(prd) {
 			return srvcall_imageUrl("product", prd);
 		},
@@ -121,7 +121,7 @@ Vue.component("vue-product-list", {
 						scaleType = "Litre";
 						break;
 					case 3:
-						scaleType = "Heure";
+						scaleType = "Hour";
 						break;
 				}
 				let line = [
@@ -136,7 +136,7 @@ Vue.component("vue-product-list", {
 					tax, prd.discountEnabled,
 					prd.discountRate,
 					prd.dispOrder, prd.visible,
-					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Modifier</a></div>",
+					"<div class=\"btn-group pull-right\" role=\"group\"><a class=\"btn btn-edit\" href=\"" + this.editUrl(prd) + "\">Edit</a></div>",
 				];
 				lines.push(line);
 			}
@@ -191,35 +191,36 @@ Vue.component("vue-product-list", {
 				});
 			}
 		},
-		updateTableTitle: function() {
-			if (this.currentCategoryId != "") {
-				let category = this.data.categories.find(c => c.id == this.currentCategoryId, this);
-				if (typeof category != "undefined") {
-					let status;
-					switch (this.filterVisible) {
-						case "visible": status = " en vente"; break;
-						case "invisible": status = " hors vente"; break;
-						default: status = ""; break;
-					}
-					let prefix;
-					if (this.filterVisible != "all") {
-						prefix = "Produits de la catégorie \"";
-					} else {
-						prefix = "Tous les produits de la catégorie \"";
-					}
-					this.productsTable.title(prefix + category.label + "\"" + status);
-				}
-			} else {
-				let title = "Tous les produits";
+	updateTableTitle: function() {
+		if (this.currentCategoryId != "") {
+			let category = this.data.categories.find(c => c.id == this.currentCategoryId, this);
+			if (typeof category != "undefined") {
+				let status;
 				switch (this.filterVisible) {
-					case "visible": title += " en vente"; break;
-					case "invisible": title += " hors vente"; break;
-					default: break;
+					case "visible": status = " for sale"; break;
+					case "invisible": status = " not for sale"; break;
+					default: status = ""; break;
 				}
-				this.productsTable.title(title);
+				let prefix;
+				if (this.filterVisible != "all") {
+					prefix = "Products in the category \"";
+				} else {
+					prefix = "All products in the category \"";
+				}
+				this.productsTable.title(prefix + category.label + "\"" + status);
 			}
+		} else {
+			let title = "All products";
+			switch (this.filterVisible) {
+				case "visible": title += " for sale"; break;
+				case "invisible": title += " not for sale"; break;
+				default: break;
+			}
+			this.productsTable.title(title);
 		}
-	},
+	}
+
+},
 	computed: {
 		newUrl: function() {
 			return "?p=product&category=" + this.currentCategoryId;
@@ -259,22 +260,22 @@ Vue.component("vue-product-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a v-bind:href="backUrl">Liste des produits</a></li>
-				<li><h1>Édition d'un produit</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a v-bind:href="backUrl">Product List</a></li>
+				<li><h1>Edit a Product</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar" v-if="data.product.id">
 			<ul>
-				<li><a class="btn btn-add" v-bind:href="duplicateUrl">Dupliquer le produit</a></li>
+				<li><a class="btn btn-add" v-bind:href="duplicateUrl">Duplicate Product</a></li>
 			</ul>
 		</nav>
 	</header>
 	<div class="box-body">
 		<form class="form-large" id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
 			<fieldset>
-				<legend>Affichage</legend>
-				<vue-input-text label="Désignation" v-model="data.product.label" v-bind:required="true" id="edit-label" />
+				<legend>Display</legend>
+				<vue-input-text label="Name" v-model="data.product.label" v-bind:required="true" id="edit-label" />
 				<div class="form-group">
 					<label for="edit-image">Image</label>
 					<img v-if="data.product.hasImage" id="product-image" class="img img-thumbnail" v-bind:src="imageSrc(data.product)" />
@@ -282,74 +283,73 @@ Vue.component("vue-product-form", {
 					<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:product_toggleImage();return false;" >{{data.deleteImageButton}}</button>
 				</div>
 				<div class="form-group">
-					<label for="edit-category">Catégorie</label></dt>
+					<label for="edit-category">Category</label>
 					<select class="form-control" id="edit-category" v-model="data.product.category">
 						<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
 					</select>
 				</div>
-				<vue-input-number label="Ordre" v-model.number="data.product.dispOrder" id="edit-dispOrder" />
-				<vue-input-checkbox label="En vente" v-model="data.product.visible" id="edit-visible" />
-				<vue-input-checkbox label="Recharge prépayé" v-model="data.product.prepay" id="edit-prepay" />
+				<vue-input-number label="Display Order" v-model.number="data.product.dispOrder" id="edit-dispOrder" />
+				<vue-input-checkbox label="For Sale" v-model="data.product.visible" id="edit-visible" />
+				<vue-input-checkbox label="Prepaid Recharge" v-model="data.product.prepay" id="edit-prepay" />
 			</fieldset>
 			<fieldset>
-				<legend>Prix</legend>
+				<legend>Price</legend>
 				<div class="form-group">
-					<label for="edit-priceSell">Prix de vente HT</label>
+					<label for="edit-priceSell">Sale Price (excl. tax)</label>
 					<input type="number" id="edit-priceSell" name="priceSell" class="form-control" v-model="data.product.priceSell" step="0.01" disabled="true">
 				</div>
 				<div class="form-group">
-					<label for="edit-tax">TVA</label>
+					<label for="edit-tax">VAT</label>
 					<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice" required>
-						<option disabled value="">Sélectionnez une TVA</option>
+						<option disabled value="">Select a VAT rate</option>
 						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 					</select>
 				</div>
 				<div class="form-group">
-					<label for="edit-taxedPrice">Prix de vente TTC</label>
+					<label for="edit-taxedPrice">Sale Price (incl. tax)</label>
 					<input type="number" id="edit-taxedPrice" v-model.number="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
-					<label for="edit-priceBuy">Prix d'achat HT</label>
+					<label for="edit-priceBuy">Purchase Price (excl. tax)</label>
 					<input type="number" id="edit-priceBuy" name="priceBuy" v-model.number="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
-					<label for="edit-margin">Marge</label>
+					<label for="edit-margin">Margin</label>
 					<input type="text" id="edit-margin" name="margin" v-model="data.product.margin" disabled="true" />
 				</div>
-				<vue-input-rate label="Remise automatique" v-model="data.product.discountRate" id="edit-discountRate" />
-				<vue-input-checkbox label="Appliquer la remise automatique" v-model="data.product.discountEnabled" id="edit-discountEnabled" />
+				<vue-input-rate label="Automatic Discount" v-model="data.product.discountRate" id="edit-discountRate" />
+				<vue-input-checkbox label="Apply Automatic Discount" v-model="data.product.discountEnabled" id="edit-discountEnabled" />
 			</fieldset>
 			<fieldset>
-				<legend>Référencement</legend>
-				<vue-input-text label="Référence" v-model="data.product.reference" v-bind:required="true" id="edit-reference" />
-				<vue-input-text label="Code barre" v-model="data.product.barcode" id="edit-barcode" />
+				<legend>Reference</legend>
+				<vue-input-text label="Reference" v-model="data.product.reference" v-bind:required="true" id="edit-reference" />
+				<vue-input-text label="Barcode" v-model="data.product.barcode" id="edit-barcode" />
 			</fieldset>
 			<fieldset>
-				<legend>Volumétrie et contenance</legend>
-				<vue-input-checkbox label="Vente en vrac" v-model="data.product.scaled" id="edit-scaled" />
+				<legend>Volume and Capacity</legend>
+				<vue-input-checkbox label="Sold in Bulk" v-model="data.product.scaled" id="edit-scaled" />
 				<div class="form-group">
-					<vue-input-number label="Contenance" v-bind:step="0.001" v-model="data.product.scaleValue" v-if="data.product.scaled == false" id="edit-scaleValue" />
+					<vue-input-number label="Capacity" v-bind:step="0.001" v-model="data.product.scaleValue" v-if="data.product.scaled == false" id="edit-scaleValue" />
 					<select id="edit-scaleType" v-model="data.product.scaleType">
-						<option v-bind:value="0" v-bind:disabled="data.product.scaled == true">pièce</option>
-						<option v-bind:value="1">Kilogramme</option>
+						<option v-bind:value="0" v-bind:disabled="data.product.scaled == true">Piece</option>
+						<option v-bind:value="1">Kilogram</option>
 						<option v-bind:value="2">Litre</option>
-						<option v-bind:value="3">Heure</option>
+						<option v-bind:value="3">Hour</option>
 					</select>
 				</div>
 				<div class="form-group">
-					<label for="edit-refPrice">Prix de référence TTC</label>
+					<label for="edit-refPrice">Reference Price (incl. tax)</label>
 					<input id="edit-refPrice" v-model="refPrice" disabled="true" />
 				</div>
 			</fieldset>
 
 			<div class="form-control">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</div>
 </section>
-</div>
-`,
+</div>` ,
 	computed: {
 		duplicateUrl: function() {
 			return "?p=productDuplicate&id=" + this.data.product.id;
@@ -362,18 +362,19 @@ Vue.component("vue-product-form", {
 			price = price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "€ ";
 			switch (this.data.product.scaleType) {
 				case 0:
-					price += "pièce";
+					price += "per piece";
 					break;
 				case 1:
-					price += "le kilogramme";
+					price += "per kilogram";
 					break;
 				case 2:
-					price += "le litre";
+					price += "per litre";
 					break;
 				case 3:
-					price += "de l'heure";
+					price += "per hour";
 					break;
 			}
+
 			return price;
 		}
 	},
@@ -404,23 +405,23 @@ Vue.component("vue-product-composition-form", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a v-bind:href="backUrl">Liste des produits</a></li>
-				<li><h1>Édition d'un produit</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a v-bind:href="backUrl">Product list</a></li>
+				<li><h1>Edit a product</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar" v-if="data.product.id">
 			<ul>
-				<li><a class="btn btn-add" v-bind:href="duplicateUrl">Dupliquer le produit</a></li>
+				<li><a class="btn btn-add" v-bind:href="duplicateUrl">Duplicate product</a></li>
 			</ul>
 		</nav>
 	</header>
 	<div class="box-body">
 		<form class="form-large" id="edit-product-form" onsubmit="javascript:products_saveProduct(); return false;">
 			<fieldset>
-				<legend>Affichage</legend>
+				<legend>Display</legend>
 				<div class="form-group">
-					<label for="edit-label">Désignation</label>
+					<label for="edit-label">Name</label>
 					<input id="edit-label" type="text" v-model="data.product.label" required="true" />
 				</div>
 				<div class="form-group">
@@ -430,77 +431,77 @@ Vue.component("vue-product-composition-form", {
 					<button type="button" v-if="data.hadImage" class="btn btn-del" onclick="javascript:product_toggleImage();" >{{data.deleteImageButton}}</button>
 				</div>
 				<div class="form-group">
-					<label for="edit-category">Catégorie</label>
+					<label for="edit-category">Category</label>
 					<select id="edit-category" v-model="data.product.category">
 						<option v-for="cat in data.categories" :key="cat.id" v-bind:value="cat.id">{{cat.label}}</option>
 					</select>
 				</div>
 				<div class="form-group">
-					<label for="edit-dispOrder">Ordre</label>
+					<label for="edit-dispOrder">Order</label>
 					<input id="edit-dispOrder" type="number" v-model.number="data.product.dispOrder" />
 				</div>
 				<div class="form-group">
 					<input class="form-control" id="edit-visible" type="checkbox" v-model="data.product.visible">
-					<label for="edit-visible">En vente</label>
+					<label for="edit-visible">For sale</label>
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Prix</legend>
+				<legend>Price</legend>
 				<div class="form-group">
-					<label for="edit-priceSell">Prix de vente HT</label>
+					<label for="edit-priceSell">Sale price excl. tax</label>
 					<input type="number" id="edit-priceSell" name="priceSell" v-model="data.product.priceSell" step="0.01" disabled="true">
 				</div>
 				<div class="form-group">
-					<label for="edit-tax">TVA</label>
+					<label for="edit-tax">VAT</label>
 					<select class="form-control" id="edit-tax" v-model="data.product.tax" v-on:change="updatePrice" required>
-						<option disabled value="">Sélectionnez une TVA</option>
+						<option disabled value="">Select a VAT</option>
 						<option v-for="tax in data.taxes" :key="tax.id" v-bind:value="tax.id">{{tax.label}}</option>
 					</select>
 				</div>
 				<div class="form-group">
-					<label for="edit-taxedPrice">Prix de vente TTC</label></dt>
+					<label for="edit-taxedPrice">Sale price incl. tax</label>
 					<input type="number" id="edit-taxedPrice" v-model="data.product.taxedPrice" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
-					<label for="edit-priceBuy">Prix d'achat</label>
+					<label for="edit-priceBuy">Purchase price</label>
 					<input type="number" id="edit-priceBuy" name="priceBuy" v-model="data.product.priceBuy" v-on:change="updatePrice" step="0.01" />
 				</div>
 				<div class="form-group">
-					<label for="edit-margin">Marge</label></dt>
+					<label for="edit-margin">Margin</label>
 					<input type="text" id="edit-margin" name="margin" v-model="data.product.margin" disabled="true" />
 				</div>
 			</fieldset>
 			<fieldset>
-				<legend>Référencement</legend>
+				<legend>Referencing</legend>
 				<div class="form-group">
-					<label for="edit-reference">Référence</label>
+					<label for="edit-reference">Reference</label>
 					<input id="edit-reference" type="text" v-model="data.product.reference" required="true" />
 				</div>
 				<div class="form-group">
-					<label for="edit-barcode">Code barre</label></dt>
+					<label for="edit-barcode">Barcode</label>
 					<input id="edit-barcode" type="text" name="barcode" v-model="data.product.barcode" />
 				</div>
 				<div class="form-group">
-					<label for="edit-discountEnabled">Remise auto</label>
+					<label for="edit-discountEnabled">Auto discount</label>
 					<input id="edit-discountEnable" type="checkbox" v-model="data.product.discountEnabled" />
 				</div>
 				<div class="form-group">
-					<label for="edit-discountRate">Taux de remise</label>
+					<label for="edit-discountRate">Discount rate</label>
 					<input id="edit-discountRate" type="number" v-model="data.product.discountRate" step="0.01" />
 				</div>
 			</fieldset>
 
 			<fieldset>
-				<legend>Choix</legend>
+				<legend>Choice</legend>
 				<vue-catalog-picker v-bind:categories="data.categories" v-bind:prdPickCallback="addProduct" v-bind:excludeCompositions="true"/>
-				<button type="button" v-on:click="addGroup">Ajouter un choix</button>
+				<button type="button" v-on:click="addGroup">Add a choice</button>
 				<template v-for="(subgroup, i) in data.product.compositionGroups">
 				<div class="composition-subgroup-editor" v-if="isSelected(i)">
 					<dl class="dl-horizontal">
-						<dt><label v-bind:for="'edit-group-label-' + i">Nom du choix</label></dt>
-						<dd><input class="form-control" v:bind-id="'edit-group-label-' + i" type="text" v-model="subgroup.label" /></dd>
+						<dt><label v-bind:for="'edit-group-label-' + i">Choice name</label></dt>
+						<dd><input class="form-control" v-bind:id="'edit-group-label-' + i" type="text" v-model="subgroup.label" /></dd>
 
-						<dt><label v:bind:for="'edit-group-dispOrder-' + i">Ordre</label></dt>
+						<dt><label v-bind:for="'edit-group-dispOrder-' + i">Order</label></dt>
 						<dd><input class="form-control" v-bind:id="'edit-dispOrder-' + i" type="number" v-model.number="subgroup.dispOrder" /></dd>
 					</dl>
 					<ul class="catalog-picker">
@@ -519,28 +520,34 @@ Vue.component("vue-product-composition-form", {
 					<col style="width:10%; min-width: 15em;" />
 					<thead>
 						<tr>
-							<th>Désignation</th>
-							<th>Ordre d'affichage</th>
-							<th>Opération</th>
+							<th>Name</th>
+							<th>Display order</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody id="group-list">
 						<tr v-for="(group, i) in data.product.compositionGroups">
 							<td>{{group.label}}</td>
 							<td>{{group.dispOrder}}</td>
-							<td><div class="btn-group pull-right" role="group"><button type="button" class="btn btn-edit" v-bind:disabled="isSelected(i)" v-on:click="selectGroup(i)">Sélectionner</button> <button type="button" class="btn btn-delete" v-bind:disabled="isSingleGroup()" v-on:click="deleteGroup(i)">Supprimer</button></div></td>
+							<td>
+								<div class="btn-group pull-right" role="group">
+									<button type="button" class="btn btn-edit" v-bind:disabled="isSelected(i)" v-on:click="selectGroup(i)">Select</button> 
+									<button type="button" class="btn btn-delete" v-bind:disabled="isSingleGroup()" v-on:click="deleteGroup(i)">Delete</button>
+								</div>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</fieldset>
 			<div class="form-group">
-				<button class="btn btn-primary btn-send" type="submit">Enregistrer</button>
+				<button class="btn btn-primary btn-send" type="submit">Save</button>
 			</div>
 		</form>
 	</div>
 </section>
 </div>
 `,
+
 	methods: {
 		updatePrice: function() {
 			product_updatePrice();
@@ -617,23 +624,24 @@ Vue.component("vue-product-import", {
 			},
 			importResult: null,
 			tableColumns: [
-				{field: "reference", label: "Référence"},
-				{field: "label", label: "Désignation"},
-				{field: "category", label: "Catégorie", type: "record", modelName: "category"},
-				{field: "barcode", label: "Code barre"},
-				{field: "prepay", label: "Recharge pré-payment", type: "boolean"},
-				{field: "scaled", label: "Vente au poids", type: "boolean"},
-				{field: "scaleType", label: "Poids/Volume", type: "scaleType"},
-				{field: "scaleValue", label: "Contenance", type: "number"},
-				{field: "priceBuy", label: "Prix d'achat HT", type: "number5"},
-				{field: "priceSell", label: "Prix de vente HT", type: "number5"},
-				{field: "taxedPrice", label: "Prix de vente TTC", type: "number2"},
-				{field: "tax", label: "TVA", type: "record", modelName: "tax"},
-				{field: "discountEnabled", label: "Remise automatique", type: "boolean"},
-				{field: "discountRate", label: "Taux de remise", type: "rate"},
-				{field: "dispOrder", label: "Ordre", type: "number"},
-				{field: "visible", label: "En vente", type: "boolean"},
+				{field: "reference", label: "Reference"},
+				{field: "label", label: "Name"},
+				{field: "category", label: "Category", type: "record", modelName: "category"},
+				{field: "barcode", label: "Barcode"},
+				{field: "prepay", label: "Prepayment recharge", type: "boolean"},
+				{field: "scaled", label: "Sold by weight", type: "boolean"},
+				{field: "scaleType", label: "Weight/Volume", type: "scaleType"},
+				{field: "scaleValue", label: "Capacity", type: "number"},
+				{field: "priceBuy", label: "Purchase price excl. tax", type: "number5"},
+				{field: "priceSell", label: "Sale price excl. tax", type: "number5"},
+				{field: "taxedPrice", label: "Sale price incl. tax", type: "number2"},
+				{field: "tax", label: "VAT", type: "record", modelName: "tax"},
+				{field: "discountEnabled", label: "Automatic discount", type: "boolean"},
+				{field: "discountRate", label: "Discount rate", type: "rate"},
+				{field: "dispOrder", label: "Order", type: "number"},
+				{field: "visible", label: "For sale", type: "boolean"},
 			],
+
 		};
 	},
 	template: `<div class="product-import">
@@ -641,22 +649,22 @@ Vue.component("vue-product-import", {
 	<header>
 		<nav class="browser">
 			<ul>
-				<li><a href="?p=home">Accueil</a></li>
-				<li><a href="?p=products">Liste des produits</a></li>
-				<li><h1>Modification des produits par fichier csv</h1></li>
+				<li><a href="?p=home">Home</a></li>
+				<li><a href="?p=products">Product List</a></li>
+				<li><h1>Modify Products via CSV File</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
 			<ul>
 				<li>
-					<label for="csv-file">Fichier</label>
+					<label for="csv-file">File</label>
 					<input ref="csvRef" type="file" accept="text/csv" id="csv-file" name="csv" v-on:change="readCsv" />
 				</li>
 			</ul>
 		</nav>
 	</header>
 	<div class="box-body">
-		<vue-import-preview newTitle="Nouveaux produits" editTitle="Produits modifiés" unchangedTitle="Produits non modifiés" modelsLabel="produits"
+		<vue-import-preview newTitle="New Products" editTitle="Modified Products" unchangedTitle="Unchanged Products" modelsLabel="products"
 			v-bind:modelDef="data.modelDef"
 			v-bind:importResult="importResult"
 			v-bind:linkedRecords="linkedRecords"
@@ -665,6 +673,7 @@ Vue.component("vue-product-import", {
 	</div>
 </section>
 </div>`,
+
 	methods: {
 		readCsv: function (event) {
 			let fileName = event.target.files[0].name;

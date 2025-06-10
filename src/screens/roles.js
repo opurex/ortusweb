@@ -34,28 +34,29 @@ function _roles_showRole(role, paymentModes) {
 		paymentModes: paymentModes,
 		permissions: {
 			session: [
-				{value: "button.openmoney", name: "Ouvrir la caisse"},
-				{value: "fr.pasteque.pos.panels.JPanelCloseMoney", name: "Fermer la caisse"},
-				{value: "fr.pasteque.pos.panels.JPanelPayments", name: "Effectuer des mouvements de caisse"},
-				{value: "fr.pasteque.pos.sales.JPanelTicketEdits", name: "Contrôler les ventes (Desktop)"},
-				{value: "sales.EditTicket", name: "Contrôler les ventes (Android)"},
-				{value: "button.print", name: "Imprimer une commande"},
-				{value: "button.opendrawer", name: "Ouvrir le tiroir caisse hors encaissement (Desktop)"},
+				{value: "button.openmoney", name: "Open the cash register"},
+				{value: "fr.pasteque.pos.panels.JPanelCloseMoney", name: "Close the cash register"},
+				{value: "fr.pasteque.pos.panels.JPanelPayments", name: "Perform cash register operations"},
+				{value: "fr.pasteque.pos.sales.JPanelTicketEdits", name: "Control sales (Desktop)"},
+				{value: "sales.EditTicket", name: "Control sales (Android)"},
+				{value: "button.print", name: "Print an order"},
+				{value: "button.opendrawer", name: "Open cash drawer outside payment (Desktop)"},
 			],
 			tickets: [
-				{value: "fr.pasteque.pos.sales.JPanelTicketSales", name: "Prendre des commandes"},
-				{value: "sales.Total", name: "Encaisser une commande"},
-				{value: "sales.EditLines", name: "Annuler/réduire une commande"},
-				{value: "sales.RefundTicket", name: "Rembourser un ticket"},
-				{value: "sales.PrintTicket", name: "Réimprimer un ticket"},
+				{value: "fr.pasteque.pos.sales.JPanelTicketSales", name: "Take orders"},
+				{value: "sales.Total", name: "Process payment for an order"},
+				{value: "sales.EditLines", name: "Cancel/reduce an order"},
+				{value: "sales.RefundTicket", name: "Refund a ticket"},
+				{value: "sales.PrintTicket", name: "Reprint a ticket"},
 			],
 			misc: [
-				{value: "fr.pasteque.pos.customers.JPanelCustomer", name: "Créer des comptes client"},
-				{value: "Menu.ChangePassword", name: "Changer son mot de passe"},
-				{value: "fr.pasteque.pos.config.JPanelConfiguration", name: "Accéder à l'écran de configuration (Desktop)"},
-				{value: "fr.pasteque.pos.panels.JPanelPrinter", name: "Historique d'impression (Desktop)"},
+				{value: "fr.pasteque.pos.customers.JPanelCustomer", name: "Create customer accounts"},
+				{value: "Menu.ChangePassword", name: "Change own password"},
+				{value: "fr.pasteque.pos.config.JPanelConfiguration", name: "Access configuration screen (Desktop)"},
+				{value: "fr.pasteque.pos.panels.JPanelPrinter", name: "Print history (Desktop)"},
 			],
-		},
+		}
+
 	}
 	vue.screen.component = "vue-role-form";
 	gui_hideLoading();
@@ -72,7 +73,7 @@ function role_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+		gui_showError("Something's wrong with the form data. " + request.statusText);
 		gui_hideLoading();
 		return;
 	}

@@ -310,44 +310,87 @@ function _parseZTickets(cashRegisters, paymentModes, taxes, categories, customer
 	vue.screen.data.table.reset();
 	vue.screen.data.table.title("Tickets Z du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
 	vue.screen.data.table
-		.column(new TableCol().reference("cashRegister").label("Caisse").visible(oldColumnVisible("Caisse", oldColumns, true)).help("Le nom de la caisse."))
-		.column(new TableCol().reference("sequence").label("N°").type(TABLECOL_TYPE.NUMBER).visible(oldColumnVisible("N°", oldColumns, true)).help("Le numéro de séquence de la session de caisse."))
-		.column(new TableCol().reference("openDate").label("Ouverture").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Ouverture", oldColumns, true)).help("La date et heure d'ouverture de la session de caisse."))
-		.column(new TableCol().reference("closeDate").label("Clôture").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Clôture", oldColumns, true)).help("La date et heure de clôture de la session de caisse."))
-		.column(new TableCol().reference("openCash").label("Fond ouverture").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond ouverture", oldColumns, true)).help("Le montant du fond de caisse compté à l'ouverture."))
-		.column(new TableCol().reference("closeCash").label("Fond clôture").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond clôture", oldColumns, true)).help("Le montant du fond de caisse compté à la clôture."))
-		.column(new TableCol().reference("expectedCash").label("Fond attendu").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.CUSTOM, "Totaux").visible(oldColumnVisible("Fond attendu", oldColumns, true)).help("Le montant du fond de caisse attendu à la clôture, calculé à partir du fond de caisse à l'ouverture et des encaissements."))
-		.column(new TableCol().reference("cashError").label("Erreur de caisse").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Erreur de caisse", oldColumns, true)).help("L'écart entre le fond de caisse à la clôture et le fond de caisse attendu. Lorsqu'il est positif, il y avait trop de monnaie, lorsque négatif, il en manquait."))
-		.column(new TableCol().reference("tickets").label("Tickets").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Tickets", oldColumns, false)).help("Le nombre de tickets réalisés sur la session de caisse."))
-		.column(new TableCol().reference("cs").label("CA HT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("CA", oldColumns, true)).class("z-oddcol").help("Le montant total du chiffre d'affaire hors taxes réalisé pendant la session."))
-		.column(new TableCol().reference("csPeriod").label("CA HT mois").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA mois", oldColumns, false)).class("z-oddcol").help("Le cumul du chiffre d'affaire réalisé sur la période. Ce cumul est remis à zéro lorsque la clôture mensuelle est choisie au moment de clôturer la caisse."))
-		.column(new TableCol().reference("csFYear").label("CA HT année").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA année", oldColumns, false)).class("z-oddcol").help("Le cumul du chiffre d'affaire réalisé sur l'année ou exercice fiscal. Ce cumul est remis à zéro lorsque la clôture annuelle est choisie au moment de clôturer la caisse."))
-		.column(new TableCol().reference("csPerpetual").label("CA HT perpétuel").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA perpétuel", oldColumns, false)).class("z-oddcol").help("Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."))
-		.column(new TableCol().reference("csTaxes").label("CA + taxes").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("CA + taxes", oldColumns, false)).class("z-oddcol").help("Le total TTC de la session."))
-		.column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Balance client", oldColumns, false)).class("z-oddcol").help("La variation totale des soldes des comptes clients. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."));
+		// .column(new TableCol().reference("cashRegister").label("Caisse").visible(oldColumnVisible("Caisse", oldColumns, true)).help("Le nom de la caisse."))
+		// .column(new TableCol().reference("sequence").label("N°").type(TABLECOL_TYPE.NUMBER).visible(oldColumnVisible("N°", oldColumns, true)).help("Le numéro de séquence de la session de caisse."))
+		// .column(new TableCol().reference("openDate").label("Ouverture").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Ouverture", oldColumns, true)).help("La date et heure d'ouverture de la session de caisse."))
+		// .column(new TableCol().reference("closeDate").label("Clôture").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Clôture", oldColumns, true)).help("La date et heure de clôture de la session de caisse."))
+		// .column(new TableCol().reference("openCash").label("Fond ouverture").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond ouverture", oldColumns, true)).help("Le montant du fond de caisse compté à l'ouverture."))
+		// .column(new TableCol().reference("closeCash").label("Fond clôture").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Fond clôture", oldColumns, true)).help("Le montant du fond de caisse compté à la clôture."))
+		// .column(new TableCol().reference("expectedCash").label("Fond attendu").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.CUSTOM, "Totaux").visible(oldColumnVisible("Fond attendu", oldColumns, true)).help("Le montant du fond de caisse attendu à la clôture, calculé à partir du fond de caisse à l'ouverture et des encaissements."))
+		// .column(new TableCol().reference("cashError").label("Erreur de caisse").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Erreur de caisse", oldColumns, true)).help("L'écart entre le fond de caisse à la clôture et le fond de caisse attendu. Lorsqu'il est positif, il y avait trop de monnaie, lorsque négatif, il en manquait."))
+		// .column(new TableCol().reference("tickets").label("Tickets").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Tickets", oldColumns, false)).help("Le nombre de tickets réalisés sur la session de caisse."))
+		// .column(new TableCol().reference("cs").label("CA HT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("CA", oldColumns, true)).class("z-oddcol").help("Le montant total du chiffre d'affaire hors taxes réalisé pendant la session."))
+		// .column(new TableCol().reference("csPeriod").label("CA HT mois").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA mois", oldColumns, false)).class("z-oddcol").help("Le cumul du chiffre d'affaire réalisé sur la période. Ce cumul est remis à zéro lorsque la clôture mensuelle est choisie au moment de clôturer la caisse."))
+		// .column(new TableCol().reference("csFYear").label("CA HT année").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA année", oldColumns, false)).class("z-oddcol").help("Le cumul du chiffre d'affaire réalisé sur l'année ou exercice fiscal. Ce cumul est remis à zéro lorsque la clôture annuelle est choisie au moment de clôturer la caisse."))
+		// .column(new TableCol().reference("csPerpetual").label("CA HT perpétuel").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("CA perpétuel", oldColumns, false)).class("z-oddcol").help("Le cumul perpetuel du chiffre d'affaire réalisé avec cette caisse. Ce cumul n'est jamais remis à zéro."))
+		// .column(new TableCol().reference("csTaxes").label("CA + taxes").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("CA + taxes", oldColumns, false)).class("z-oddcol").help("Le total TTC de la session."))
+		// .column(new TableCol().reference("custBalance").label("Balance client").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Balance client", oldColumns, false)).class("z-oddcol").help("La variation totale des soldes des comptes clients. En positif pour les recharges pré-payés ou remboursements, en négatif pour les dépenses ou dettes."));
+		//
+
+		.column(new TableCol().reference("cashRegister").label("Register").visible(oldColumnVisible("Register", oldColumns, true)).help("The name of the register."))
+		.column(new TableCol().reference("sequence").label("No.").type(TABLECOL_TYPE.NUMBER).visible(oldColumnVisible("No.", oldColumns, true)).help("The session sequence number of the register."))
+		.column(new TableCol().reference("openDate").label("Opening").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Opening", oldColumns, true)).help("The date and time when the register session was opened."))
+		.column(new TableCol().reference("closeDate").label("Closing").type(TABLECOL_TYPE.DATETIME).visible(oldColumnVisible("Closing", oldColumns, true)).help("The date and time when the register session was closed."))
+		.column(new TableCol().reference("openCash").label("Opening float").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Opening float", oldColumns, true)).help("The amount of cash counted at opening."))
+		.column(new TableCol().reference("closeCash").label("Closing float").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Closing float", oldColumns, true)).help("The amount of cash counted at closing."))
+		.column(new TableCol().reference("expectedCash").label("Expected float").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.CUSTOM, "Totals").visible(oldColumnVisible("Expected float", oldColumns, true)).help("The expected amount of cash at closing, calculated from the opening float and payments."))
+		.column(new TableCol().reference("cashError").label("Cash error").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Cash error", oldColumns, true)).help("The difference between the actual and expected cash at closing. A positive value indicates excess cash, a negative value indicates a shortage."))
+		.column(new TableCol().reference("tickets").label("Receipts").type(TABLECOL_TYPE.NUMBER).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Receipts", oldColumns, false)).help("The number of receipts issued during the register session."))
+		.column(new TableCol().reference("cs").label("Sales excl. VAT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Sales", oldColumns, true)).class("z-oddcol").help("The total sales amount excluding VAT during the session."))
+		.column(new TableCol().reference("csPeriod").label("Monthly sales excl. VAT").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Monthly sales", oldColumns, false)).class("z-oddcol").help("The accumulated sales amount over the current period. This is reset when monthly closing is selected at register closure."))
+		.column(new TableCol().reference("csFYear").label("Annual sales excl. VAT").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Annual sales", oldColumns, false)).class("z-oddcol").help("The accumulated sales amount over the fiscal year. This is reset when annual closing is selected at register closure."))
+		.column(new TableCol().reference("csPerpetual").label("Perpetual sales excl. VAT").type(TABLECOL_TYPE.NUMBER2).visible(oldColumnVisible("Perpetual sales", oldColumns, false)).class("z-oddcol").help("The perpetual accumulated sales amount for this register. This is never reset."))
+		.column(new TableCol().reference("csTaxes").label("Sales incl. taxes").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Sales incl. taxes", oldColumns, false)).class("z-oddcol").help("The total including taxes for the session."))
+		.column(new TableCol().reference("custBalance").label("Customer balance").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Customer balance", oldColumns, false)).class("z-oddcol").help("The total variation of customer account balances. Positive for pre-paid top-ups or refunds, negative for expenses or debts."))
+
+	// for (let i = 0; i < paymentModes.length; i++) {
+	// 	let pm = paymentModes[i];
+	// 	vue.screen.data.table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(pm.label, oldColumns, true)).help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
+	// }
+	// vue.screen.data.table.column(new TableCol().reference("overPerceived").label("Produit exceptionnel").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Produit exceptionnel", oldColumns, false)).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie ou les arrondis de TVA sur remises."));
+	// for (let i = 0; i < taxes.length; i++) {
+	// 	let tax = taxes[i];
+	// 	vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
+	// 	vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée associé au taux de TVA."));
+	// }
+	// for (let i = 0; i < categories.length; i++) {
+	// 	let cat = categories[i];
+	// 	vue.screen.data.table.column(new TableCol().reference("cat-" + cat.reference + "-cs").label(cat.label).type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(cat.label, oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."));
+	// }
+	// for (let i = 0; i < catTaxes.length; i++) {
+	// 	let catTax = catTaxes[i];
+	// 	vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-base").label(catTax.cat + " " + catTax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."));
+	// 	vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-amount").label(catTax.cat + " " + catTax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."));
+	// }
+	// for (let i = 0; i < customers.length; i++) {
+	// 	let customer = customers[i];
+	// 	vue.screen.data.table.column(new TableCol().reference("cust-" + customer.id + "-balance").label(customer.dispName).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(customer.dispName, oldColumns, false)).help("La variation du solde client"));
+	// }
+
 	for (let i = 0; i < paymentModes.length; i++) {
 		let pm = paymentModes[i];
-		vue.screen.data.table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(pm.label, oldColumns, true)).help("Le montant des encaissements réalisés avec ce moyen de paiement sur la session."));
+		vue.screen.data.table.column(new TableCol().reference("pm-" + pm.reference).label(pm.label).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(pm.label, oldColumns, true)).help("The amount of payments made using this payment method during the session."));
 	}
-	vue.screen.data.table.column(new TableCol().reference("overPerceived").label("Produit exceptionnel").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Produit exceptionnel", oldColumns, false)).help("Le montant trop perçu pour les modes de paiement sans rendu-monnaie ou les arrondis de TVA sur remises."));
+	vue.screen.data.table.column(new TableCol().reference("overPerceived").label("Exceptional income").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible("Exceptional income", oldColumns, false)).help("The overpaid amount for payment methods without change or VAT rounding on discounts."));
 	for (let i = 0; i < taxes.length; i++) {
 		let tax = taxes[i];
-		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe associé au taux de TVA."));
-		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-amount").label(tax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée associé au taux de TVA."));
+		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-base").label(tax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " base", oldColumns, false)).class("z-oddcol").help("The VAT-excluded revenue amount associated with this VAT rate."));
+		vue.screen.data.table.column(new TableCol().reference("tax-" + i + "-amount").label(tax.label + " VAT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(tax.label + " VAT", oldColumns, false)).class("z-oddcol").help("The VAT amount collected associated with this VAT rate."));
 	}
 	for (let i = 0; i < categories.length; i++) {
 		let cat = categories[i];
-		vue.screen.data.table.column(new TableCol().reference("cat-" + cat.reference + "-cs").label(cat.label).type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(cat.label, oldColumns, false)).help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie de produit (indicatif)."));
+		vue.screen.data.table.column(new TableCol().reference("cat-" + cat.reference + "-cs").label(cat.label).type(TABLECOL_TYPE.NUMBER5).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(cat.label, oldColumns, false)).help("The VAT-excluded sales revenue made in this product category (indicative)."));
 	}
 	for (let i = 0; i < catTaxes.length; i++) {
 		let catTax = catTaxes[i];
-		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-base").label(catTax.cat + " " + catTax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false)).class("z-oddcol").help("Le montant de chiffre d'affaire hors taxe réalisé dans cette catégorie pour ce taux de TVA (indicatif)."));
-		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-amount").label(catTax.cat + " " + catTax.label + " TVA").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " TVA", oldColumns, false)).class("z-oddcol").help("Le montant de TVA collectée pour cette catégorie pour ce taux de TVA (indicatif)."));
+		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-base").label(catTax.cat + " " + catTax.label + " base").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " base", oldColumns, false)).class("z-oddcol").help("The VAT-excluded sales revenue made in this category for this VAT rate (indicative)."));
+		vue.screen.data.table.column(new TableCol().reference("catTax-" + i + "-amount").label(catTax.cat + " " + catTax.label + " VAT").type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(catTax.cat + " " + catTax.label + " VAT", oldColumns, false)).class("z-oddcol").help("The VAT amount collected for this category for this VAT rate (indicative)."));
 	}
 	for (let i = 0; i < customers.length; i++) {
 		let customer = customers[i];
-		vue.screen.data.table.column(new TableCol().reference("cust-" + customer.id + "-balance").label(customer.dispName).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(customer.dispName, oldColumns, false)).help("La variation du solde client"));
+		vue.screen.data.table.column(new TableCol().reference("cust-" + customer.id + "-balance").label(customer.dispName).type(TABLECOL_TYPE.NUMBER2).footerType(TABLECOL_FOOTER.SUM).visible(oldColumnVisible(customer.dispName, oldColumns, false)).help("The variation in the customer's balance"));
 	}
+
 	for (let i = 0; i < renderZs.length; i++) {
 		let z = renderZs[i];
 		let line = [z.cashRegister, z.sequence, z.openDate, z.closeDate, z.openCash, z.closeCash, z.expectedCash,

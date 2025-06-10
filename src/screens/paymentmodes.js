@@ -46,13 +46,13 @@ function _paymentmodes_showPaymentMode(paymentMode, paymentModes) {
 		let pmValue = paymentMode.values[i];
 		hadValueImage[pmValue.value] = pmValue.hasImage;
 		deleteValueImage[pmValue.value] = false;
-		deleteValueImageButton[pmValue.value] = "Supprimer";
+		deleteValueImageButton[pmValue.value] = "Delete";
 	}
 	vue.screen.data = {
 		paymentMode: paymentMode,
 		paymentModes: paymentModes,
 		deleteImage: false,
-		deleteImageButton: "Supprimer",
+		deleteImageButton: "Delete",
 		hadImage: paymentMode.hasImage, // Save for later check
 		hadValueImage: hadValueImage,
 		deleteValueImage: deleteValueImage,
@@ -67,11 +67,11 @@ function paymentmodes_toggleImage() {
 		vue.screen.data.paymentMode.hasImage = false;
 		vue.screen.data.deleteImage = true;
 		document.getElementById("edit-image").value = "";
-		vue.screen.data.deleteImageButton = "Restaurer";
+		vue.screen.data.deleteImageButton = "Restore";
 	} else {
 		vue.screen.data.paymentMode.hasImage = true;
 		vue.screen.data.deleteImage = false;
-		vue.screen.data.deleteImageButton = "Supprimer"
+		vue.screen.data.deleteImageButton = "Delete"
 	}
 }
 
@@ -83,11 +83,11 @@ function paymentmodes_toggleValueImage(pmValue) {
 		if (imgTag != null) {
 			imgTag.value = "";
 		}
-		vue.screen.data.deleteValueImageButton[pmValue.value] = "Restaurer";
+		vue.screen.data.deleteValueImageButton[pmValue.value] = "Restore";
 	} else {
 		pmValue.hasImage = true;
 		vue.screen.data.deleteValueImage[pmValue.value] = false;
-		vue.screen.data.deleteValueImageButton[pmValue.value] = "Supprimer"
+		vue.screen.data.deleteValueImageButton[pmValue.value] = "Delete"
 	}
 }
 
@@ -126,12 +126,13 @@ function paymentmodes_saveCallback(request, status, response) {
 		return;
 	}
 	if (status == 400) {
-		if (request.statusText == "Reference is already taken") {
-			gui_showError("La référence existe déjà, veuillez en choisir une autre.");
+		if (request.statusText === "Reference is already taken") {
+			gui_showError("The reference already exists, please choose another one.");
 			document.getElementById("edit-reference").focus(); // TODO: make this Vuejsy.
 		} else {
-			gui_showError("Quelque chose cloche dans les données du formulaire. " + request.statusText);
+			gui_showError("There is something wrong with the form data. " + request.statusText);
 		}
+
 		gui_hideLoading();
 		return;
 	}
