@@ -1,25 +1,43 @@
-/* Content */
+/* === Body & Content Layout === */
 
 body {
 	margin: 0;
 	padding: 0;
+	background-color: #1e1e2f;
+	font-family: 'Open Sans', sans-serif;
+	color: #f8f9fa;
 }
 
 #content {
-	padding-top: 4rem;
+	padding: 4rem 1rem 1rem;
 	display: flex;
 	flex-wrap: wrap;
+	gap: 1rem;
+	box-sizing: border-box;
 }
 
+/* === Box Styles === */
+
 .box {
-	margin: 1em;
+	background-color: #2c2c3e;
+	border-radius: 1rem;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+	padding: 1.5rem;
+	color: #ffffff;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.box:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Box Size Variants */
 
 .box-tiny {
 	min-width: 14rem;
 	max-width: 20rem;
 }
-
 
 .box-medium {
 	min-width: 40rem;
@@ -35,18 +53,20 @@ aside.box {
 	max-width: 40rem;
 }
 
-@media (max-width:22rem) {
-	.box.box-tiny {
+/* === Responsive Boxes === */
+
+@media (max-width: 22rem) {
+	.box.box-tiny,
+	aside.box {
 		margin: 0;
 		min-width: 100%;
 	}
 	aside.box {
-		margin: 0.5em, 0, 0, 0;
-		min-width: 100%;
+		margin-top: 0.5em;
 	}
 }
 
-@media (max-width:42rem) {
+@media (max-width: 42rem) {
 	.box.box-medium,
 	.box.box-large {
 		margin: 0;
@@ -54,29 +74,50 @@ aside.box {
 	}
 }
 
-/* Modal */
+/* === Modal Styling === */
 
 .modal-container {
 	position: fixed;
-	top: 3.6rem;
+	top: 4rem;
 	left: 0;
 	right: 0;
 	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	z-index: 1000;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem;
+	box-sizing: border-box;
 }
 
-/* Messages */
+/* === Message Box === */
 
 #message-box {
-	padding: 8px 15px;
-	margin: 0px 30px 20px 30px;
 	position: fixed;
-	top: 3ex;
-	right: 3ex;
-	z-index: 2000;
+	top: 1.5rem;
+	right: 1.5rem;
+	padding: 1rem 1.5rem;
+	margin: 0;
+	background-color: #32325d;
+	color: #ffffff;
+	border-radius: 0.5rem;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+	font-size: 0.95rem;
+	max-width: 90%;
 	cursor: pointer;
+	z-index: 2000;
+	transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Common form */
+#message-box:hover {
+	transform: scale(1.02);
+	opacity: 0.95;
+}
+
+
+/* === Common Form Elements === */
 
 .form-group,
 .form-control {
@@ -85,44 +126,56 @@ aside.box {
 
 .form-group input[type=checkbox],
 .form-group input[type=radio] {
-	vertical-align: baseline;
+	vertical-align: middle;
+	margin-right: 0.4em;
 }
+
 .form-group input:not([type=checkbox]):not([type=radio]),
-.form-group select {
+.form-group select,
+.form-group textarea {
 	min-height: 2.5em;
+	width: 100%;
+	padding: 0.4em 0.6em;
+	border: 1px solid #ccc;
+	border-radius: 0.3em;
+	font-size: 1rem;
+	box-sizing: border-box;
 }
 
 form > .form-control {
 	display: flex;
-	justify-content: end;
+	justify-content: flex-end;
+	gap: 0.75em;
 }
 
-/* Navbar form */
+/* === Navbar Form === */
 
 nav form,
 nav.table-pagination,
 nav.table-pagination ul {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: baseline;
+	align-items: center;
+	gap: 0.5em;
 }
-#login nav form { /* Disable inline for login form */
+
+#login nav form {
 	display: inherit;
 	flex-wrap: inherit;
 }
+
 nav .form-group,
 nav .form-control {
 	margin-right: 0.5em;
+	margin-bottom: 0.5em;
 }
+
 nav .form-group input[type=checkbox] + label,
 nav .form-group input[type=radio] + label {
 	margin-right: 0.25em;
 }
-nav .form-control {
-	margin-bottom: 1em;
-}
 
-/* Form tiny */
+/* === Tiny Forms (Compact Layout) === */
 
 .form-tiny .form-group,
 .form-tiny .form-group input,
@@ -139,22 +192,28 @@ fieldset.form-tiny .form-group input[type=checkbox] {
 }
 
 fieldset.form-tiny .form-group {
-	display: inherit;
+	display: block;
+	margin-bottom: 0.75em;
 }
 
 fieldset.form-tiny {
 	max-width: 15em;
+	padding: 1em;
+	border: 1px solid #ddd;
+	border-radius: 0.5em;
+	background-color: #fafafa;
 }
 
-/* Form large */
+
+/* === Large Forms === */
 
 .box-large .form-large,
 .form-large.form-mosaic {
 	display: flex;
 	flex-wrap: wrap;
-	flex-direction: row;
 	justify-content: space-evenly;
 	align-items: center;
+	gap: 1.5rem;
 }
 
 .box-large .form-large fieldset {
@@ -164,6 +223,7 @@ fieldset.form-tiny {
 .form-large .form-group {
 	display: flex;
 	align-items: center;
+	margin-bottom: 0.75rem;
 }
 
 .box-medium .form-large .form-group {
@@ -176,42 +236,54 @@ fieldset.form-tiny {
 	width: 7em;
 	text-align: right;
 	padding-right: 1em;
+	font-weight: 600;
 }
+
 .form-large .form-group input,
 .form-large .form-group select,
 .form-large .form-group textarea {
-	flex: 10;
+	flex: 1;
+	padding: 0.4rem 0.6rem;
+	border: 1px solid #ccc;
+	border-radius: 0.25rem;
+	font-size: 1rem;
 }
+
 .form-large .form-group input[type=checkbox],
 .form-large .form-group input[type=radio] {
 	margin-left: 12em;
 	flex: 0;
 }
+
 .form-large .form-group input[type=checkbox] + label,
 .form-large .form-group input[type=radio] + label {
 	width: auto;
+	margin-left: 0.5rem;
+	text-align: left;
 }
 
-/* Form filters */
+/* === Form Filters === */
 
 .filters ul {
-	list-style-type: none;
-	padding: 0px;
+	list-style: none;
+	padding: 0;
 	display: flex;
 	flex-wrap: wrap;
-}
-.filters ul li {
-	margin: 0px 1ex;
-}
-.filters ul.filter-columns li {
-	margin: 0px 1em;
-	width: 15rem;
-}
-.filters ul li label {
-	display: inline;
+	gap: 0.5rem 1.5rem;
+	align-items: center;
 }
 
-/* Table */
+.filters ul.filter-columns li {
+	width: 15rem;
+}
+
+.filters ul li label {
+	display: inline-block;
+	margin-bottom: 0.25rem;
+	font-weight: 500;
+}
+
+/* === Tables === */
 
 .box-body table {
 	margin-left: auto;
@@ -219,160 +291,198 @@ fieldset.form-tiny {
 }
 
 table {
+	width: 100%;
 	border-spacing: 0;
 	border-collapse: collapse;
 	margin-bottom: 0.5rem;
+	font-size: 0.95rem;
+	background-color: #fff;
+}
+
+th, td {
+	padding: 0.5em;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
 }
 
 td nav {
 	display: flex;
 	justify-content: center;
+	gap: 0.5rem;
 }
 
-td, th {
-	padding: 0.5em;
-}
-
-/* Misc */
+/* === Miscellaneous === */
 
 nav button,
 .btn {
 	cursor: pointer;
+	border: none;
+	padding: 0.4rem 0.75rem;
+	background-color: #eee;
+	border-radius: 0.25rem;
+	transition: background-color 0.2s ease;
 }
 
-@media print {
-	.noprint {
-		display:none;
-	}
+nav button:hover,
+.btn:hover {
+	background-color: #ddd;
 }
 
 .text-flow {
 	display: flex;
 	flex-wrap: wrap;
+	gap: 0.5rem;
 }
 
-/* Loading filter */
+/* === Print Handling === */
 
-#loading {
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 100%;
-	padding-top: 15%;
-	z-index: 999;
-}
-
-/* Login form */
-
-.login-box {
-	max-width: 30rem;
-	margin: 3em auto;
-	position: relative;
-}
-#login > aside {
-	position: absolute;
-	float: left;
-	left: -17rem;
-	min-width: auto;
-	max-width: 17rem;
-}
-#login-logo {
-	text-align: center;
-}
-.login-box .login-box-body {
-	padding: 2em;
-}
-
-@media (max-height: 30rem) {
-	#login {
-		margin: 1em auto;
+@media print {
+	.noprint {
+		display: none !important;
 	}
 }
 
-@media (max-width: 60rem) and (min-height: 35rem) {
+
+/* === Loading Filter === */
+#loading {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.8);
+	z-index: 999;
+}
+
+/* === Login Form === */
+.login-box {
+	max-width: 30rem;
+	margin: 3rem auto;
+	padding: 2rem;
+	background: #fff;
+	border-radius: 0.5rem;
+	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+	position: relative;
+}
+
+#login > aside {
+	position: absolute;
+	left: -17rem;
+	max-width: 17rem;
+	text-align: center;
+}
+
+#login-logo {
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.login-box .login-box-body {
+	padding: 1.5rem;
+	background-color: #fafafa;
+	border-radius: 0.25rem;
+}
+
+/* === Responsive Login Adjustments === */
+@media (max-height: 30rem) {
+	#login {
+		margin: 1rem auto;
+	}
+}
+
+@media (max-width: 60rem) and (min-height: 35rem),
+(max-height: 35rem) and (max-width: 60rem) {
 	#login > aside {
 		position: relative;
-		float: none;
 		left: 0;
-		margin-bottom: 1rem;
-		margin-left: auto;
-		margin-right: auto;
+		margin: 0 auto 1rem;
+	}
+	#login-logo {
+		display: none;
 	}
 	#login nav {
 		margin-top: 0;
 	}
 }
 
-@media (max-height: 35rem) and (max-width: 60rem) {
-	#login > aside {
-		position: relative;
-		float: none;
-		left: 0;
-		margin-bottom: 0;
-		margin-left: auto;
-		margin-right: auto;
-	}
-	#login-logo {
-		display: none;
-	}
-}
-
-/* Navigation bar (main menu and box menu) */
-
+/* === Navigation Bar === */
 nav.navbar {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
+	background-color: #f8f8f8;
+	padding: 0.5rem 1rem;
+	border-bottom: 1px solid #ccc;
 }
 
 .navbar ul {
 	display: flex;
 	flex-wrap: wrap;
-	list-style-type: none;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	gap: 0.5rem;
 }
 
 #menu {
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 1030;
 	width: 100%;
-}
-
-#user-menu {
-	justify-content: end;
-	flex-grow: 1;
+	z-index: 1030;
 }
 
 #menu .navbar-brand {
 	display: block;
+	margin-right: auto;
 }
 
+#user-menu {
+	display: flex;
+	justify-content: flex-end;
+	flex-grow: 1;
+}
+
+/* === Dropdown Menus === */
 #main-menu .dropdown-menu,
 #user-menu .dropdown-menu {
 	position: absolute;
+	display: flex;
 	flex-direction: column;
-}
-#user-menu .dropdown-menu {
-	right: 0px;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	border-radius: 0.25rem;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+	z-index: 1040;
 }
 
+#user-menu .dropdown-menu {
+	right: 0;
+}
+
+/* === Menu Collapser === */
 #menu-collapser {
 	display: none;
 }
 
+/* Large Screens */
 @media (min-width: 42rem) {
 	#menu-collapser + label {
 		display: none !important;
 	}
 }
 
+/* Small Screens */
 @media (max-width: 42rem) {
 	#menu {
-		display: inherit;
+		display: block;
 	}
 	#menu-collapser + label {
 		float: right;
+		cursor: pointer;
 	}
 	#menu .navbar-brand {
 		float: left;
@@ -397,82 +507,139 @@ nav.navbar {
 	}
 }
 
-/* Browser bar */
+
+/* === Browser Bar === */
 
 .browser ul {
 	display: flex;
-	list-style-type: none;
+	list-style: none;
+	gap: 0.5rem;
+	padding: 0;
+	margin: 0;
 }
-
-/* Catalog picker */
 
 .catalog-picker {
 	display: flex;
-	align-items: stretch;
-	margin-bottom: 0.5rem;
+	gap: 1rem;
+	align-items: flex-start;
+	margin-bottom: 1rem;
+	flex-wrap: wrap; /* Better on smaller screens */
 }
 
+.catalog-picker ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* Allow better wrapping in small spaces */
+.catalog-picker li {
+	display: inline-block;
+}
+
+/* Product and category panes */
+.catalog-picker-categories,
+.catalog-picker-products {
+	overflow-y: auto;
+	border: 1px solid #aaa;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	background-color: #fdfdfd;
+	box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+	max-height: 60vh; /* Prevent overflow on touch devices */
+}
+
+/* Size proportions */
 .catalog-picker ul.catalog-picker-categories {
 	flex: 1;
 	min-width: 8rem;
 	max-width: 20rem;
 }
-
 .catalog-picker ul.catalog-picker-products {
 	flex: 3;
 }
 
-.catalog-picker ul {
-	list-style-type: none;
-	margin: 0px;
-	padding: 0px;
-}
-.catalog-picker li {
-	display: inline-block;
-}
-
+/* Catalog Buttons - now more POS-touch-friendly */
 .catalog-picker button {
 	position: relative;
-	width: 4.5rem;
-	height: 4.5rem;
+	width: 5.5rem;
+	height: 5.5rem;
 	margin: 0.25rem;
-	vertical-align: bottom;
+	border: none;
+	background-color: #fafafa;
+	border-radius: 0.75rem;
+	overflow: hidden;
+	cursor: pointer;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+	transition: all 0.2s ease-in-out;
+	touch-action: manipulation; /* helps on touchscreens */
 }
+
+.catalog-picker button:hover,
+.catalog-picker button:focus {
+	background-color: #e0ffe0;
+	outline: none;
+	transform: scale(1.05);
+}
+
 .catalog-picker button img {
 	max-width: 100%;
 	max-height: 100%;
-}
-.catalog-picker label {
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
-	margin: 0px;
-	width: 100%;
-	overflow: hidden;
-}
-.catalog-label-long {
-	font-size: small;
-}
-.catalog-label-verylong {
-	font-size: x-small;
+	object-fit: contain;
+	pointer-events: none;
 }
 
-.catalog-picker-categories,
-.catalog-picker-products {
-	overflow-y: scroll;
-	border: 1px solid #000;
-	padding: 0.2rem;
+.catalog-picker label {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	font-weight: bold;
+	background: rgba(255, 255, 255, 0.85);
+	font-size: 0.8rem;
+	padding: 0.25rem;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
+
+/* Optional label variants */
+.catalog-label-long {
+	font-size: 0.75rem;
+}
+.catalog-label-verylong {
+	font-size: 0.65rem;
+}
+
+
+/* === Quantity Input Enhancements === */
 
 .qty-cell {
 	text-align: center;
-}
-.qty {
-	width: 4em;
-	text-align: center;
+	vertical-align: middle;
 }
 
-/* Restaurant map */
+.qty {
+	width: 4.5em;
+	text-align: center;
+	border: 2px solid #ccc;
+	border-radius: 0.4rem;
+	padding: 0.4rem;
+	font-size: 1.2rem;
+	background-color: #fff;
+	transition: border-color 0.2s ease;
+}
+
+.qty:focus {
+	outline: none;
+	border-color: #5aaf58;
+	background-color: #f0fff0;
+}
+
+
+
+/* === Restaurant Map (Floor Display) === */
 
 .floor-display {
 	width: 640px;
@@ -480,12 +647,45 @@ nav.navbar {
 	border-top: 1px solid #888;
 	border-left: 1px solid #888;
 	position: relative;
+	background-color: #f0f0f0;
+	background-image: url('../img/grid.png');
+	background-size: contain;
 }
+
+/* Table/Place elements */
+
 .place {
-	list-style-type: none;
-	margin: -1.5rem 0px 0px -2rem;
+	position: absolute;
+	list-style: none;
+	margin: -1.5rem 0 0 -2rem;
+	width: 4rem;
+	height: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	font-size: 0.9rem;
+	font-weight: bold;
+	background-color: #fff;
+	border: 1px solid #000;
+	border-radius: 0.4rem;
+	cursor: grab;
 	user-select: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
+
+.place.selected {
+	background-color: #c0e174;
+	border-color: #5aaf58;
+	color: #333;
+	box-shadow: 0 0 0 2px #5aaf58 inset;
+}
+
 .place-list {
-	list-style-type: none;
+	list-style: none;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 0.4rem;
+	background-color: #fff;
+	box-shadow: 0 0 0.5rem rgba(0,0,0,0.05);
 }
+

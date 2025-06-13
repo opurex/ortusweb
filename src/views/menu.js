@@ -85,7 +85,7 @@ function menu_init() {
 			{
 				"name": "Sales",
 				"items": [
-					{"target": _menu_getTargetUrl("sales_z"), "name": "Z Tickets", "icon": _menu_getIcon(null)},
+					{"target": _menu_getTargetUrl("sales_z"), "name": "Final Tickets", "icon": _menu_getIcon(null)},
 					{"target": _menu_getTargetUrl("sales_tickets"), "name": "Tickets", "icon": _menu_getIcon(null)},
 					{"target": _menu_getTargetUrl("salesbyproduct"), "name": "By Product", "icon": _menu_getIcon(null)},
 					{"target": _menu_getTargetUrl("salesbycategory"), "name": "By Category", "icon": _menu_getIcon(null)},
@@ -95,7 +95,7 @@ function menu_init() {
 			{
 				"name": "Accounting",
 				"items": [
-					{"target": _menu_getTargetUrl("accounting_z"), "name": "Z Records", "icon": _menu_getIcon(null)},
+					{"target": _menu_getTargetUrl("accounting_z"), "name": "Final Records", "icon": _menu_getIcon(null)},
 					{"target": _menu_getTargetUrl("accounting_config"), "name": "Settings", "icon": _menu_getIcon(null)},
 				]
 			},

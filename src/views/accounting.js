@@ -6,7 +6,7 @@ Vue.component("vue-accounting-z", {
     <nav class="browser">
       <ul>
         <li><a href="?p=home">Home</a></li>
-        <li><h1>Accounting Entries for Z Tickets</h1></li>
+        <li><h1>Accounting Entries for Final Tickets</h1></li>
       </ul>
     </nav>
     <nav class="navbar">
@@ -26,7 +26,7 @@ Vue.component("vue-accounting-z", {
     </nav>
   </header>
   <article class="box-body">
-    <p class="warning">This screen allows you to export your Z tickets as accounting entries to simplify import into third-party accounting software. This table cannot directly replace a cash journal.</p>
+    <p class="warning">This screen allows you to export your Final tickets as accounting entries to simplify import into third-party accounting software. This table cannot directly replace a cash journal.</p>
     <template v-if="hasMissing()">
       <p>The account number for the following lines is not configured:</p>
       <ul v-for="miss in missingList" :key="miss">

@@ -62,11 +62,29 @@
 
 /* Containers */
 
+/*body {*/
+/*	background: #999 url(../img/fond.png) repeat center fixed;*/
+/*	color: #555;*/
+/*	line-height: 1.5;*/
+/*}*/
+
 body {
-	background: #999 url(../img/fond.png) repeat center fixed;
+	background-image: linear-gradient(to left, #BDBBBE 0%, #9D9EA3 100%), radial-gradient(88% 271%, rgba(255, 255, 255, 0.25) 0%, rgba(254, 254, 254, 0.25) 1%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(50% 100%, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%);
+	background-blend-mode: normal, lighten, soft-light;
+	background-size: 400% 400%;
+	animation: gradientShift 20s ease infinite;
 	color: #555;
 	line-height: 1.5;
+	font-family: "PT Sans", sans-serif;
 }
+
+/* Smooth animated gradient effect */
+@keyframes gradientShift {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
 .default-font {
 	font-family:"PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif !important;
 	line-height: 1.35;
@@ -97,38 +115,194 @@ body {
 
 /* Modal */
 
+/*.modal-container {*/
+/*	padding: 1rem;*/
+/*	background-color: rgba(0, 0, 0, 0.4);*/
+/*	display: flex;*/
+/*	flex-direction: column;*/
+/*	align-items: center;*/
+/*}*/
+
+/* === Modal Styling === */
+
 .modal-container {
-	padding: 1rem;
-	background-color: rgba(0, 0, 0, 0.4);
+	position: fixed;
+	top: 4rem;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	z-index: 1000;
 	display: flex;
-	flex-direction: column;
+	justify-content: center;
 	align-items: center;
+	padding: 1rem;
+	box-sizing: border-box;
 }
 
-/* Box rounded borders */
 
+
+/*!* Box rounded borders *!*/
+
+/*.box.box-body,*/
+/*.box > .box-body {*/
+/*	border-radius: 1em;*/
+/*}*/
+/*.box header + .box-body {*/
+/*	border-radius: 0px 0em 1em 1em;*/
+/*}*/
+
+/*@media (max-width:22rem) {*/
+/*	.box.box-tiny .box-body {*/
+/*		border-radius: 0;*/
+/*	}*/
+/*}*/
+
+/*@media (max-width:42rem) {*/
+/*	.box.box-medium .box-body,*/
+/*	.box.box-large .box-body{*/
+/*		border-radius: 0;*/
+/*	}*/
+/*}*/
+/*!* Box browser header *!*/
+
+/*.box header .browser {*/
+/*	background: transparent;*/
+/*}*/
+
+/*.box header .browser ul {*/
+/*	padding: 0;*/
+/*	margin: 0 0 0 1ex;*/
+/*	justify-content: flex-start;*/
+/*}*/
+
+/*.box header .browser li {*/
+/*	background-color: #eee;*/
+/*	margin-right: 0.5em;*/
+/*	padding: 0.5em;*/
+/*	border-radius: 0.5em 0.5em 0 0;*/
+/*	border-bottom: 1px solid #aaa;*/
+/*}*/
+/*.box header .browser li:last-child {*/
+/*	background-color: #fff;*/
+/*	border-bottom: none;*/
+/*}*/
+
+/*.box header .browser li h1 {*/
+/*	font-size: medium;*/
+/*	font-weight: bold;*/
+/*	color: #555;*/
+/*	margin: 0;*/
+/*}*/
+
+/*.box header .browser a {*/
+/*	color: #555;*/
+/*	text-decoration: none;*/
+/*}*/
+/*.box header .browser a:hover {*/
+/*	color: #555;*/
+/*	text-decoration: underline;*/
+/*}*/
+
+
+/*!* Box header *!*/
+
+/*.box header .navbar {*/
+/*	background-color: #5aaf58;*/
+/*}*/
+
+/*.box header > h2 {*/
+/*	background-color: #5aaf58;*/
+/*	color: #fff;*/
+/*	border-radius: 0.5em 0.5em 0 0;*/
+/*	margin: 0;*/
+/*	padding: 0.5em 1em 0.5em 1em;*/
+/*}*/
+
+/*.box.box-body,*/
+/*.box .box-body {*/
+/*	background-color: #fff;*/
+/*	padding: 1em;*/
+/*}*/
+
+/*.box nav {*/
+/*	color: #fff;*/
+/*	border: none 0;*/
+/*	border-radius: 0;*/
+/*	margin-bottom: 0;*/
+/*}*/
+
+
+/* === Box Card Layout for POS === */
+
+.box {
+	background-color: #fff;
+	border-radius: 1rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	margin-bottom: 2rem;
+	overflow: hidden;
+}
+
+.box:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* === Box Header === */
+.box header {
+	background-color: #5aaf58;
+	color: #fff;
+	padding: 1rem;
+	border-bottom: 1px solid #ddd;
+	font-size: 1.25rem;
+	font-weight: bold;
+}
+
+.box header > h2 {
+	background: none;
+	color: inherit;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+/* === Box Body === */
+.box.box-body,
+.box .box-body {
+	background-color: #fff;
+	padding: 1.25rem;
+	color: #333;
+	font-size: 0.95rem;
+	border-radius: 0 0 1rem 1rem;
+}
+
+/* Special: Rounded if no header */
 .box.box-body,
 .box > .box-body {
-	border-radius: 1em;
+	border-radius: 1rem;
 }
 .box header + .box-body {
-	border-radius: 0px 0em 1em 1em;
+	border-radius: 0 0 1rem 1rem;
 }
 
-@media (max-width:22rem) {
+/* === Responsive tweaks === */
+@media (max-width: 22rem) {
 	.box.box-tiny .box-body {
 		border-radius: 0;
 	}
 }
-
-@media (max-width:42rem) {
+@media (max-width: 42rem) {
 	.box.box-medium .box-body,
-	.box.box-large .box-body{
+	.box.box-large .box-body {
 		border-radius: 0;
 	}
 }
-/* Box browser header */
 
+/* === Browser-style Header Tabs (Optional) === */
 .box header .browser {
 	background: transparent;
 }
@@ -136,6 +310,7 @@ body {
 .box header .browser ul {
 	padding: 0;
 	margin: 0 0 0 1ex;
+	display: flex;
 	justify-content: flex-start;
 }
 
@@ -146,6 +321,7 @@ body {
 	border-radius: 0.5em 0.5em 0 0;
 	border-bottom: 1px solid #aaa;
 }
+
 .box header .browser li:last-child {
 	background-color: #fff;
 	border-bottom: none;
@@ -167,33 +343,14 @@ body {
 	text-decoration: underline;
 }
 
-
-/* Box header */
-
-.box header .navbar {
-	background-color: #5aaf58;
-}
-
-.box header > h2 {
-	background-color: #5aaf58;
-	color: #fff;
-	border-radius: 0.5em 0.5em 0 0;
-	margin: 0;
-	padding: 0.5em 1em 0.5em 1em;
-}
-
-.box.box-body,
-.box .box-body {
-	background-color: #fff;
-	padding: 1em;
-}
-
+/* === Optional Box Nav === */
 .box nav {
 	color: #fff;
-	border: none 0;
+	border: none;
 	border-radius: 0;
 	margin-bottom: 0;
 }
+
 
 /* Buttons */
 
@@ -336,64 +493,73 @@ dt {
 	font-size: x-large;
 	text-shadow: 1px 1px 5px #444;
 }
-
-/* Navigation bar (main menu and box menu) */
+/* === Navigation Bar (Main Menu + Box Menu) === */
 
 #menu {
-	border-bottom: 0.1rem;
-	border-color: #101010;
 	background-color: #222;
+	border-bottom: 1px solid #101010;
 }
-@media (max-width:30rem) {
+
+@media (max-width: 30rem) {
 	#menu {
 		padding: 0;
 	}
 }
 
 .navbar ul {
-	padding: 0px;
-	margin: 0px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .box .navbar {
-	padding: 0.5em 1em;
+	padding: 0.5rem 1rem;
 }
+
 .box .navbar ul li {
-	margin-right: 1em;
+	margin-right: 1rem;
 	margin-block: auto;
 }
 
-#menu .navbar-brand,
-#menu-collapser + label {
-	height: 3rem;
-	padding: 0.1rem;
-	margin: 0.2rem 0.5rem;
-}
-
-#menu-collapser + label {
-	background: url('../img/menu-collapser.png') 0 0px no-repeat;
-	background-size: contain;
-	display: block;
-	width: 3rem;
-}
-#menu-collapser + label {
-	color: transparent;
-}
+/* === Menu Branding & Collapser === */
 
 #menu .navbar-brand {
 	background-color: #fff;
 	border-radius: 0.2rem;
+	padding: 0.1rem;
+	margin: 0.2rem 0.5rem;
+	height: 3rem;
+	display: flex;
+	align-items: center;
 }
+
 #menu .navbar-brand img {
 	height: 100%;
 }
 
+#menu-collapser + label {
+	background: url('../img/menu-collapser.png') no-repeat center;
+	background-size: contain;
+	display: block;
+	width: 3rem;
+	height: 3rem;
+	color: transparent;
+	margin: 0.2rem 0.5rem;
+	cursor: pointer;
+}
+
+/* === Dropdown Menus === */
+
 #menu .dropdown button {
 	border: none;
-	background-color: unset;
+	background: none;
 	color: #9d9d9d;
 	height: 3.6rem;
 	min-width: 10em;
+	font-size: 1rem;
+	cursor: pointer;
 }
 
 #menu .dropdown button:hover,
@@ -406,33 +572,56 @@ dt {
 }
 
 #menu .dropdown-menu {
-	padding: 0.5em 1em 0.5em 0.5em;
 	background-color: #fff;
-	box-shadow: 0 0.5em 1em rgba(0,0,0,0.175);
+	padding: 0.5rem 1rem 0.5rem 0.5rem;
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+	border-radius: 0.25rem;
 }
+
 #menu .dropdown-menu a {
 	color: #333;
 	text-decoration: none;
-}
-#menu .dropdown-menu a:hover {
-	text-decoration: underline;
+	display: block;
+	padding: 0.3rem 0.5rem;
 }
 
-.spacing-row {
-	margin-top: 10px;
-	margin-bottom: 10px;
+#menu .dropdown-menu a:hover {
+	text-decoration: underline;
+	background-color: #f8f8f8;
 }
+
+/* === Spacing Helper === */
+.spacing-row {
+	margin: 10px 0;
+}
+
+/* === System Message Boxes === */
 
 #message-box.message-info {
 	background-color: #393F4C;
 	color: #DDD;
 	border: 2px solid #DDD;
+	padding: 1rem;
+	border-radius: 0.5rem;
 }
+
 #message-box.message-warning {
 	background-color: #c6c900;
 	color: #000;
 	border: 2px solid #DDD;
+	padding: 1rem;
+	border-radius: 0.5rem;
 }
+
+#message-box.message-error {
+	background-color: #4F4C4D;
+	border: 2px solid #333;
+	color: #DDD;
+	padding: 1rem;
+	border-radius: 0.5rem;
+}
+
+/* Inline Warning Paragraphs */
 p.warning {
 	background-color: #c6c900;
 	color: #000;
@@ -440,110 +629,162 @@ p.warning {
 	border-radius: 1ex;
 	padding: 1ex;
 }
+
 p.warning strong {
 	color: #e00;
 }
-#message-box.message-error {
-	background-color: #4F4C4D;
-	border: 2px solid #333;
-	color: #DDD;
-}
 
+/* === Table Pagination === */
 nav.table-pagination {
-	color: unset;
 	justify-content: center;
+	display: flex;
+	color: inherit;
+	margin-top: 1rem;
 }
+/* === Sticky Table Headers and Footers === */
+
 table thead {
 	position: sticky;
 	top: 4rem;
+	background-color: #ddd;
+	z-index: 3;
 }
+
 table tfoot {
 	position: sticky;
 	bottom: 1rem;
+	background-color: #ddd;
+	z-index: 2;
 }
+
 table thead tr,
-table thead tr .z-oddcol,
 table tfoot tr,
+table thead tr .z-oddcol,
 table tfoot tr .z-oddcol {
 	background-color: #ddd;
 }
+
+/* === Table Cells === */
+
 table td.numeric {
 	font-variant-numeric: tabular-nums;
 	text-align: end;
 }
+
 table td.datetime {
 	font-variant-numeric: tabular-nums;
 }
+
+/* === Ticket Receipt Style === */
+
 .ticket {
-	background-color: #eee;
+	background-color: #f5f5f5;
 	border: 1px solid #000;
 	padding: 1ex;
 	min-width: 34ex;
 	max-width: 34ex;
-	top: 4rem;
-	bottom: 0px;
 	max-height: 90vh;
-	overflow-y: scroll;
+	overflow-y: auto;
+	position: relative;
+	top: 4rem;
+	border-radius: 0.5rem;
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
 }
 
-/* Form */
+/* === Form Styling === */
 
 fieldset legend {
 	font-weight: bold;
-	font-size: large;
+	font-size: 1.2rem;
 	color: #A3351E;
 }
 
 .tooltip {
 	font-style: italic;
-	font-size: small;
+	font-size: 0.85rem;
+	color: #555;
 }
 
-/* Catalog picker */
+/* === Catalog Picker Buttons === */
 
 .catalog-picker button {
 	background-color: #DDD;
+	border: 1px solid #bbb;
+	border-radius: 0.25rem;
+	padding: 0.5rem;
+	cursor: pointer;
 }
 
 .catalog-picker label {
 	background-color: rgba(255, 255, 255, 0.4);
+	padding: 0.25rem;
+	display: inline-block;
 }
 
-/* Table styles */
+/* === Table Styling === */
 
 .floor-display {
 	margin-left: auto;
 	margin-right: auto;
+	background-image: url('../img/grid.png');
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
 }
 
 table, th, td {
 	border: 1px solid #ddd;
 }
+
 th {
+	background-color: #f7f7f7;
 	border-bottom: 2px solid #ddd;
+	text-align: left;
+	padding: 0.5rem;
 }
+
+td {
+	padding: 0.5rem;
+}
+
 tr {
 	background-color: #fff;
 }
+
 tr:hover {
-	background-color: #eee;
-}
-.z-oddcol {
 	background-color: #f0f0f0;
 }
-tbody tr:hover .z-oddcol {
-	background-color: #ebebeb;
+
+.z-oddcol {
+	background-color: #f9f9f9;
 }
 
-/* Archive entries like products not currently sold. */
+tbody tr:hover .z-oddcol {
+	background-color: #eee;
+}
+
+/* === Archived / Soft-Deleted Items === */
+
 .invisible-data {
 	font-style: italic;
-	font-size: small;
+	font-size: 0.9rem;
+	color: #888;
 }
 
-.floor-display {
-	background-image: url('../img/grid.png');
+/* === Floor Plan Editor === */
+
+.floor {
+	background-color: #d3d3d3;
+	border: 1px solid #000;
+	position: relative;
+	width: 640px;
+	height: 480px;
+	overflow: hidden;
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
 }
+
 .place {
 	position: absolute;
 	border: 1px solid #000;
@@ -551,32 +792,34 @@ tbody tr:hover .z-oddcol {
 	z-index: 2;
 	width: 4rem;
 	height: 3rem;
-	font-size: small;
+	font-size: 0.9rem;
 	display: flex;
-	align-items: end;
+	align-items: flex-end;
+	justify-content: center;
 	line-height: 1;
 	cursor: grab;
+	border-radius: 0.3rem;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
+
 .place.selected {
 	border-color: #5aaf58;
 	background-color: #c0e174;
 	color: #333;
+	box-shadow: 0 0 0 2px #5aaf58 inset;
 }
+
 .deleted-places {
 	display: flex;
-	padding: 0px;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	padding: 0;
 }
+
 .place-list {
 	margin: 1ex;
 	padding: 0.5ex;
 	border: 1px solid #000;
 	background-color: #fff;
-}
-.floor {
-	background-color: lightgray;
-	border: solid 1px black;
-	position: relative;
-	width: 640px;
-	height: 480px;
-	overflow: hidden;
+	border-radius: 0.3rem;
 }

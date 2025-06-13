@@ -86,6 +86,6 @@ function _tickets_filterCallback(request, status, response) {
 
 function _tickets_dataRetreived() {
 	gui_hideLoading();
-	Vue.set(vue.screen.data, "tableTitle", "Tickets du " + tools_dateToString(vue.screen.data.start) + " au " + tools_dateToString(vue.screen.data.stop));
+	Vue.set(vue.screen.data, "tableTitle", "Tickets from " + tools_dateToString(vue.screen.data.start) + " to " + tools_dateToString(vue.screen.data.stop));
 	Vue.set(vue.screen.data, "tickets", _tickets_data.tickets);
 }

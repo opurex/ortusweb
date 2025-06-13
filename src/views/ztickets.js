@@ -6,7 +6,7 @@ Vue.component("vue-zticket-list", {
 		<nav class="browser">
 			<ul>
 				<li><a href="?p=home">Home</a></li>
-				<li><h1>List of Z Tickets</h1></li>
+				<li><h1>List of Final Tickets</h1></li>
 			</ul>
 		</nav>
 		<nav class="navbar">
