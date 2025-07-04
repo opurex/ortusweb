@@ -431,26 +431,22 @@ nav.navbar {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 100%;
 	z-index: 1030;
+	width: 100%;
+}
+
+#user-menu {
+	justify-content: end;
+	flex-grow: 1;
 }
 
 #menu .navbar-brand {
 	display: block;
-	margin-right: auto;
 }
 
-#user-menu {
-	display: flex;
-	justify-content: flex-end;
-	flex-grow: 1;
-}
-
-/* === Dropdown Menus === */
 #main-menu .dropdown-menu,
 #user-menu .dropdown-menu {
 	position: absolute;
-	display: flex;
 	flex-direction: column;
 	background-color: #fff;
 	border: 1px solid #ccc;
@@ -458,9 +454,8 @@ nav.navbar {
 	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 	z-index: 1040;
 }
-
 #user-menu .dropdown-menu {
-	right: 0;
+	right: 0px;
 }
 
 /* === Menu Collapser === */

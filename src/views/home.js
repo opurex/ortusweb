@@ -49,17 +49,17 @@ Vue.component("vue-home", {
         <p>Hello <strong>{{data.user}}</strong>. You are logged in on <strong>{{data.server}}</strong>.</p>
         <p class="text-sm text-gray-600">Manage your products, categories, and access sales statistics.</p>
 
-        <h2 class="text-xl font-semibold mt-6">Documentation</h2>
-        <ul class="list-disc list-inside text-left">
-          <li><a class="text-blue-500 underline" href="https://fr.wikibooks.org/wiki/Logiciel_Pasteque" target="_blank">Manual on Wikibooks</a></li>
-          <li><a class="text-blue-500 underline" href="https://opurex.com/pos" target="_blank">Contact Opurex POS</a></li>
-        </ul>
+<!--        <h2 class="text-xl font-semibold mt-6">Documentation</h2>-->
+<!--        <ul class="list-disc list-inside text-left">-->
+<!--          <li><a class="text-blue-500 underline" href="https://fr.wikibooks.org/wiki/Logiciel_Pasteque" target="_blank">Manual on Wikibooks</a></li>-->
+<!--          <li><a class="text-blue-500 underline" href="https://opurex.com/pos" target="_blank">Contact Opurex POS</a></li>-->
+<!--        </ul>-->
 
-        <p class="text-xs mt-6">
-          Fonts licensed under SIL: 
-          <a class="underline" href="res/fonts/SIL Open Font License.txt" target="_blank">Open Dyslexic</a> and 
-          <a class="underline" href="res/fonts/Atkinson Hyperlegible Font License.txt" target="_blank">Atkinson Hyperlegible</a>.
-        </p>
+<!--        <p class="text-xs mt-6">-->
+<!--          Fonts licensed under SIL: -->
+<!--          <a class="underline" href="res/fonts/SIL Open Font License.txt" target="_blank">Open Dyslexic</a> and -->
+<!--          <a class="underline" href="res/fonts/Atkinson Hyperlegible Font License.txt" target="_blank">Atkinson Hyperlegible</a>.-->
+<!--        </p>-->
         <p class="text-xs text-right">OpurexPOS v{{data.version}}</p>
       </article>
     </section>
